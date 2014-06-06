@@ -1,0 +1,106 @@
+/* 
+    Created on : 2014-02-09, 22:28:45
+    Author     : piotr
+*/
+.this{
+    border: 1px solid #DD3D36 !important;
+    background: #DD3D36;
+}
+.pwp-icon{
+       
+    vertical-align: middle;
+color: #888888;
+}
+
+.sortable-item, .sortable-item-placeholder {
+    height: 80px;
+    
+}
+
+input.error, input.pwp-error, div.pwp-error, textarea.pwp-error{
+    background: none repeat scroll 0 0 #ffefef;
+    border-left: 4px solid #DD3D36;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1);
+}
+.pwp-error{
+    padding-left: 10px;
+}
+span.error{
+    display: block;
+    color: #DD3D36;
+}
+.block{
+    display: block;
+}
+
+
+.attachment-fieldset{
+    margin: 10px 0;
+}
+.field-box{
+    margin-top: 5px;
+}
+
+.attachment-preview .thumbnail{
+     overflow: hidden;
+}
+.attachment-fieldset .attachment-preview, .attachment-preview .thumbnail {
+    height: 110px;
+    width: 110px;
+overflow: hidden;
+}
+.attachment-preview .thumbnail img{
+    smargin: 0 auto;
+    
+    width: auto;
+    max-height: 110px;
+}
+.attachment-preview .thumbnail .centered {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    transform: translate(50%, 50%);
+    width: 100%;
+}
+.attachment-preview .thumbnail .centered img {
+    transform: translate(-50%, -50%);
+}
+
+.disable, .disable:hover, .disable:active, .disable:focus{
+    color: #dddddd;
+}
+table.repeatable{
+    width: 100%;
+}
+td.order{
+    cursor: move;
+    
+}
+tr.inline-edit-row.repeatable-item td{
+    border-bottom: 4px solid #eeeeee;
+    padding-bottom: 5px;
+}
+.pwp-metabox tr{
+    zborder-bottom: 1px solid #eeeeee;
+    aborder: 1px solid #E5E5E5;
+    box-shadow: 0 1px 0px rgba(0, 0, 0, 0.04);
+}
+td.order:hover, .drag{
+    background-color: #eeeeee;
+
+}
+td.order, td.remove{
+    width: 20px;
+}
+.repeatable-add.button {
+    margin-top: 5px;
+}
+input:disabled.disabled-noframe, textarea.disabled.disabled-noframe {
+    background-color: #eeeeee;
+    border-color: transparent;
+     border-left: 4px solid #dddddd;
+    box-shadow: 0 0 0 0 ;
+    color: inherit;
+
+}

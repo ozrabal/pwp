@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title> File Browser</title>
+<link rel="stylesheet" type="text/css" href="styles.css" />
+<script type="text/javascript" src="ajax.js"></script>
+<script type="text/javascript" src="browser.js"></script>
+<script type="text/javascript">
+function init(){
+browser({
+	contentsDisplay:document.getElementById("dvContents"),
+	refreshButton:document.getElementById("btnrefresh"),
+	pathDisplay:document.getElementById("pPathDisplay"),
+	filter:document.getElementById("txtFilter"),
+	openFolderOnSelect:true,
+	onSelect:function(item,params){
+		if(item.type=="folder")
+			return confirm("Do you want to open this Folder : "+item.path);
+		else
+			alert("You selected :"+item.path)
+	},
+	currentPath:"images"
+	});
+}
+</script>
+
+</head>
+<a href="http://yourindex.net"<img src="./images/key.png" /></a>
+<body onload="init()">
+<div class="browser">
+	<p class="pfilter">File types filter
+		<input type="text" id="txtFilter" value=""/>
+		<input type="button" value="Refresh" id="btnrefresh"/>
+	</p>
+	<p id="pPathDisplay" class="pPathDisplay">Loading...</p>
+	<div id="dvContents" class="dvContents">&nbsp;</div>
+</div>
+</body>
+</html>

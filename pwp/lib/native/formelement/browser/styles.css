@@ -1,0 +1,153 @@
+.browser{
+	position:relative;
+	display:block;
+	padding:0px;
+	margin:0px;
+	width:350px;
+	height:300px;
+	font-size:12px;
+	font-family:tahoma;
+	color:#222222;
+	border:1px solid #888888;
+}
+
+.pfilter{
+	padding:2px;
+	margin:0px;
+	height:24px;
+}
+.pfilter input[type="button"]{
+	padding:1px 2px;
+	margin:0px;
+	color:#222222;
+	border:1px solid #666666;
+	background-color:#EEEEEE;
+	cursor:pointer;
+}
+
+.pfilter input[type="text"]{
+	padding:0px 2px;
+	margin:0px;
+	width:170px;
+	height:18px;
+	border:1px solid #666666;
+}
+
+.pPathDisplay{
+	padding:2px;
+	margin:0px;
+	height:18px;
+	background-color:#777777;
+	color:#FFFFFF;
+	white-space:nowrap;
+	overflow:hidden;
+}
+
+.dvContents{
+	padding:0px;
+	margin:0px;
+	width:100%;
+	height:250px;
+	overflow:auto;
+}
+
+.item{
+	padding:3px 0px 3px 23px;
+	margin:0px;
+	line-height:20px;
+	height:20px;
+	vertical-align:middle;
+	white-space:nowrap;
+	cursor:pointer;
+	background-position: 3px 50%;
+	background-repeat:no-repeat;
+}
+
+.item:hover{
+	background-color:yellow;
+}
+
+.item{
+	background-image:url(./images/page_white.png);
+}
+
+.odd{
+	background-color:#EEEEEE;
+
+}
+
+.even{
+	background-color:#DDDDDD;
+}
+
+.item.ft_folder{
+	background-image:url(./images/folder.png);
+}
+
+.item.ft_pdf{
+	background-image:url(./images/page_white_acrobat.png);
+}
+
+.item.ft_cs{
+	background-image:url(./images/page_white_csharp.png);
+}
+
+.item.ft_xls{
+	background-image:url(./images/page_white_excel.png);
+}
+
+.item.ft_swf{
+	background-image:url(./images/page_white_flash.png);
+}
+
+.item.ft_php{
+	background-image:url(./images/page_white_php.png);
+}
+.item.ft_h,
+.item.ft_hpp,
+.item.ft_hxx,
+.item.ft_cpp,
+.item.ft_cxx,
+.item.ft_cc{
+	background-image:url(./images/page_white_cplusplus.png);
+}
+.item.ft_puk{
+	background-image:url(./images/key.png);
+}
+.item.ft_png,
+.item.ft_jpg,
+.item.ft_bmp,
+.item.ft_gif{
+	background-image:url(./images/photo.png);
+}
+
+.item.ft_txt{
+	background-image:url(./images/page_white_text.png);
+}
+.item.ft_rar,
+.item.ft_zip{
+	background-image:url(./images/page_white_compressed.png);
+}
+.item.ft_ogg,
+.item.ft_mp3,
+.item.ft_wav{
+	background-image:url(./images/music.png);
+}
+.item.ft_cab{
+	background-image:url(./images/music.png);
+}
+.item.ft_lua{
+	background-image:url(./images/bricks.png);
+}
+.item.ft_sql{
+	background-image:url(./images/database.png);
+}
+.item.ft_html{
+	background-image:url(./images/html.png);
+}
+.item.ft_css{
+	background-image:url(./images/css.png);
+}
+.item.ft_js{
+	background-image:url(./images/plugin.png);
+}
