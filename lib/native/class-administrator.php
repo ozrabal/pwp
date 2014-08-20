@@ -88,7 +88,9 @@ static $instance = null;
     }
     public function register_settings(){
         //z tego options tylko aktualne, te z taba albo strony
-	
+	//dump($_POST);
+
+	//die();
         //dump($this->options[$this->current_tab]);
 if(isset($_POST['_wp_http_referer'])){
       //$this->active_tab = $this->current_page();
@@ -298,7 +300,7 @@ if(isset($this->sections[$tab]['title'])){
         echo '</div>';
     }
     
-    function validate(Array $values ) {
+    function validate(Array $values = null ) {
         if( $this->current_tab ) {
             $current = $this->current_tab;
         } else {
@@ -306,6 +308,9 @@ if(isset($this->sections[$tab]['title'])){
         }
         $this->option_values = get_option( $this->options[$current]->get_name() );
         foreach( $this->options[$current]->elements as $element ) {
+
+	    //dump($element);
+
             if( $element->get_validator() ) {
                 $o = $element->validate( $values[$element->get_name()], $element->get_validator());
                 //$this->set_message($element, $o, $current);

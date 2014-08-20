@@ -1,12 +1,46 @@
 <?php
+
+
+add_action('the_content','dump_var');
+
+function dump_var($content){
+
+ $t = get_option( 'taxonomy_1' );
+ dump($t);
+ 
+
+$c = get_option('tab_options');
+dump($c);
+
+
+$a = get_post_meta(get_the_ID(),'subtitle',true);
+
+dump($a);
+$b = get_post_meta(get_the_ID(),'video',true);
+
+dump($b);
+
+    
+    
+    
+    
+    
+    dump(get_post_meta($GLOBALS['post']->ID,'video',true));
+
+    return $content;
+}
+
+
+
 function pwp_theme_setup() {
     load_theme_textdomain( 'pwp', get_template_directory() . '/languages' );
     register_nav_menu( 'primary', __( 'Primary Menu', 'pwp' ) );
     add_theme_support( 'post-thumbnails' );
-    add_image_size( 'work-large', 1000, 1000,false);
-     add_image_size( 'work-medium', 600, 600, false );
-    add_image_size( 'work-thumbnail', 300, 300, array( 'center', 'center' ) );
-    
+    //add_image_size( 'gallery-thumbnail', 140, 85, array( 'center', 'center' ) );
+    //add_image_size( 'work-large', 1000, 1000,false);
+     //add_image_size( 'work-medium', 600, 600, false );
+    //add_image_size( 'image-square', 400, 400, array( 'center', 'center' ) );
+    //add_image_size( 'image-wide', 1170, 372, true);
 }
 add_action( 'after_setup_theme', 'pwp_theme_setup' );
 add_filter( 'show_admin_bar', '__return_false');
@@ -46,7 +80,7 @@ $admin_template = new Admin(
             'link-manager.php',
             'tools.php',
             'edit-comments.php',
-	    'upload.php',
+	    //'upload.php',
 	    'edit.php?post_type=form',
 	    'profile.php',
 	    'customize.php'
@@ -86,8 +120,8 @@ $site->remove_head_element();
 function register_post_types(){
         //rejestracja typu postu 'work'
          $slide_labels = array(
-            'name'               => __( 'Works', 'pwp' ),
-            'singular_name'      => __( 'Work', 'pwp' ),
+            'name'               => __( 'Discography', 'pwp' ),
+            'singular_name'      => __( 'Discography', 'pwp' ),
             'add_new'            => __( 'Add New', 'pwp' ),
             'add_new_item'       => __( 'Add New work', 'pwp' ),
             'edit_item'          => __( 'Edit slide', 'pwp' ),
@@ -98,7 +132,7 @@ function register_post_types(){
             'not_found'          => __( 'No slides found', 'pwp' ),
             'not_found_in_trash' => __( 'No slides found in Trash', 'pwp' ),
             'parent_item_colon'  => __( ':', 'pwp' ),
-            'menu_name'          => __( 'Home slides', 'pwp' )
+            'menu_name'          => __( 'Discography', 'pwp' )
         );
 
         $slide_args = array(
@@ -108,19 +142,19 @@ function register_post_types(){
             'show_ui'            => true,
             'show_in_menu'       => true,
             'query_var'          => true,
-	    'taxonomies'	 => array('post_tag'),
-            'rewrite'            => array( 'slug' => 'work' ),
-            'capability_type'    => 'post',
+	    //'taxonomies'	 => array('post_tag'),
+            'rewrite'            => array( 'slug' => 'discography' ),
+            'capability_type'    => 'page',
             'has_archive'        => true,
             'hierarchical'       => false,
             'menu_position'      => null,
-	    'supports'           => array( 'title','thumbnail' )
+	    'supports'           => array( 'title','thumbnail','editor','page-attributes' )
         );
-        register_post_type( 'work', $slide_args );
+        register_post_type( 'discography', $slide_args );
 
         $file_labels = array(
-            'name'               => __( 'File', 'pwp' ),
-            'singular_name'      => __( 'File', 'pwp' ),
+            'name'               => __( 'Review', 'pwp' ),
+            'singular_name'      => __( 'Review', 'pwp' ),
             'add_new'            => __( 'Add New', 'pwp' ),
             'add_new_item'       => __( 'Add New file', 'pwp' ),
             'edit_item'          => __( 'Edit file', 'pwp' ),
@@ -131,7 +165,7 @@ function register_post_types(){
             'not_found'          => __( 'No files found', 'pwp' ),
             'not_found_in_trash' => __( 'No files found in Trash', 'pwp' ),
             'parent_item_colon'  => __( ':', 'pwp' ),
-            'menu_name'          => __( 'File', 'pwp' )
+            'menu_name'          => __( 'Reviews', 'pwp' )
         );
 
         $file_args = array(
@@ -142,41 +176,225 @@ function register_post_types(){
             'show_in_menu'       => true,
             'query_var'          => true,
 	    //'taxonomies'	 => false,
-            'rewrite'            => array( 'slug' => 'file' ),
-            'capability_type'    => 'post',
+            'rewrite'            => array( 'slug' => 'review' ),
+            'capability_type'    => 'page',
             'has_archive'        => false,
             'hierarchical'       => false,
             'menu_position'      => null,
-	    'supports'           => array( 'title' )
+	    'supports'           => array( 'title','thumbnail','editor','page-attributes' )
         );
-        register_post_type( 'file', $file_args );
+        register_post_type( 'review', $file_args );
 
+
+	$file_labels = array(
+            'name'               => __( 'Event', 'pwp' ),
+            'singular_name'      => __( 'Event', 'pwp' ),
+            'add_new'            => __( 'Add New', 'pwp' ),
+            'add_new_item'       => __( 'Add New file', 'pwp' ),
+            'edit_item'          => __( 'Edit file', 'pwp' ),
+            'new_item'           => __( 'New file', 'pwp' ),
+            'all_items'          => __( 'All files', 'pwp' ),
+            'view_item'          => __( 'View file', 'pwp' ),
+            'search_items'       => __( 'Search files', 'pwp' ),
+            'not_found'          => __( 'No files found', 'pwp' ),
+            'not_found_in_trash' => __( 'No files found in Trash', 'pwp' ),
+            'parent_item_colon'  => __( ':', 'pwp' ),
+            'menu_name'          => __( 'Events', 'pwp' )
+        );
+
+        $file_args = array(
+            'labels'             => $file_labels,
+            'public'             => true,
+            'publicly_queryable' => true,
+            'show_ui'            => true,
+            'show_in_menu'       => true,
+            'query_var'          => true,
+	    //'taxonomies'	 => false,
+            'rewrite'            => array( 'slug' => 'event' ),
+            'capability_type'    => 'page',
+            'has_archive'        => true,
+            'hierarchical'       => false,
+            'menu_position'      => null,
+	    'supports'           => array( 'title','thumbnail','excerpt','editor','page-attributes' )
+        );
+        register_post_type( 'event', $file_args );
         
 }
 add_action( 'init', 'register_post_types' );
 
 
-//metabox obrazek dodatkowy w brandach (logo na czarnym)
-$work_meta = array(
-    'name'      => 'file_meta',
+$prefix = 'pwp_';
+$event_meta_config = array(
+    'id'             => 'event_page_fields',
+    'title'          => __( 'Event parameters' ,'pwp' ),
+    'pages'          => array( 'event' ),
+    'context'        => 'advanced',
+    'priority'       => 'high',
+    'fields'         => array(),
+    'local_images'   => false,
+    'use_with_theme' => false
+);
+$event_meta_fields =  new AT_Meta_Box( $event_meta_config );
+//$event_meta_fields->addTextarea( $prefix . 'event_subtitle', array( 'name' => __( 'Sub title', 'pwp' ), 'style' => 'height:80px', 'desc' => 'Podtytuł wydarzenia (niebieski tekst wyświetlany w opisie wydarzenia)') );
+//$event_meta_fields->addTextarea( $prefix . 'event_band', array( 'name' => __( 'Band', 'pwp' ), 'style' => 'height:80px', 'desc' => 'Skład zespołu') );
+
+$event_meta_fields->addDate( $prefix . 'event_start', array( 'name' => __( 'Start date', 'pwp' ), 'format' => 'yy-mm-dd' , 'desc' => 'Data rozpoczęcia wydarzenia (format: RRRR-MM-DD)') );
+$event_meta_fields->addTime( $prefix . 'event_time', array( 'name'=> __( 'Start time' , 'pwp' ), 'format' => 'HH:mm', 'desc' => 'Godzina rozpoczęcia (format: GG:MM)' ) );
+$event_meta_fields->addDate( $prefix . 'event_end', array( 'name'=> __( 'End date', 'pwp' ), 'format' => 'yy-mm-dd', 'desc' => 'Data zakończenia wydarzenia, w przypadku wydarzeń jednodniowych wystarczy pozostawić pole puste, wypełni się automatycznie (format: RRRR-MM-DD)' ) );
+//$event_meta_fields->addTextarea( $prefix . 'event_price', array( 'name'=> __( 'Price', 'pwp' ),'style' => 'height:80px', 'desc' => 'Informacja o cenie biletów' ) );
+//$event_meta_fields->addText( $prefix . 'event_ticket', array( 'name' => __( 'Ticket info', 'pwp' ), 'desc' => 'Informacja o spzedaży biletów (do nabycia:...) w przypadku eBilet nie trzeba wpisywać nazwy "eBilet", wystarczy podać link w polu poniżej' ) );
+//$event_meta_fields->addText( $prefix . 'event_ebilet', array( 'name'=> __( 'eBilet', 'pwp' ), 'desc' => 'Link do serwisu eBilet' ) );
+//$event_meta_fields->addCheckbox( $prefix . 'event_reservation_form', array( 'name'=> __( 'Hide Reservation form', 'pwp' ) ,'desc' => 'Czy przy wydarzeniu NIE wyświetlać formularza rezerwacji biletów?') );
+$event_meta_fields->Finish();
+
+//jesli nie ustawiono data zakonczenia eventu = data rozpoczecia
+add_action( 'save_post', 'validate_event_end' );
+function validate_event_end() {
+    global $post_id;
+    if( $_POST['post_type'] = 'event' ) {
+	if( isset( $_POST['pwp_event_start'] ) && ( $_POST['pwp_event_end'] == '' || !isset( $_POST['pwp_event_end'] ) ) ) {
+	    $_POST['pwp_event_end'] = $_POST['pwp_event_start'];
+	    update_post_meta( $post_id, 'pwp_event_end', $_POST['pwp_event_start'] );
+	}
+    }
+}
+
+
+
+//metabox pola dodatkowe w dyskografii
+$discography_meta = array(
+    //'name'      => 'category',
     'title'     => __( 'Dodatkowe', 'pwp' ),
-    'post_type' => 'file',
+    //'tax' => 'post_tag',
     'elements'  => array(
     array(
-        'type'  => 'attachment',
-        'name'  => 'file',
+        'type'  => 'date',
+        'name'  => 'release_date',
         'params'    => array(
-            'label'     => __( 'Plik załącznika', 'pwp' ),
-            
+            'label'     => __( 'Data wydania płyty', 'pwp' ),
+            //'validator' => array('notempty'),
+            'comment' => 'opis'
+         
+        )
+    ),
+	array(
+        'type'  => 'image',
+        'name'  => 'header',
+        'params'    => array(
+            'label'     => __( 'Obrazek w nagłówku strony', 'pwp' ),
+             'comment' => 'opis opis'
          
         )
     ),
     )
 );
-new Metabox( $work_meta );
+$d = new Taxmeta( $discography_meta );
+//$d->render();
+//dump($d);
 
 
 
+//metabox pola dodatkowe w dyskografii
+$page_meta = array(
+    'name'      => 'page_meta',
+    'title'     => __( 'Ustawienia wyświetlania', 'pwp' ),
+    'post_type' => array('page','post'),
+    //'allow_posts' => array('rule' => 'id','params'=> array(63)),
+    'elements'  => array(
+
+
+     array(
+        'type'  => 'date',
+        'name'  => 'event_start',
+        'params'    => array(
+            'label'     => __( 'Start', 'pwp' ),
+            'comment' => 'bla',
+'validator' => array('notempty'),
+
+        ),
+
+    ),
+
+
+        array(
+        'type'  => 'date',
+        'name'  => 'event_stop',
+        'params'    => array(
+            'label'     => __( 'Stop', 'pwp' ),
+            'comment' => 'bla',
+'validator' => array('notempty'),
+
+        ),
+            
+    ),
+    array(
+        'type'  => 'checkbox',
+        'name'  => 'expanded',
+        'params'    => array(
+            'label'     => __( 'Pokazuj zwinięte', 'pwp' ),
+	    'comment' => 'Domyślnie panele są rozwinięte i niezwijalne',
+
+//'validator' => array('notempty'),
+        )
+    ),
+    )
+);
+new Metabox( $page_meta );
+
+//metabox obrazek dodatkowy w brandach (logo na czarnym)
+$video_gallery = array(
+    'name'      => 'gallery',
+    'title'     => __( 'Galeria video', 'pwp' ),
+    'posts' =>array(67),
+    'post_type' => 'page',
+    //'allow_posts' => array('rule' => 'id','params'=> array(63,67)),
+    'elements'  => array(
+
+	array(
+	    'type'=>'repeatable',
+	    'name'=>'video',
+
+'params' => array(
+		'title' => 'Film',
+
+	    'options' => array(
+		array(
+	    'type'	=> 'text',
+	    'name'	=> 'url',
+	    'params'	=> array(
+	        'label'	    => __( 'URL filmu', 'pwp' ),
+	        'comment'   => __( 'Plik załącznika tylko w jpg', 'pwp' ),
+	        'class'	    => 'large-text',
+
+            )
+	),
+		array(
+
+		  'type' => 'textarea',
+		'name' => 'caption',
+		'params'=> array(
+                    'label' => __( 'Opis', 'pwp' ),
+                    'class' => 'large-text',
+                ),
+
+		),
+                array(
+	    'type'	=> 'image',
+	    'name'	=> 'thumbnail',
+	    'params'	=> array(
+	        'label'	    => __( 'miniaturka filmu', 'pwp' ),
+	        'comment'   => __( 'Plik załącznika tylko w jpg', 'pwp' ),
+	        'class'	    => 'large-text',
+
+            )
+	),
+
+		)),
+
+	)
+    )
+);
+new Metabox( $video_gallery );
 
 
 
@@ -459,7 +677,7 @@ $options_tabs = new Options();
         );
 
         $options_tabs->add_element( 'repeatable', 'powtorz' )
-                    ->set_label( 'Powtarzalne' )
+                    ->set_title( 'Powtarzalne' )
                     ->set_comment( 'komentarz do repeatable' )
                     ->add_elements( $elements_repeater );
         $admins->add_options( $options_tabs, 'inny-tab' );
@@ -467,57 +685,417 @@ $options_tabs = new Options();
 
 
 
-//metabox obrazek dodatkowy w brandach (logo na czarnym)
-$brand_meta = array(
-    'name'      => 'brand_meta',
-    'title'     => __( 'Dodatkowe', 'pwp' ),
-    'post_type' => 'post',
-    'elements'  => array(
-    array(
-        'type'  => 'image',
-        'name'  => 'logo_black',
-        'params'    => array(
-            'label'     => __( 'Logo na czarnym tle', 'pwp' ),
-            'comment'   => __( 'Logo producenta z tłem w kolorze czarnym', 'pwp' ),
-            'class'     => 'large-text',
-        )
-    ),
-	array(
-	    'type'=>'repeatable',
-	    'name'=>'powtarzalne',
 
-'params' => array(
-		'label' => 'Powtarzalne z obrazkami',
 
-	    'options' => array(
-		array(
-	    'type'	=> 'image',
-	    'name'	=> 'file34',
-	    'params'	=> array(
-	        'label'	    => __( 'jpeg', 'pwp' ),
-	        'comment'   => __( 'Plik załącznika tylko w jpg', 'pwp' ),
-	        'class'	    => 'large-text',
-                'data'      => array(
-                    'mime'      => 'image/jpeg',
-                    'title'     => 'obrazki jpg',
-                    'select'    => __( 'Insert image', 'pwp' )
-                )
-            )
-	),
-		array(
 
-		  'type' => 'text',
-		'name' => 'zalacznik',
-		'params'=> array(
-                    'label' => __( 'Ue', 'pwp' ),
-                    'class' => 'large-text',
-                ),
 
-		)
+/**********/
 
-		)),
+if (!class_exists('WP_EX_PAGE_ON_THE_FLY')){
+    /**
+    * WP_EX_PAGE_ON_THE_FLY
+    * @author Ohad Raz
+    * @since 0.1
+    * Class to create pages "On the FLY"
+    * Usage:
+    *   $args = array(
+    *       'slug' => 'fake_slug',
+    *       'post_title' => 'Fake Page Title',
+    *       'post content' => 'This is the fake page content'
+    *   );
+    *   new WP_EX_PAGE_ON_THE_FLY($args);
+    */
+    class WP_EX_PAGE_ON_THE_FLY
+    {
 
-	)
-    )
-);
-new Metabox( $brand_meta );
+        public $slug ='';
+        public $args = array();
+        /**
+         * __construct
+         * <a href="/param">@param</a> array $arg post to create on the fly
+         * @author Ohad Raz
+         *
+         */
+        function __construct($arg){
+            add_filter('the_posts',array($this,'fly_page'));
+            $this->args = $args;
+            $this->slug = $args['slug'];
+        }
+
+        /**
+         * fly_page
+         * the Money function that catches the request and returns the page as if it was retrieved from the database
+         * <a href="/param">@param</a>  array $posts
+         * @return array
+         * @author Ohad Raz
+         */
+        public function fly_page($posts){
+            global $wp,$wp_query;
+            $page_slug = $this->slug;
+
+            //check if user is requesting our fake page
+            if(count($posts) == 0 && (strtolower($wp->request) == $page_slug || $wp->query_vars['page_id'] == $page_slug)){
+
+                //create a fake post
+                $post = new stdClass;
+                $post->post_author = 1;
+                $post->post_name = $page_slug;
+                $post->guid = get_bloginfo('wpurl' . '/' . $page_slug);
+                $post->post_title = 'page title';
+                //put your custom content here
+                $post->post_content = "Fake Content";
+                //just needs to be a number - negatives are fine
+                $post->ID = -42;
+                $post->post_status = 'static';
+                $post->comment_status = 'closed';
+                $post->ping_status = 'closed';
+                $post->comment_count = 0;
+                //dates may need to be overwritten if you have a "recent posts" widget or similar - set to whatever you want
+                $post->post_date = current_time('mysql');
+                $post->post_date_gmt = current_time('mysql',1);
+
+                $post = (object) array_merge((array) $post, (array) $this->args);
+                $posts = NULL;
+                $posts[] = $post;
+
+                $wp_query->is_page = true;
+                $wp_query->is_singular = true;
+                $wp_query->is_home = false;
+                $wp_query->is_archive = false;
+                $wp_query->is_category = false;
+                unset($wp_query->query["error"]);
+                $wp_query->query_vars["error"]="";
+                $wp_query->is_404 = false;
+            }
+
+            return $posts;
+        }
+    }//end class
+}//end if
+
+
+//dump($wp);
+//
+//$args = array(
+//        'slug' => 'fake_slug',
+//        'post_title' => 'Fake Page Title',
+//        'post content' => 'This is the fake page content'
+//);
+//new WP_EX_PAGE_ON_THE_FLY($args);
+
+
+
+
+
+/********
+ *
+ *
+ *
+ *
+ *
+ */
+
+
+/*
+ * Virtual Themed Page class
+ *
+ * This class implements virtual pages for a plugin.
+ *
+ * It is designed to be included then called for each part of the plugin
+ * that wants virtual pages.
+ *
+ * It supports multiple virtual pages and content generation functions.
+ * The content functions are only called if a page matches.
+ *
+ * The class uses the theme templates and as far as I know is unique in that.
+ * It also uses child theme templates ahead of main theme templates.
+ *
+ * Example code follows class.
+ *
+ * August 2013 Brian Coogan
+ *
+ */
+
+
+
+
+// There are several virtual page classes, we want to avoid a clash!
+//
+//
+class Virtual_Themed_Pages_BC
+{
+    public $title = '';
+    public $body = '';
+    private $vpages = array();  // the main array of virtual pages
+    private $mypath = '';
+    public $blankcomments = "blank-comments.php";
+
+
+    function __construct($plugin_path = null, $blankcomments = null)
+    {
+	if (empty($plugin_path))
+	    $plugin_path = dirname(__FILE__);
+	$this->mypath = $plugin_path;
+
+	if (! empty($blankcomments))
+	    $this->blankcomments = $blankcomments;
+
+	// Virtual pages are checked in the 'parse_request' filter.
+	// This action starts everything off if we are a virtual page
+	add_action('parse_request', array(&$this, 'vtp_parse_request'));
+    }
+
+    function add($virtual_regexp, $contentfunction)
+    {
+	$this->vpages[$virtual_regexp] = $contentfunction;
+    }
+
+
+    // Check page requests for Virtual pages
+    // If we have one, call the appropriate content generation function
+    //
+    function vtp_parse_request(&$wp)
+    {
+	//global $wp;
+//dump($wp);
+dump($this->vpages);
+	//if (empty($wp->query_vars['pagename']))
+	    //return; // page isn't permalink
+
+	//$p = $wp->query_vars['pagename'];
+	$p = $_SERVER['REQUEST_URI'];
+
+	$matched = 0;
+	foreach ($this->vpages as $regexp => $func)
+	{
+	    if (preg_match($regexp, $p))
+	    {
+		$matched = 1;
+		break;
+	    }
+	}
+	
+
+	// Do nothing if not matched
+	if (! $matched)
+	    return;
+
+	// setup hooks and filters to generate virtual movie page
+	add_action('template_redirect', array(&$this, 'template_redir'));
+	add_filter('the_posts', array(&$this, 'vtp_createdummypost'));
+
+	// we also force comments removal; a comments box at the footer of
+	// a page is rather meaningless.
+	// This requires the blank_comments.php file be provided
+	add_filter('comments_template', array(&$this, 'disable_comments'), 11);
+
+	// Call user content generation function
+	// Called last so it can remove any filters it doesn't like
+	// It should set:
+	//    $this->body   -- body of the virtual page
+	//    $this->title  -- title of the virtual page
+	//    $this->template  -- optional theme-provided template
+	//          eg: page
+	//    $this->subtemplate -- optional subtemplate (eg movie)
+	// Doco is unclear whether call by reference works for call_user_func()
+	// so using call_user_func_array() instead, where it's mentioned.
+	// See end of file for example code.
+	$this->template = $this->subtemplate = null;
+	$this->title = null;
+	unset($this->body);
+	call_user_func_array($func, array(&$this, $p));
+
+	if (! isset($this->body)) //assert
+	    wp_die("Virtual Themed Pages: must save ->body [VTP07]");
+
+	return($wp);
+    }
+
+
+    // Setup a dummy post/page
+    // From the WP view, a post == a page
+    //
+    function vtp_createdummypost($posts)
+    {
+
+	// have to create a dummy post as otherwise many templates
+	// don't call the_content filter
+	global $wp, $wp_query;
+
+	//create a fake post intance
+	$p = new stdClass;
+	// fill $p with everything a page in the database would have
+	$p->ID = -1;
+	$p->post_author = 1;
+	$p->post_date = current_time('mysql');
+	$p->post_date_gmt =  current_time('mysql', $gmt = 1);
+	$p->post_content = $this->body;
+	$p->post_title = $this->title;
+	$p->post_excerpt = '';
+	$p->post_status = 'publish';
+	$p->ping_status = 'closed';
+	$p->post_password = '';
+	$p->post_name = 'movie_details'; // slug
+	$p->to_ping = '';
+	$p->pinged = '';
+	$p->modified = $p->post_date;
+	$p->modified_gmt = $p->post_date_gmt;
+	$p->post_content_filtered = '';
+	$p->post_parent = 0;
+	$p->guid = get_home_url('/' . $p->post_name); // use url instead?
+	$p->menu_order = 0;
+	$p->post_type = 'page';
+	$p->post_mime_type = '';
+	$p->comment_status = 'closed';
+	$p->comment_count = 0;
+	$p->filter = 'raw';
+	$p->ancestors = array(); // 3.6
+
+	// reset wp_query properties to simulate a found page
+	$wp_query->is_page = TRUE;
+	$wp_query->is_singular = TRUE;
+	$wp_query->is_home = FALSE;
+	$wp_query->is_archive = FALSE;
+	$wp_query->is_category = FALSE;
+	unset($wp_query->query['error']);
+	$wp->query = array();
+	$wp_query->query_vars['error'] = '';
+	$wp_query->is_404 = FALSE;
+
+	$wp_query->current_post = $p->ID;
+	$wp_query->found_posts = 1;
+	$wp_query->post_count = 1;
+	$wp_query->comment_count = 0;
+	// -1 for current_comment displays comment if not logged in!
+	$wp_query->current_comment = null;
+	$wp_query->is_singular = 1;
+
+	$wp_query->post = $p;
+	$wp_query->posts = array($p);
+	$wp_query->queried_object = $p;
+	$wp_query->queried_object_id = $p->ID;
+	$wp_query->current_post = $p->ID;
+	$wp_query->post_count = 1;
+
+	return array($p);
+    }
+
+
+    // Virtual Movie page - tell wordpress we are using the given
+    // template if it exists; otherwise we fall back to page.php.
+    //
+    // This func gets called before any output to browser
+    // and exits at completion.
+    //
+    function template_redir()
+    {
+	//    $this->body   -- body of the virtual page
+	//    $this->title  -- title of the virtual page
+	//    $this->template  -- optional theme-provided template eg: 'page'
+	//    $this->subtemplate -- optional subtemplate (eg movie)
+	//
+
+	if (! empty($this->template) && ! empty($this->subtemplate))
+	{
+	    // looks for in child first, then master:
+	    //    template-subtemplate.php, template.php
+	        dump($this->template);
+	    load_template($this->template);
+	    get_template_part($this->template, $this->subtemplate);
+	}
+	elseif (! empty($this->template))
+	{
+	    // looks for in child, then master:
+	    //    template.php
+	    get_template_part($this->template);
+	
+	}
+	elseif (! empty($this->subtemplate))
+	{
+	    // looks for in child, then master:
+	    //    template.php
+	    get_template_part($this->subtemplate);
+	}
+	else
+	{
+	    get_template_part('page');
+	}
+
+	// It would be possible to add a filter for the 'the_content' filter
+	// to detect that the body had been correctly output, and then to
+	// die if not -- this would help a lot with error diagnosis.
+
+        exit;
+    }
+
+
+    // Some templates always include comments regardless, sigh.
+    // This replaces the path of the original comments template with a
+    // empty template file which returns nothing, thus eliminating
+    // comments reliably.
+    function disable_comments($file)
+    {
+	if (file_exists($this->blankcomments))
+	   return($this->mypath.'/'.$blankcomments);
+	return($file);
+    }
+
+
+} // class
+
+
+// Example code - you'd use something very like this in a plugin
+//
+if (1)
+{
+    // require 'BC_Virtual_Themed_pages.php';
+    // this code segment requires the WordPress environment
+
+    $vp =  new Virtual_Themed_Pages_BC();
+    $vp->add('#/mypattern/unique#i', 'mytest_contentfunc');
+
+    // Example of content generating function
+    // Must set $this->body even if empty string
+    function mytest_contentfunc($v, $url)
+    {
+
+	dump($url);
+	// extract an id from the URL
+	$id = 'none';
+	if (preg_match('#unique/(\d+)#', $url, $m))
+	    $id = $m[1];
+	// could wp_die() if id not extracted successfully...
+
+	$v->title = "My Virtual Page Title";
+	$v->body = "Some body content for my virtual page test - id $id\n";
+	$v->template = 'page'; // optional
+	$v->subtemplate = 'billing'; // optional
+    }
+
+
+    $vp->add('#/uzytkownik#i', 'mytest_contentfunca');
+$vp->add('#/user#i', 'mytest_contentfunca');
+    // Example of content generating function
+    // Must set $this->body even if empty string
+    function mytest_contentfunca($v, $url)
+    {
+
+	dump($url);
+	// extract an id from the URL
+	$id = 'none';
+	if (preg_match('#unique/(\d+)#', $url, $m))
+	    $id = $m[1];
+	// could wp_die() if id not extracted successfully...
+
+	$v->title = __( 'User profile page', 'pwp');
+	$v->body = "Some body content for my virtual page test - id $id\n";
+	$v->template = plugin_dir_path( __FILE__ ).'template.php'; // optional
+	$v->subtemplate = 'billing'; // optional
+    }
+
+}
+
+
+
+
+// end

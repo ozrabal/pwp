@@ -7,7 +7,7 @@ abstract class Form {
             $elements,
             $body;
 
-    private $name, $action;
+    private $name='', $action;
     
     protected 
             $render_after_submit = true,
@@ -104,6 +104,13 @@ abstract class Form {
             $this->request = $request[$this->name];
             
         }
+    }
+    
+    protected function is_edit(){
+        if(isset($_GET['action']) && $_GET['action'] == 'edit'){
+            return true;
+        }
+        return false;
     }
     
     public function get_request($value = null){

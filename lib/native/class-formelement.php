@@ -72,11 +72,12 @@ abstract class Formelement{
 
     public function set_title($title){
         $this->title = $title;
+        return $this;
     }
     
     public function get_title($tag = '%s'){
         if(isset($this->title)){
-        return sprintf( $tag ,$this->title);
+            return sprintf( $tag ,$this->title);
 	}else if(isset($this->label)){
 	    return sprintf($tag, $this->get_label());
 	}else{
@@ -93,14 +94,28 @@ abstract class Formelement{
 	return $this->name;
     }
     
-    public function name($tag = true){
+    public function name( $tag = true ) {
+	if ( isset( $this->name ) ) {
+	    if ( $this->form instanceof Options || $this->form instanceof Taxmeta) {
+		if ( $tag ) {
+		    return 'name="'.$this->form->get_name().'['.$this->get_name().']" ';
+		    //return 'name="'.$this->get_name().'" ';
+		    //return 'name="'.$this->get_name().'" ';
+		} else {
+		    return $this->form->get_name().'['.$this->get_name().']';
+		    //return $this->get_name();
+		}
+	    }
 
-        if(isset($this->name)){
 	    if($tag){
-	    return 'name="'.$this->form->get_name().'['.$this->get_name().']" ';
+		
+	    //return 'name="'.$this->form->get_name().'['.$this->get_name().']" ';
+
+		return 'name="'.$this->get_name().'" ';
 	    //return 'name="'.$this->get_name().'" ';
 	    }else{
-		 return $this->form->get_name().'['.$this->get_name().']';
+		 //return $this->form->get_name().'['.$this->get_name().']';
+         return $this->get_name();
 	    }
         }
     }

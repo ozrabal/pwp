@@ -13,13 +13,15 @@ class Ajaxpagination {
     
     public function __construct() {
         add_action( 'template_redirect', array( $this, 'load' ) );
+
+	
     }
     
     public function load(){
         global $wp_query;
         
       
-        
+      
         if( !is_singular() ) {
             $paged = ( get_query_var( 'paged' ) > 1 ) ? get_query_var( 'paged' ) : 1;
             $params = array(
@@ -32,7 +34,9 @@ class Ajaxpagination {
                     'loading'       => __( 'Loading works', 'pwp' )
                 )
             );
-            wp_enqueue_script( 'pwp-ax-pagination', plugin_dir_url( __FILE__ ) . 'ajax-pagination.js', array( 'jquery','jquery.application' ), false, true );
+
+	      
+            wp_enqueue_script( 'pwp-ax-pagination', plugin_dir_url( __FILE__ ) . 'ajax-pagination.js', array( 'jquery' ), false, true );
             //wp_enqueue_style( 'pwp-ax-pagination', plugin_dir_url( __FILE__ ) . 'ajax-pagination.css', false, false, 'all' );
             wp_localize_script( 'pwp-ax-pagination', 'axp', $params );
  	}

@@ -93,36 +93,41 @@ class Cyclethumbnavi {
 	$this->selector = "gallery-{$this->instance}";
 	//if ( apply_filters( 'use_default_gallery_style', true ) )
 	$pager = '
-	    <a id="prev'.$this->selector.'" class="cycle-prev right carousel-control"> '.__('Previous', 'pwp').'</a>
-	    <a id="next'.$this->selector.'" class="cycle-next left carousel-control"> '.__('Next','pwp').'</a>';
+	    <a id="prev'.$this->selector.'" class="cycle-prev right carousel-control"><span class="icon "></span></a>
+	    <a id="next'.$this->selector.'" class="cycle-next left carousel-control"> <span class="icon "></span></a>';
 
 
 
 
 
-	$output = '<div class="slideshow-loader"></div><div id="slideshow-1"  class="offer-slideshow slideshow-outer"><div id="'.$this->selector.'" class="offer-slideshow cycle-slideshow row '.$this->params['wrapper_class'].'"
-								data-cycle-slides="> div"
-      data-cycle-pause-on-hover=true
-      data-cycle-fx="fadeout"
-          data-cycle-swipe=true
-          data-cycle-speed=4000
-          data-cycle-timeout=1000
-        data-cycle-prev="#slideshow-1 .cycle-prev"
-        data-cycle-next="#slideshow-1 .cycle-next"
-        data-cycle-caption="#slideshow-1 .custom-caption"
-        data-cycle-caption-template="Slide {{slideNum}} of {{slideCount}}"
-	data-cycle-loader="wait"
-	zdata-cycle-auto-init=false
-	 data-cycle-delay="3000"
+	$output = '<div class="slideshow-loader"></div>'
+                . '<div id="slideshow-1"  class="offer-slideshow slideshow-outer">'
+                .'<div class="slideshow-main carousel slide">'
+                . '<div id="'.$this->selector.'" class="carousel-inner offer-slideshow slideshow cycle-slideshow '.$this->params['wrapper_class'].'"
+		data-cycle-slides="> div"
+            zdata-cycle-pause-on-hover=true
+            data-cycle-fx="scrollHorz"
+            data-cycle-swipe=true
+            data-cycle-speed=1000
+            data-cycle-timeout=0
+                     data-cycle-caption="> .caption"
+                    data-cycle-caption-template="{{html}}"
+            data-cycle-prev=".slideshow-main .cycle-prev"
+            data-cycle-next=".slideshow-main .cycle-next"
+            
+            zdata-cycle-loader="wait"
+            zdata-cycle-auto-init=false
+            zdata-cycle-delay="3000"
+            data-cycle-auto-height="calc"
         
 >';
 	$i = 0;
 	//$pager = '<div id="slide-navi'.$this->selector.'" class="gallery-slide-navi thumbnail-pager">';
 $carousel_items = '';
 $caption = null;
-$visible = 5;
+$visible = 3;
 $att_count = count($attachments);
-if($att_count <= 5){
+if($att_count <= 3){
     $visible = $att_count;
 }
 
@@ -131,20 +136,20 @@ if($att_count <= 5){
 		$img = wp_get_attachment_image_src($id, $size);
 		$link = '<img src="'. $img[0] .'" alt="" class="'.$this->params['image_class'].'"/>';
 		
-		$img_thumbnail = wp_get_attachment_image_src($id, 'thumbnail');
-		$link_thumbnail = '<img src="'. $img_thumbnail[0] .'" alt=""/>';
+		$img_thumbnail = wp_get_attachment_image_src($id, 'gallery-thumbnail');
+		$link_thumbnail = '<img src="'. $img_thumbnail[0] .'" height="85" alt=""/>';
 
 		//$pager .= '<img src="'. $img[0] .'" alt="" />';
 
 		if ( trim($attachment->post_excerpt) ) {
-			$caption .= '<div class="caption"><h2>
+			$caption .= '<div class="caption">
 			' . $attachment->post_excerpt . '
-			</h2></div>';
+			</div>';
 		}
 
 		$output .= '<div class="col-xs-12 slide">'.$caption.$link.'</div>';
 
-		$carousel_items .= '<div class="slideshow-thumbnail">'.$link_thumbnail.'</div>';
+		$carousel_items .= '<div class="slideshow-thumbnail scol-md-2">'.$link_thumbnail.'</div>';
 		
 		
 		
@@ -156,24 +161,50 @@ if($att_count <= 5){
 	//$output .= $pager;
 	//$output .= '<div id="slide-navi'.$this->selector.'" class="gallery-slide-navi"></div>';
 	$output .= $pager;
-	$output .= '</div> ';
+	$output .= '</div></div> '
+                . '<div class="container-fluid">
+<div class="row">
+
+<div class="col-md-1d2 gallery-navi clearfix">';
+		
+/*                . '<ul class="nav nav-pills">
+<li class="active"><a href="media.html">Galeria</a></li>
+<li><a href="filmy.html">Filmy</a></li>
+<!--<li><a href="">Inne</a></li>-->
 
 
-	$output .= '<div class="outer ">';
-	$output .= '<div id="slideshow-2" class="offer-carousel clearfix hidden-xs">';
-	$output .= ' <a href="#" class="cycle-prev">next &raquo;</a>';
-	$output .= '<div class="xcol-sm-10 thumbnails">';
-$output .= ' <div id="pager" class="offer-slideshow cycle-slideshow thumbnail-list "
+</ul>';
+
+*/
+
+$output .= apply_filters('gallery_menu','','');
+
+	$output .= '<div class="col-sm-2  col-md-3  col-lg-5">
+
+
+
+<h1 class="gallery-title">Galeria</h1>
+</div>';
+	$output .= '<div id="slideshow-2" class="hidden-xs col-xs-12 col-sm-10 col-md-9 col-lg-7">';
+	$output .= '<div class="container-fluid">
+            <div class="row">
+            <div class="col-xs-2 col-sm-1 col-md-1 col-lg-1">
+ <a href="#" class=" carousel-prev"></a>
+</div>';
+	//$output .= '<div class="xcol-sm-10 thumbnails">';
+$output .= ' <div id="pager" class="col-xs-8  col-sm-10 col-md-10  col-lg-10  offer-scarousel offer-slideshow cycle-slideshow thumbnail-list "
         data-cycle-slides="> div"
-        data-cycle-timeout="0"
-        data-cycle-prev="#slideshow-2 .cycle-prev"
-        data-cycle-next="#slideshow-2 .cycle-next"
-        data-cycle-caption="#slideshow-2 .custom-caption"
-        data-cycle-caption-template="Slide {{slideNum}} of {{slideCount}}"
-        data-cycle-fx="carousel"
-        data-cycle-carousel-visible="'.$visible.'"
-        data-cycle-carousel-fluid=false
-        data-cycle-allow-wrap="false"
+                    data-cycle-timeout="0"
+
+                    data-cycle-prev="#slideshow-2 .carousel-prev"
+                    data-cycle-next="#slideshow-2 .carousel-next"
+                    data-cycle-caption="#slideshow-2 .custom-caption"
+                    data-cycle-caption-template="Slide {{slideNum}} of {{slideCount}}"
+                    data-cycle-fx="carousel"
+                     
+                    data-cycle-carousel-visible="3"
+                    data-cycle-carousel-fluid=true
+                    data-cycle-allow-wrap="false"
       
 	 
         >';
@@ -184,8 +215,15 @@ $output .= ' <div id="pager" class="offer-slideshow cycle-slideshow thumbnail-li
 
 
 	$output .= '</div>';
+        $output .= ' <div class="col-xs-2 col-sm-1 col-md-1 col-lg-1">
+  <a href="#" class=" carousel-next"></a>
+</div>';
 	$output .= '</div>';
-	$output .= ' <a href="#" class="cycle-next">&laquo; prev</a> ';
+	
+	$output .= '</div>';
+	$output .= '</div>';
+$output .= '</div>';
+	
 	$output .= '</div>';
 	$output .= '</div>';
 

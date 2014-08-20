@@ -6,7 +6,7 @@
 	var label = axp.label;
 	if( page <= max ) {
             //id of main content
-            $( '#content' ).append('<a id="load-more" href="#">'+label.load_more+'</a>');
+            $( '#content' ).append('<a id="load-more" href="#">aaaa'+label.load_more+'</a>');
             //css class of pagination links to remove
             $('.navigation').remove();
 	}

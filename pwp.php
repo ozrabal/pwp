@@ -32,6 +32,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 define( 'PWP_ROOT_URL',  plugin_dir_url( __FILE__));
 define( 'PWP_ROOT', plugin_dir_path( __FILE__ ) );
+define( 'PWP_EXTERNAL_LIBRARY',  plugin_dir_url(plugin_basename(__FILE__)).'lib/external/' );
 define( 'PWP_VERSION', '1.1' );
 
 //unset($_SESSION);
@@ -86,7 +87,7 @@ function load_custom_wp_admin_style() {
         wp_enqueue_style( 'pwp_admin_css' );
 }
 add_action( 'admin_enqueue_scripts', 'load_custom_wp_admin_style' );
-
+include_once( PWP_ROOT . 'lib/external/meta-box-class/my-meta-box-class.php' );
 include_once PWP_ROOT . 'lib/native/helpers.php';
 include_once PWP_ROOT . 'lib/native/class-pwp.php';
 
@@ -102,8 +103,8 @@ include_once PWP_ROOT . 'config/site-config.php';
 
 //$plugin_instance->load_module('cookie-alert');
 
-register_activation_hook( __FILE__, array( 'Pwp', 'plugin_activation' ) );
-register_deactivation_hook( __FILE__, array( 'Pwp', 'plugin_deactivation' ) );
+//register_activation_hook( __FILE__, array( 'Pwp', 'plugin_activation' ) );
+//register_deactivation_hook( __FILE__, array( 'Pwp', 'plugin_deactivation' ) );
 add_action( 'plugins_loaded', 'pwp_plugin_initialize' );
 function pwp_plugin_initialize() {
     load_plugin_textdomain( 'pwp', false, basename( dirname( __FILE__ ) ) . '/languages/' );

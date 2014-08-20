@@ -22,7 +22,11 @@ class Options extends Form {
 
         $this->options = get_option($this->get_name(), true);
 	//register_setting( $this->get_name(), 'form_options');
+	//echo $a = $this->get_name();
+
 	$this->elements[$name] = parent::add_element($type, $name);
+
+	//$this->elements[$name] = parent::add_element($type, $name);
         
 	$old_value = get_option($this->get_name(), true);
 	if(isset($old_value[$name])){
