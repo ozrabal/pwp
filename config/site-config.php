@@ -1,11 +1,9 @@
 <?php
 
-
 add_action('the_content','dump_var');
 
 function dump_var($content){
-
- $t = get_option( 'taxonomy_1' );
+$t = get_option( 'taxonomy_17' );
  dump($t);
  
 

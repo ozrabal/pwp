@@ -55,14 +55,13 @@ class Taxmeta extends Form{
 	return $this->term_id;
     }
 
-
-    public function delete( $term, $term_id ) {
+    public function delete( $term_id ) {
 	delete_option( 'taxonomy_' . $term_id );
     }
 
     public function save( $term_id ) {
         $this->set_term_id( $term_id );
-        global $current_screen;
+        //global $current_screen;
         if ( isset( $_POST[$this->get_name()] ) /*&& $current_screen->base == 'edit-tags'*/) {
 	    //pobieramy stare wartosci
 	    //$term_meta = get_option( 'taxonomy_' . $this->get_term_id() );
@@ -91,7 +90,6 @@ class Taxmeta extends Form{
     
     function error_notice() {
 	echo '<div class="error"><p>' . __( 'There were mistakes, not all changes have been saved', 'pwp' ) . '</p></div>';
-	
     }
 
     public function render() {
