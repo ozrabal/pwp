@@ -1,19 +1,13 @@
 <?php
-/**
- * Widget Newsletter subscription form
- * Display form for subscribe newsletter with link to rules
- * 
- * @package PWP
- * 
- */
+
 class Newsletter_Widget extends WP_Widget {
  
     function __construct() {
         
+       
         
         
-        
-        
+      
         
 	$widget_ops = array(
             'classname'     => 'widget_newsletter',
@@ -74,6 +68,9 @@ class Newsletter_Widget extends WP_Widget {
     }
         
     function widget( $args, $instance ) {
+        
+        
+        
         extract($args);
 	$newsletter_rules_id = apply_filters( 'newsletter_rules', empty( $instance['newsletter_rules'] ) ? '' : $instance['newsletter_rules'], $instance );
         $newsletter_rules_link = get_permalink( $newsletter_rules_id );
@@ -103,6 +100,8 @@ class Newsletter_Widget extends WP_Widget {
     }
 
     function form( $instance ) {
+        
+     
 	$instance = wp_parse_args( (array) $instance, array( 'newsletter_rules' => '' ) );
 	$newsletter_rules = intval( $instance['newsletter_rules'] );
 	
@@ -154,14 +153,4 @@ class Newsletter_Widget extends WP_Widget {
         }
         wp_reset_query();
     }
-}
-
-
-
-//register widget
-add_action( 'widgets_init', create_function( '', 'return register_widget("Newsletter_Widget");' ) );
-
-function zucc_get_calendar_filter( $content ) {
-    $output = ucc_get_calendar( '' , '' , false );
-    return $output;
 }

@@ -34,7 +34,7 @@ define( 'PWP_ROOT_URL',  plugin_dir_url( __FILE__));
 define( 'PWP_ROOT', plugin_dir_path( __FILE__ ) );
 define( 'PWP_EXTERNAL_LIBRARY',  plugin_dir_url(plugin_basename(__FILE__)).'lib/external/' );
 define( 'PWP_VERSION', '1.1' );
-
+include_once PWP_ROOT . 'lib/native/helpers.php';
 //unset($_SESSION);
 spl_autoload_register( 'pwp_class_autoloader' );
 
@@ -45,6 +45,8 @@ function pwp_class_autoloader( $classname ) {
     
     $path = explode('_', strtolower( $classname ));
     $end = end($path);
+    $module = explode('_', strtolower( $classname ));
+    
     array_pop($path);
 //dump($path);
 if(isset($path[0]) && $path[0] == 'interface'){
@@ -59,9 +61,22 @@ if(isset($path[0]) && $path[0] == 'interface'){
     $classname = str_replace( '_', '/', strtolower( $classname ) );
     $classfile = sprintf( '%slib/native/%s.php', ABSPATH.'wp-content/plugins/pwp/', str_replace( '_', '-', strtolower( $classname ) ));
 
-   //dump($classfile);
 
-    if ( file_exists( $classfile ) ) include_once( $classfile );
+
+    if ( file_exists( $classfile ) ) {
+        include_once( $classfile );
+    } else {
+        
+        
+        $classfile = sprintf( '%smodules/%s/%s.php', ABSPATH.'wp-content/plugins/pwp/', $module[0], 'class-'. implode( '-',$module  ));
+        
+        
+    if ( file_exists( $classfile ) ) {
+        include_once( $classfile );
+    }
+    }
+      //dump($classfile);
+      //dump(implode( '-',$module  ));
 }
 
 
@@ -88,7 +103,7 @@ function load_custom_wp_admin_style() {
 }
 add_action( 'admin_enqueue_scripts', 'load_custom_wp_admin_style' );
 include_once( PWP_ROOT . 'lib/external/meta-box-class/my-meta-box-class.php' );
-include_once PWP_ROOT . 'lib/native/helpers.php';
+
 include_once PWP_ROOT . 'lib/native/class-pwp.php';
 
 include_once PWP_ROOT . 'config/site-config.php';

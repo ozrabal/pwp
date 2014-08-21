@@ -4,15 +4,17 @@
  */
 abstract class Form {
     public 
-            $elements,
-            $body;
+        $elements,
+        $body;
 
-    private $name='', $action;
+    private 
+        $name='',
+        $action;
     
     protected 
-            $render_after_submit = true,
-            $request = false,
-            $errors = false;
+        $render_after_submit = true,
+        $request = false,
+        $errors = false;
     /**
      * 
      * @param array $params
@@ -22,8 +24,12 @@ abstract class Form {
 
         if(isset($_REQUEST[$this->get_name()])){
             //@todo sprawdzic czy prawidlowy
-            $this->set_request($_REQUEST);
-            //dump($_REQUEST);
+            //$this->set_request($_REQUEST);
+            $this->set_request(filter_input_array(INPUT_REQUEST));
+
+            //filter_input( INPUT_REQUEST, 'tag_ID', FILTER_SANITIZE_NUMBER_INT, FILTER_NULL_ON_FAILURE );
+            dump($this->get_request());
+            die();
         }
                 
         $this->set_params($params);

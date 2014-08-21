@@ -220,6 +220,40 @@ function register_post_types(){
 }
 add_action( 'init', 'register_post_types' );
 
+add_action( 'widgets_init', create_function( '', 'return register_widget("Newsletter_Widget");' ) );
+
+////widgets initialization
+//$widgets = new Widgets(
+//    array(
+//        'unregister_widget' => array(
+//            'WP_Widget_Pages',
+//	    'WP_Widget_Archives',
+//            'WP_Widget_Calendar',
+//	    'WP_Widget_Links',
+//            'WP_Widget_Meta',
+//            'WP_Widget_Search',
+//            'WP_Widget_Categories',
+//            'WP_Widget_Recent_Posts',
+//            'WP_Widget_Recent_Comments',
+//            'WP_Widget_RSS',
+//            'WP_Widget_Tag_Cloud',
+//            
+//            'WP_Nav_Menu_Widget'
+//        ),
+//        'register_widget' => array(
+//            'Button_Widget',
+//	    'Featuredarticles_Widget',
+//	    //'Calendar_Widget',
+//	    //'Contentblock_Widget',
+//	    'Newsletter_Widget',
+//	   // 'Bannersingle_Widget',
+//           // 'Bannermulti_Widget',
+//	    'Latestarticles_Widget'
+//        )
+//    )
+//);
+//$widgets->remove_widgets();
+//$widgets->register_widgets();
 
 $prefix = 'pwp_';
 $event_meta_config = array(
