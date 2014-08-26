@@ -4,26 +4,26 @@ add_action('the_content','dump_var');
 
 function dump_var($content){
 $t = get_option( 'taxonomy_17' );
- dump($t);
+ //dump($t);
  
 
 $c = get_option('tab_options');
-dump($c);
+//dump($c);
 
 
 $a = get_post_meta(get_the_ID(),'subtitle',true);
 
-dump($a);
+//dump($a);
 $b = get_post_meta(get_the_ID(),'video',true);
 
-dump($b);
+//dump($b);
 
     
     
     
     
     
-    dump(get_post_meta($GLOBALS['post']->ID,'video',true));
+    //dump(get_post_meta($GLOBALS['post']->ID,'video',true));
 
     return $content;
 }
@@ -557,7 +557,7 @@ function limitMediaLibraryItems_56456($where) {
 
 function alter($q){
     
-    dump($q);
+    //dump($q);
     
     
     
@@ -890,7 +890,7 @@ class Virtual_Themed_Pages_BC
     {
 	//global $wp;
 //dump($wp);
-dump($this->vpages);
+//dump($this->vpages);
 	//if (empty($wp->query_vars['pagename']))
 	    //return; // page isn't permalink
 
@@ -1031,7 +1031,7 @@ dump($this->vpages);
 	{
 	    // looks for in child first, then master:
 	    //    template-subtemplate.php, template.php
-	        dump($this->template);
+	        //dump($this->template);
 	    load_template($this->template);
 	    get_template_part($this->template, $this->subtemplate);
 	}
@@ -1091,7 +1091,7 @@ if (1)
     function mytest_contentfunc($v, $url)
     {
 
-	dump($url);
+	//dump($url);
 	// extract an id from the URL
 	$id = 'none';
 	if (preg_match('#unique/(\d+)#', $url, $m))
@@ -1112,7 +1112,7 @@ $vp->add('#/user#i', 'mytest_contentfunca');
     function mytest_contentfunca($v, $url)
     {
 
-	dump($url);
+	//dump($url);
 	// extract an id from the URL
 	$id = 'none';
 	if (preg_match('#unique/(\d+)#', $url, $m))

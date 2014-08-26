@@ -31,8 +31,9 @@ class Newsletter_Widget extends WP_Widget {
      function send_mail(){
 	$alert = '';
 	$error = 0;
-	if(isset($_POST['data'])){
-	    parse_str(urldecode($_POST['data']),$data);
+	if(filter_input(INPUT_POST, 'data')){
+	    //parse_str(urldecode($_POST['data']),$data);
+            parse_str(urldecode(filter_input(INPUT_POST, 'data')),$data);
 	    if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)){
 		$alert .= __( 'Email address is not valid<br>', 'pwp' );
 		$error = 1;
@@ -52,16 +53,18 @@ class Newsletter_Widget extends WP_Widget {
 		    $user_content = $options['welcome_message'];
 		}
 		*/
+               
+                
 		if(wp_mail($admin_email, __( 'Newsletter subscription', 'pwp' ), $admin_content, $headers)){
 		    wp_mail($data['email'], __('Newsletter '.get_bloginfo( 'name' ), 'pwp'), $user_content, $headers);
 		    $alert .= __( 'Succesfully subscribed', 'pwp' );
-		    $class='alert-success';
+		    $class='alert alert-success';
 		}else{
 		    $alert = __( 'The mail could not be sent.', 'pwp' );
-		    $class= 'alert-danger';
+		    $class= 'alert alert-danger';
 		}
 	    }else{
-		$class='alert-danger';
+		$class='alert alert-danger';
 	    }
 	    return array('alert'=>$alert, 'class' => $class);
 	}
@@ -82,12 +85,17 @@ class Newsletter_Widget extends WP_Widget {
 	echo $before_widget;
 	if ( $this->title && $this->display_title )
         echo $before_title . $this->title . $after_title;
-        include( locate_template( 'widget-newsletter-subscribe.php' ) );
+        if ( !locate_template( 'widget-newsletter-subscribe.php' ,true )){
+            include( 'themes/newsletter-subscribe.php' );
+        }
         echo $after_widget;
     }
 
     function enqueue_media() {
-        wp_enqueue_script( 'ajax-request', plugins_url( 'pwp-settings/pwp/widgets/newsletter_widget.js' ), array( 'jquery' ) );  
+        
+        
+        
+        wp_enqueue_script( 'ajax-request', plugins_url( '/newsletter-widget.js',__FILE__ ), array( 'jquery' ) );  
         wp_localize_script( 'ajax-request', 'pwpax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );  
     }
 
