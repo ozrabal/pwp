@@ -7,21 +7,22 @@
  * 
  */
 
+
 add_action( 'pwp_init_newsletter', 'pwp_init_newsletter' );
-//add_action( 'widgets_init', 'pwp_init_newsletter' );
-
-
 
 
 
 function pwp_init_newsletter(){
     //$n = new Newsletter_Widget();
 //$n->widget(array(), array());
- 
+ //add_action( 'init', create_function( '', 'return register_widget("Newsletter_Widget");' ),5);
      //register_widget( 'Newsletter_Widget' );
-
-
-    //dump($n);
+    //new Newsletter_Widget();
+    //return 
+    //add_action( 'widgets_init', create_function( '', 'return register_widget("Newsletter_Widget");' ),5);
+    register_widget("Newsletter_Widget");
+//dump('pwp_init_newsletter');
+    //dump('dupa');
     //die();
     //add_action( 'init', create_function( '', 'return register_widget("Newsletter_Widget");' ) );
 }
@@ -43,7 +44,7 @@ class Newsletterwidget extends WP_Widget {
             'height' => 350
         );
 	parent::__construct('newsletter', __( 'Newsletter subscription form', 'pwp' ), $widget_ops, $control_ops );
-        $this->enqueue_media();
+        //add_action( 'init',array($this,'enqueue_media'));
         add_action('wp_ajax_subscribe', array($this,'subscribe'));
         add_action('wp_ajax_nopriv_subscribe', array($this,'subscribe'));
         add_action('template_redirect', array($this,'enqueue_media'));
@@ -182,16 +183,17 @@ class Newsletterwidget extends WP_Widget {
 }
 
 
-new Newsletter_Widget();
+
 //register widget
 
 
 function f(){
-    
+    new Newsletter_Widget();
     return register_widget("Newsletter_Widget");
 }
 
-f();
+
+
 function zucc_get_calendar_filter( $content ) {
     $output = ucc_get_calendar( '' , '' , false );
     return $output;

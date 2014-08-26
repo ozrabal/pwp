@@ -93,6 +93,7 @@ class Pwp{
            require_once PWP_ROOT.'/modules/'.$module.'/'.$module.'.php';
            
            do_action( 'pwp_init_' . $module ,array('init'));
+           //dump('pwp_init_' . $module);
             //if(  is_callable( $module))
 	}else{
 echo 'File not found: '.PWP_ROOT.'/modules/'.$module.'/'.$module.'.php';

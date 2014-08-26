@@ -220,7 +220,7 @@ function register_post_types(){
 }
 add_action( 'init', 'register_post_types' );
 
-add_action( 'widgets_init', create_function( '', 'return register_widget("Newsletter_Widget");' ) );
+
 
 ////widgets initialization
 //$widgets = new Widgets(

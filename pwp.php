@@ -125,6 +125,7 @@ function pwp_plugin_initialize() {
     load_plugin_textdomain( 'pwp', false, basename( dirname( __FILE__ ) ) . '/languages/' );
     
 }
-add_action( 'init', array( 'Pwp', 'init' ) );
+add_action( 'widgets_init', array( 'Pwp', 'init' ),2 );
+
 
 
