@@ -11,7 +11,7 @@
                     action : 'subscribe',
                     data: form 
                 },
-                url : pwpax.ajaxurl,
+                url : ajaxurl,
                 beforeSend: function(){
                     //alert(form);
                 },

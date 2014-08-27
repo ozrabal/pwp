@@ -11,7 +11,7 @@ class Newsletter_Widget extends WP_Widget {
             'height' => 350
         );
 	parent::__construct('newsletter', __( 'Newsletter subscription form', 'pwp' ), $widget_ops, $control_ops );
-        $this->enqueue_media();
+        //$this->enqueue_media();
         add_action('wp_ajax_subscribe', array($this,'subscribe'));
         add_action('wp_ajax_nopriv_subscribe', array($this,'subscribe'));
         add_action('template_redirect', array($this,'enqueue_media'));
@@ -90,7 +90,8 @@ class Newsletter_Widget extends WP_Widget {
         
         
         wp_enqueue_script( 'ajax-request', plugins_url( '/newsletter-widget.js',__FILE__ ), array( 'jquery' ) );  
-        wp_localize_script( 'ajax-request', 'pwpax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );  
+        wp_localize_script( 'ajax-request', 'ajaxurl', admin_url( 'admin-ajax.php'  ) );  
+         
     }
 
     function update( $new_instance, $old_instance ) {

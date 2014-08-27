@@ -33,7 +33,7 @@ class Accesscontrol{
    public function __construct(){
 if(!is_admin()){
     require_once PWP_ROOT.'lib/external/class-securewalker.php';
-	dump(__CLASS__);
+	//dump(__CLASS__);
 	add_action('wp', array($this, 'check'));
 //
 	add_filter('the_posts', array($this, 'the_posts'));
@@ -175,7 +175,7 @@ unset($allowed);
         
         //$wp_query->found_posts = 8;
         
-    dump($posts);    
+    //dump($posts);    
 if(!is_singular()){
    foreach($posts as $key => $post){
 

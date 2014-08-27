@@ -3,12 +3,12 @@
 
 class Pwp{
 
-    protected $name
-            ;
+    protected $name;
+    
     public static $instance,$modules_directory,$modules;
     
     public static function init() {
-                wp_localize_script( 'ajax-request', 'ajaxurl', ( admin_url( 'admin-ajax.php' ) ) );  
+        //wp_localize_script( 'ajax-request', 'ajaxurl', ( admin_url( 'admin-ajax.php' ) ) );  
 		
         if ( is_null( self::$instance ) )
             self::$instance = new Pwp();
@@ -16,7 +16,9 @@ class Pwp{
         return self::$instance;
         
     }
-    
+    public function enqueue_media(){
+        wp_localize_script( 'ajax-request', 'ajaxurl', ( admin_url( 'admin-ajax.php' ) ) );
+    }
     public static function get_instance(){
          if ( is_null( self::$instance ) )
             self::$instance = new Pwp();
@@ -30,6 +32,7 @@ class Pwp{
         $this->base_dir = plugin_dir_path( __FILE__ );
         $this->get_modules_list();
         self::load_modules();
+        
     }
         
     
