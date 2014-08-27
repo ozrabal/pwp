@@ -3,13 +3,7 @@
 class Newsletter_Widget extends WP_Widget {
  
     function __construct() {
-        
-       
-        
-        
-      
-        
-	$widget_ops = array(
+       $widget_ops = array(
             'classname'     => 'widget_newsletter',
             'description'   => __('Newsletter subscription form with link to article contains rules', 'pwp' ) );
 	$control_ops = array(
