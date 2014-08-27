@@ -3,7 +3,7 @@
 
        
     
-add_action( 'pwp_init_contact', array( 'Accesscontrol','init' ) );
+add_action( 'pwp_init_access-control', array( 'Accesscontrol','init' ) );
 
 
 
@@ -33,7 +33,7 @@ class Accesscontrol{
    public function __construct(){
 if(!is_admin()){
     require_once PWP_ROOT.'lib/external/class-securewalker.php';
-	//dump(__CLASS__);
+	dump(__CLASS__);
 	add_action('wp', array($this, 'check'));
 //
 	add_filter('the_posts', array($this, 'the_posts'));
@@ -173,14 +173,14 @@ unset($allowed);
  
 //dump($wp_query->found_posts);
         
-        $wp_query->found_posts = 8;
+        //$wp_query->found_posts = 8;
         
-        
+    dump($posts);    
 if(!is_singular()){
    foreach($posts as $key => $post){
 
 if(!$this->is_allowed($post->ID)){
-
+ 
     unset($posts[$key]);
 }
 
@@ -206,9 +206,9 @@ public function wp_nav_menu_args($args){
 
 private function get_allowed($post_id){
     $allowed = get_post_meta($post_id, 'access', true);
-    //dump($allowed);
+    dump($allowed);
     if(!empty($allowed)){
-    return $allowed['allowed'];
+    return $allowed;
     }
 }
 
@@ -231,7 +231,7 @@ private function user_can($allowed){
 
 public function is_allowed($post_id = null){
     global $wp_roles, $current_user;
-     
+    
     if(!empty($post_id)){
         
         
@@ -314,6 +314,8 @@ public static function remove_restricted_posts($posts, $query = false){
 public function check_access(){
     
     global $post;
+    
+     dump($post);
  global $current_user;
     if (/*is_admin() ||*/ !$post) {
       return;
@@ -422,7 +424,7 @@ public function setup(){
                 'name'      => 'access',
                 'title'     => __( 'Acces manager', 'pwp' ),
                 //'callback'=> '',
-                'post_type' => array('resource'),
+                'post_type' => array('post','page'),
                 'elements'  => array(
 
                     
@@ -430,7 +432,7 @@ public function setup(){
 
                     array(
                         'type' => 'select',
-                        'name' => 'allowed',
+                        'name' => 'access',
                         'params'=> array(
                             'label' => __( 'Allow access to:', 'pwp' ),
                             'comment' => __('Content of this page are restricted to only this user group','pwp'),
@@ -454,7 +456,8 @@ function get_roles(  ) {
 
 
     global $wp_roles;
-    $default_roles = array('administrator','editor', 'author', 'contributor', 'subscriber', 'pending');
+    $default_roles = array();
+    //$default_roles = array('administrator','editor', 'author', 'contributor', 'subscriber', 'pending');
     
     
      $roles = $wp_roles->get_names();
