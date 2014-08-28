@@ -1,6 +1,6 @@
 <?php
 
-add_action('the_content','dump_var');
+//add_action('the_content','dump_var');
 
 function dump_var($content){
 $t = get_option( 'taxonomy_17' );
@@ -1119,7 +1119,7 @@ $vp->add('#/user#i', 'mytest_contentfunca');
 	    $id = $m[1];
 	// could wp_die() if id not extracted successfully...
 
-	$v->title = __( 'User profile page', 'pwp');
+	$v->title = __( 'sUser profile page', 'pwp');
 	$v->body = "Some body content for my virtual page test - id $id\n";
 	$v->template = plugin_dir_path( __FILE__ ).'template.php'; // optional
 	$v->subtemplate = 'billing'; // optional
