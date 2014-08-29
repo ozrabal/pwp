@@ -18,6 +18,16 @@ abstract class Formelement{
         print_r('Klasa '.__CLASS__.' nie posiada metody '.$name);
         return $this;
     }
+
+
+    public function set_disabled($value){
+	$this->disabled = $value;
+    }
+
+    public function attribute($name){
+	return 'disabled="'.$this->disabled.'" ';
+    }
+
     public function get_type(){
         return $this->type;
     }

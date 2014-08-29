@@ -28,6 +28,56 @@ $b = get_post_meta(get_the_ID(),'video',true);
     return $content;
 }
 
+add_action('the_content','get_map');
+
+function get_map($content){
+
+
+    $a = get_post_meta(get_the_ID(),'latlong',true);
+$a = explode(',', $a);
+dump($a);
+
+?>
+<style>
+
+    #map {
+  height: 300px;
+  border: 1px solid #000;
+}
+
+</style>
+<div id="map"></div>
+
+<script>
+window.onload = function() {
+
+    var latlng = new google.maps.LatLng(<?php echo trim($a[0]) ?>, <?php echo trim($a[1]) ?>);
+    var map = new google.maps.Map(document.getElementById('map'), {
+        center: latlng,
+        zoom: <?php echo trim($a[2]) ?>,
+        mapTypeId: google.maps.MapTypeId.<?php echo strtoupper(trim($a[3])); ?>
+    });
+    var marker = new google.maps.Marker({
+        position: latlng,
+        map: map,
+        title: 'Set lat/lon values for this property',
+        draggable: false
+    });
+    
+};
+</script>
+
+<?php
+
+wp_enqueue_script( 'maps', 'http://maps.google.com/maps/api/js?sensor=false' );
+	
+
+    
+
+    return $content;
+}
+
+
 
 
 function pwp_theme_setup() {
@@ -334,7 +384,17 @@ $page_meta = array(
     //'allow_posts' => array('rule' => 'id','params'=> array(63)),
     'elements'  => array(
 
+array(
+        'type'  => 'map',
+        'name'  => 'latlong',
+        'params'    => array(
+            'label'     => __( 'Location', 'pwp' ),
+            'comment' => 'Lokalizacja'
 
+
+        ),
+
+    ),
      array(
         'type'  => 'date',
         'name'  => 'event_start',

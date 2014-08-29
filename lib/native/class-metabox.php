@@ -11,7 +11,7 @@ class Metabox extends Form {
     ;
 
     public function __construct( $box ) {
-	
+
 	if ( ! is_admin() )
 	    return;
         
@@ -107,7 +107,7 @@ class Metabox extends Form {
 
         
         
-        
+          
         
 //if(isset( $_POST[$this->get_name()])){
     
@@ -139,7 +139,7 @@ class Metabox extends Form {
                 //$this->set_message($element, $o, $current);
                 
                
-                
+              
                 
                
                 if( $o ) { 
@@ -150,6 +150,7 @@ class Metabox extends Form {
 
                     //$values[$element->get_name()] = $this->option_values[$element->get_name()];
                     $element->set_class( 'pwp_error' );
+		    
                     if(!isset($_SESSION['metabox-error'][$this->get_name()][$element->get_name()]['message'])){
                     $_SESSION['metabox-error'][$this->get_name()][$element->get_name()]['message'] = array( 'error', $o );
                     //dump($_SESSION['metabox-error']);
