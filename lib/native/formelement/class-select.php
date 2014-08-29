@@ -20,12 +20,14 @@ class Formelement_Select extends Formelement{
 
     public function get_options(){
         $r = null;
+        $screen =false;
+        if(  is_callable( 'get_current_screen' ))
 	$screen = get_current_screen();
 	
 	foreach($this->options as $option){
 	   
 $option->selected = false;
-            if(($screen->action != 'add') ){
+            if(($screen && $screen->action != 'add') ){
 
 	    if($this->get_value() == $option->get_value()){
                 $option->selected = true;

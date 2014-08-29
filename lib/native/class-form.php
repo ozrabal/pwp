@@ -28,13 +28,13 @@ abstract class Form {
             $this->set_request(filter_input_array(INPUT_REQUEST));
 
             //filter_input( INPUT_REQUEST, 'tag_ID', FILTER_SANITIZE_NUMBER_INT, FILTER_NULL_ON_FAILURE );
-            dump($this->get_request());
+            //dump($this->get_request());
             //die();
         }
                 
         $this->set_params($params);
         
-               
+    /*           
        $this->render();
        
 	//dump(count($this->request));
@@ -50,7 +50,7 @@ abstract class Form {
         }
         
         $this->print_form();
-        
+        */
     }
     
     protected function set_params( Array $params ){
@@ -156,7 +156,7 @@ abstract class Form {
         
        // dump($this->get_request());
 	$this->body = '<form method="POST" name="'.$this->get_name().'" enctype="multipart/form-data"  action="">';
-
+//dump($this);
 	foreach ($this->elements as $element){
             $element->valid();
             
@@ -172,6 +172,9 @@ abstract class Form {
     }
     
     public function print_form(){
+      
+        
+        //dump($this->body);
         echo $this->body;
     }
     

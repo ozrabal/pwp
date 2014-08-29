@@ -116,9 +116,9 @@ function pwp_blank_search( $query ) {
     }
 }
 
-
-
-
+//$_SESSION = null;
+//dump($_SESSION);
+//unset($_SESSION);
 
 //common admin template
 $admin_template = new Admin(
@@ -143,7 +143,7 @@ $admin_template = new Admin(
     )
 );
 $admin_template->add_theme_style();
-$admin_template->remove_menu_items();
+//$admin_template->remove_menu_items();
 $admin_template->remove_bar_links();
 
 //site config
@@ -380,7 +380,7 @@ $d = new Taxmeta( $discography_meta );
 $page_meta = array(
     'name'      => 'page_meta',
     'title'     => __( 'Ustawienia wyświetlania', 'pwp' ),
-    'post_type' => array('page','post'),
+    'post_type' => array('page'),
     //'allow_posts' => array('rule' => 'id','params'=> array(63)),
     'elements'  => array(
 

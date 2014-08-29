@@ -5,7 +5,9 @@ add_action( 'pwp_init_contact', array( 'Contact','init' ) );
 function form( $args ) {
 
     if( isset( $args ) ) {
+        
 	$contact = new Contact( $args );
+        //dump($args);
     }
 }
 function form_shortcode($atts){
@@ -78,18 +80,7 @@ class Contact extends Form implements Observable {
         register_post_type( 'form', $args );
         
         
-//        function myformatTinyMCE($in)
-//{
-// $in['plugins']='inlinepopups,tabfocus,paste,media,fullscreen,wordpress,wpeditimage,wpgallery,wplink,wpdialogs,wpfullscreen';
-// $in['wpautop']=true;
-// $in['apply_source_formatting']=false;
-// $in['theme_advanced_buttons1']='formatselect,forecolor,|,bold,italic,underline,|,bullist,numlist,blockquote,|,justifyleft,justifycenter,justifyright,justifyfull,|,link,unlink,|,wp_fullscreen,wp_adv';
-// $in['theme_advanced_buttons2']='pastetext,pasteword,removeformat,|,charmap,|,outdent,indent,|,undo,redo';
-// $in['theme_advanced_buttons3']='';
-// $in['theme_advanced_buttons4']='';
-// return $in;
-//}
-//add_filter('tiny_mce_before_init', 'myformatTinyMCE' );
+
         
         //pola metabox w typie postu form
         $metad = array(
@@ -97,7 +88,7 @@ class Contact extends Form implements Observable {
                 'name'      => 'pwp_form',
                 'title'     => __( 'Form parameters', 'pwp' ),
                 //'callback'=> '',
-                'post_type' => 'form',
+                'post_type' => array('form'),
                 'elements'  => array(
 //		    array(
 //                        'type' => 'image',
@@ -183,57 +174,9 @@ class Contact extends Form implements Observable {
         }
 
 
-	   $elements_repeater = array(
-		array(
-		    'type' => 'text',
-		    'name' => 'user_email_template',
-		    'params'=> array(
-			'label' => __( 'User email template', 'pwp' ),
-			'class' => 'large-text',
-
-		    ),
-		));
-
-
-        $taxmeta = array(
-            
-                'name'      => 'category',
-            
-                'title'     => __( 'Category meta', 'pwp' ),
-                //'callback'=> '',
-                
-                'elements'  => array(
-		    array(
-                        'type' => 'text',
-                        'name' => 'text_field',
-                        'params'=> array(
-                            'label' => __( 'Tekst', 'pwp' ),
-                            'class' => 'large-text',
-			    'validator' => array(
-				'notempty'
-			    ),
-                         ),
-                    ),
-		    array(
-		    'type' => 'repeatable',
-		    'name' => 'powtorz',
-		    'params'=> array(
-			'title' => __( 'Powtarzalne', 'pwp' ),
-			'label' => __( 'powtarzalne pole', 'pwp' ),
-			'class' => 'large-text',
-			'validator' => array(
-				'notempty'
-			    ),
-			'options' => $elements_repeater
-		    ),
-		),
 
 
 
-
-        ));
-        
-        //new Taxmeta($taxmeta);
         
     }
 
@@ -246,21 +189,27 @@ class Contact extends Form implements Observable {
                 'numberposts'   => 1
             );
             $form_definition = get_posts( $arg );
+            
+            //dump($form_definition);
             if( !empty( $form_definition ) ){
-                $meta = get_post_meta( $form_definition[0]->ID, 'pwp_form', true );
+                $meta = get_post_meta( $form_definition[0]->ID,'user_email_template',true );
                 
-                //dump($form_definition);
+                //dump($meta);
                 
                 
                 
-                $this->user_email_template = $meta['user_email_template'];
-                $this->admin_email_template = $meta['admin_email_template'];
-                $this->user_email_subject = $meta['user_email_subject'];
-                $this->admin_email_subject = $meta['admin_email_subject'];
-                $this->recipient = $meta['recipient'];
-                $this->send_to_user = $meta['send_to_user'];
-                $this->message_form_send = $meta['message_form_send'];
-                return $meta['definition'];
+                $this->user_email_template = get_post_meta( $form_definition[0]->ID,'user_email_template',true );;
+                $this->admin_email_template = get_post_meta( $form_definition[0]->ID,'admin_email_template',true );;
+                $this->user_email_subject = get_post_meta( $form_definition[0]->ID,'user_email_subject',true );;
+                $this->admin_email_subject = get_post_meta( $form_definition[0]->ID,'admin_email_subject',true );;
+                $this->recipient = get_post_meta( $form_definition[0]->ID,'recipient',true );;
+                $this->send_to_user = get_post_meta( $form_definition[0]->ID,'send_to_user',true );;
+                $this->message_form_send = get_post_meta( $form_definition[0]->ID,'message_form_send',true );;
+                
+                //dump(get_post_meta( $form_definition[0]->ID,'definition',true ));
+                $a = get_post_meta( $form_definition[0]->ID,'definition',true );
+                //return $a['definition'];
+                return get_post_meta( $form_definition[0]->ID,'definition',true );;
             }
         }
         
@@ -395,12 +344,13 @@ class Contact extends Form implements Observable {
             }
             $meta = get_post_meta( $post->ID, 'pwp_form', true ); 
             $meta['definition'] = $this->shortcode;
-            update_post_meta($post->ID, 'pwp_form', $meta);
+            update_post_meta($post->ID, 'definition', $meta);
         }
     } 
 
     public function __construct( $args = null) {
         $this->options = Options::get_instance();
+        
         
         //strona administracyjna z zakladkami
 	//
@@ -476,6 +426,10 @@ class Contact extends Form implements Observable {
             } else {
                 $params = $args;
             }
+            //dump($params);
+      
+            parent::__construct($params['definition']);
+            
             if(  is_array( $params )){
             if( isset( $params['callback'] ) ) {
                 
@@ -500,7 +454,25 @@ class Contact extends Form implements Observable {
                     $this->attach( $n );
                 }
             }
-            parent::__construct( $params );
+            
+            
+            
+            $this->render();
+       
+	//dump(count($this->request));
+
+        if(count($this->request) > 1 && $this->get_errors() == false){
+            //$this->render_after_submit = false;
+            
+            $this->submit();
+            $this->body = '';
+            
+        }else if($this->get_errors()){
+            $this->body = '<div class="alert alert-danger">'.__( 'In the form errors occurred', 'pwp' ).'</div>'.$this->body;
+        }
+        
+        $this->print_form();
+            
         }
         }
     }
@@ -509,6 +481,7 @@ class Contact extends Form implements Observable {
         parent::render();
     }
 
+    
     function save(){        
     }
     
