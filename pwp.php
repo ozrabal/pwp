@@ -26,11 +26,12 @@
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
-	die;
+    die;
 }
+//glowne sciezki
 define( 'PWP_ROOT_URL',  plugin_dir_url( __FILE__));
 define( 'PWP_ROOT', plugin_dir_path( __FILE__ ) );
-define( 'PWP_EXTERNAL_LIBRARY',  plugin_dir_url(plugin_basename(__FILE__)).'lib/external/' );
+define( 'PWP_EXTERNAL_LIBRARY',  plugin_dir_url( plugin_basename( __FILE__ ) ) . 'lib/external/' );
 define( 'PWP_VERSION', '1.1' );
 include_once PWP_ROOT . 'lib/native/helpers.php';
 
@@ -82,6 +83,3 @@ function pwp_plugin_initialize() {
     
 }
 add_action( 'widgets_init', array( 'Pwp', 'init' ),2 );
-
-
-

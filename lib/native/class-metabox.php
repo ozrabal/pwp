@@ -12,15 +12,14 @@ class Metabox extends Form {
 
     public function __construct( $box ) {
 
-	if ( ! is_admin() )
+	//parent::__construct($box);
+	if ( ! is_admin() ){
 	    return;
-        
+	}
         $this->config( $box );
 	$this->set_params( $box );
-	
-	
-        add_action( 'add_meta_boxes', array( $this, 'add_box' ) );
-        if(!defined( 'DOING_AJAX' ) ) {
+	add_action( 'add_meta_boxes', array( $this, 'add_box' ) );
+        if ( !defined( 'DOING_AJAX' ) ) {
             add_action( 'save_post', array( $this, 'save' ) );
 	}
     }
@@ -57,8 +56,7 @@ class Metabox extends Form {
     }
     
     public function set_allow_posts( $allow_posts ) {
-        
-	$this->allow_box = $allow_posts;
+        $this->allow_box = $allow_posts;
     }
     
     public function get_name() {
@@ -72,7 +70,7 @@ class Metabox extends Form {
 
     public function get_title( $tag = '%s' ) {
         if ( isset( $this->title ) )
-        return sprintf( $tag, $this->title );
+	    return sprintf( $tag, $this->title );
     }
     
     public function set_callback( $callback ) {
@@ -104,34 +102,15 @@ class Metabox extends Form {
     }
         
     function save( $post_id ) {
-
-        
-        
-          
-        
-//if(isset( $_POST[$this->get_name()])){
-    
 	foreach( $this->elements as $element ) {
-
-
-
-	    if( isset( $_POST[$element->get_name()] ) ) {
-                
-		//$save[$element->get_name()] = $_POST[$this->get_name()][$element->get_name()];
-        $save[$element->get_name()] = $_POST[$element->get_name()];
-	    }else{
+	    if ( isset( $_POST[$element->get_name()] ) ) {
+		$save[$element->get_name()] = $_POST[$element->get_name()];
+	    } else {
                 $save[$element->get_name()] = '';
             }
-             //$old = get_post_meta( $post_id, $this->get_name(), true );
-             $old = get_post_meta( $post_id, $element->get_name(), true );
-           // dump($element->get_name());
-             global $current_screen;
-
-	     //dump($element->get_name());
-// dump($this->get_name());
-	
-//die();
-            if(  isset($current_screen) && $current_screen->action != 'add' && $element->get_validator() /*&& isset( $_POST[$element->get_name()])*/ ) {
+            $old = get_post_meta( $post_id, $element->get_name(), true );
+	    global $current_screen;
+	    if ( isset($current_screen) && $current_screen->action != 'add' && $element->get_validator() /*&& isset( $_POST[$element->get_name()])*/ ) {
                 
                
                 
