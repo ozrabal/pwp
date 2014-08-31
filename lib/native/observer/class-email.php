@@ -7,8 +7,7 @@ class Observer_Email implements Observer{
         $this->set_params($params);
         
         //dump($_FILES);
-        // dump($_POST);
-         //die();
+        
          
          
         if ($this->send()){
@@ -48,7 +47,8 @@ class Observer_Email implements Observer{
     }
 
     public function send(){
-
+ dump($_POST);
+         die();
         $user_body = $this->get_param( 'user_email_template' );
         $user_subject = $this->get_param( 'user_email_subject' );
         $admin_body = $this->get_param( 'admin_email_template' );

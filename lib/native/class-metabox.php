@@ -14,6 +14,7 @@ class Metabox extends Form {
         if ( ! is_admin() ){
 	    return;
 	}
+        parent::__construct($box);
         $this->config( $box );
 	$this->set_params( $box );
 	add_action( 'add_meta_boxes', array( $this, 'add_box' ) );
@@ -25,7 +26,7 @@ class Metabox extends Form {
             add_action( 'save_post', array( $this, 'save' ) );
             unset($_SESSION['p_'.$_POST['post']]);
 	}
-        //parent::__construct($box);
+        
     }
 
     public function set_params( Array $params ) {

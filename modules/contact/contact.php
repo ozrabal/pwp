@@ -226,6 +226,9 @@ class Contact extends Form implements Observable {
     }
  
     public function notify() {
+        
+        
+        
 	$result = false;
 	$request = $this->get_request();
 	if(isset($request['event'])){
@@ -330,6 +333,9 @@ class Contact extends Form implements Observable {
      * @global $post
      */
     public function onsave(){
+        
+        
+        
         if( isset( $_REQUEST['content'] ) ){
             global $post;
             do_shortcode( stripslashes( $_REQUEST['content'] ) );
@@ -430,6 +436,10 @@ class Contact extends Form implements Observable {
       
             parent::__construct($params['definition']);
             
+            $this->addElement('text','wp_nonce');
+            $this->elements['wp_nonce']->set_value(wp_create_nonce('form_'.$this->get_name()));
+            
+            
             if(  is_array( $params )){
             if( isset( $params['callback'] ) ) {
                 
@@ -461,9 +471,18 @@ class Contact extends Form implements Observable {
        
 	//dump(count($this->request));
 
-        if(count($this->request) > 1 && $this->get_errors() == false){
-            //$this->render_after_submit = false;
+            //dump(filter_input(INPUT_POST,'wp_nonce'));
+         
+           if( wp_verify_nonce( filter_input(INPUT_POST,'wp_nonce'), 'form_'.$this->get_name() ) ){ 
             
+        //if(count($this->request) > 1 && $this->get_errors() == false){
+            //$this->render_after_submit = false;
+          
+            
+           dump($_POST);
+         //die();
+         
+         
             $this->submit();
             $this->body = '';
             
@@ -482,7 +501,9 @@ class Contact extends Form implements Observable {
     }
 
     
-    function save(){        
+    function save(){    
+        
+        
     }
     
     public function submit(){
