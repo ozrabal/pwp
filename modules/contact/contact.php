@@ -477,9 +477,9 @@ class Contact extends Form implements Observable {
             
         //if(count($this->request) > 1 && $this->get_errors() == false){
             //$this->render_after_submit = false;
-          
+          dump($this->get_errors());
             
-           dump($_POST);
+           //dump($_POST);
          //die();
          
          

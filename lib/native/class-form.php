@@ -24,15 +24,20 @@ abstract class Form {
 
         
         //sprawdzac nonce
+        dump(filter_input_array(INPUT_POST));
+        echo '--------------';
+        if(isset($_POST)){
         
-        if(isset($_REQUEST[$this->get_name()])){
+        //if(isset($_REQUEST[$this->get_name()])){
             
             //@todo sprawdzic czy prawidlowy
             //$this->set_request($_REQUEST);
-            $this->set_request(filter_input_array(INPUT_REQUEST));
+            
+            
+            $this->set_request(filter_input_array(INPUT_POST));
  
             //filter_input( INPUT_REQUEST, 'tag_ID', FILTER_SANITIZE_NUMBER_INT, FILTER_NULL_ON_FAILURE );
-            //dump($this->get_request());
+            dump($this->get_request());
             //die();
         }
                 
@@ -112,7 +117,6 @@ abstract class Form {
 	
         if(isset($request[$this->name])){
             $this->request = $request[$this->name];
-            
         }
     }
     
@@ -163,7 +167,14 @@ abstract class Form {
 //dump($this);
 	foreach ($this->elements as $element){
             $element->valid();
+            //$this->form->get_request();
+           // dump($element->form);
             
+            dump($element->form);
+            dump( $element->valid());
+       
+            
+           
 	    $this->body .= $element->render();
 	}
 
