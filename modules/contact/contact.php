@@ -90,17 +90,6 @@ class Contact extends Form implements Observable {
                 //'callback'=> '',
                 'post_type' => array('form'),
                 'elements'  => array(
-//		    array(
-//                        'type' => 'image',
-//                        'name' => 'user_image',
-//                        'params'=> array(
-//                            'label' => __( 'User image', 'pwp' ),
-//                            'class' => 'large-text',
-//			    'validator' => array(
-//				'notempty'
-//			    ),
-//                         ),
-//                    ),
                     array(
                         'type' => 'text',
                         'name' => 'user_email_subject',
@@ -227,14 +216,12 @@ class Contact extends Form implements Observable {
  
     public function notify() {
         
-        
-        
 	$result = false;
 	$request = $this->get_request();
-	if(isset($request['event'])){
-	    $p = get_post(intval($request['event']));
-	    $request['tytul'] = $p->post_title;
-	}
+//	if(isset($request['event'])){
+//	    $p = get_post(intval($request['event']));
+//	    $request['tytul'] = $p->post_title;
+//	}
         $result = null;
         foreach ($this->observers as $observer) {
             
@@ -250,6 +237,7 @@ class Contact extends Form implements Observable {
         
             
         }
+	dump($result);
 	return $result;
     }
 
@@ -436,23 +424,25 @@ class Contact extends Form implements Observable {
       
             parent::__construct($params['definition']);
             
-            $this->addElement('text','wp_nonce');
-            $this->elements['wp_nonce']->set_value(wp_create_nonce('form_'.$this->get_name()));
+            $this->addElement('text','_nonce');
+            $this->elements['_nonce']->set_value(wp_create_nonce('form_'.$this->get_name()));
             
-            
-            if(  is_array( $params )){
-            if( isset( $params['callback'] ) ) {
+            $this->addElement('text','_name');
+            $this->elements['_name']->set_value($this->get_name());
+//dump($params);
+            if(  is_array( $params['definition'] )){
+            if( isset( $params['definition']['callback'] ) ) {
                 
                 //dump($params['callback']);
-                foreach ($params['elements'] as $element){
+                foreach ($params['definition']['elements'] as $element){
                     if($element['type'] == 'file'){
                         //dump($element);
-                        $n = array('Observer_Upload', $params['callback']);
-                         $params['callback'] = $n;
+                        $n = array('Observer_Upload', $params['definition']['callback']);
+                         $params['definition']['callback'] = $n;
                     }
                 }
                 
-                $this->callback = $params['callback'];
+                $this->callback = $params['definition']['callback'];
                 if( is_array( $this->callback ) ) {
                     foreach( $this->callback as $callback ) {
                         $c = new $callback();
@@ -473,11 +463,11 @@ class Contact extends Form implements Observable {
 
             //dump(filter_input(INPUT_POST,'wp_nonce'));
          
-           if( wp_verify_nonce( filter_input(INPUT_POST,'wp_nonce'), 'form_'.$this->get_name() ) ){ 
+           if( wp_verify_nonce( filter_input(INPUT_POST,'_nonce'), 'form_'.$this->get_name() ) && $this->get_errors() == false ){
             
         //if(count($this->request) > 1 && $this->get_errors() == false){
             //$this->render_after_submit = false;
-          dump($this->get_errors());
+          //dump($this->get_errors());
             
            //dump($_POST);
          //die();
@@ -501,14 +491,12 @@ class Contact extends Form implements Observable {
     }
 
     
-    function save(){    
-        
-        
+    function save(){
+	
     }
     
     public function submit(){
-        
-        
+	//dump($this);
 	if( $this->notify() ) {
 	    echo '<div class="alert alert-success">'.$this->message_form_send.'</div>';
 	}

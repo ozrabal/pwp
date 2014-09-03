@@ -6,10 +6,10 @@ class Observer_Email implements Observer{
     public function update( $params ) {
         $this->set_params($params);
         
-        //dump($_FILES);
+        dump($_POST);
         
          
-         
+         dump($this);
         if ($this->send()){
             
             return true;

@@ -20,25 +20,12 @@ abstract class Form {
      * @param array $params
      */
     public function __construct( Array $params ) {
-	$this->set_name($params['name']);
 
+	$this->set_name($params['name']);
         
-        //sprawdzac nonce
-        dump(filter_input_array(INPUT_POST));
-        echo '--------------';
-        if(isset($_POST)){
+	if(filter_input(INPUT_POST, '_name')){
         
-        //if(isset($_REQUEST[$this->get_name()])){
-            
-            //@todo sprawdzic czy prawidlowy
-            //$this->set_request($_REQUEST);
-            
-            
-            $this->set_request(filter_input_array(INPUT_POST));
- 
-            //filter_input( INPUT_REQUEST, 'tag_ID', FILTER_SANITIZE_NUMBER_INT, FILTER_NULL_ON_FAILURE );
-            dump($this->get_request());
-            //die();
+	    $this->set_request(filter_input_array(INPUT_POST));
         }
                 
         $this->set_params($params);
@@ -81,9 +68,7 @@ abstract class Form {
             if($this->get_request() && isset($element['validator'])){
                 
             $this->elements[$element['name']]->set_validator($element['validator']);
-        }
-           
-
+	    }
 	}
     }
     
@@ -114,10 +99,14 @@ abstract class Form {
     }
     
     public function set_request($request){
-	
+
         if(isset($request[$this->name])){
             $this->request = $request[$this->name];
-        }
+        }else{
+	    if(isset($request['_name']) && $request['_name'] == $this->name ){
+		$this->request = $request;
+	    }
+	}
     }
     
     protected function is_edit(){
@@ -138,6 +127,7 @@ abstract class Form {
         }
         return $this->request;
     }
+    
     public function set_title($title){
         $this->title = $title;
     }
@@ -160,44 +150,29 @@ abstract class Form {
     public function get_action(){
 	return $this->action;
     }
+    
     public function render(){
         
-       // dump($this->get_request());
+
 	$this->body = '<form method="POST" name="'.$this->get_name().'" enctype="multipart/form-data"  action="">';
-//dump($this);
+
 	foreach ($this->elements as $element){
             $element->valid();
-            //$this->form->get_request();
-           // dump($element->form);
-            
-            dump($element->form);
-            dump( $element->valid());
-       
-            
-           
 	    $this->body .= $element->render();
 	}
 
 	$this->body .= '</form>';
-
-
 
 	return $this->body;
         
     }
     
     public function print_form(){
-      
-        
-        //dump($this->body);
         echo $this->body;
     }
     
     public function submit(){
-       
-        
         echo '<div class="alert alert-success">'.__( 'wysłano').'</div>';
-        
     }
 }
 

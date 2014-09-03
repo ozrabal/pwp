@@ -28,7 +28,15 @@ $b = get_post_meta(get_the_ID(),'video',true);
     return $content;
 }
 
-add_action('the_content','get_map');
+
+add_action('the_content','get_form');
+function get_form($content){
+    form('kontakt');
+    return $content;
+}
+
+
+//add_action('the_content','get_map');
 
 function get_map($content){
 
