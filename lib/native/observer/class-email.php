@@ -6,10 +6,10 @@ class Observer_Email implements Observer{
     public function update( $params ) {
         $this->set_params($params);
         
-        dump($_POST);
+      
         
          
-         dump($this);
+         //dump($this);
         if ($this->send()){
             
             return true;
@@ -46,17 +46,30 @@ class Observer_Email implements Observer{
 	return $headers;
     }
 
+
+    private function get_recipient(){
+	if($this->get_param( 'recipient' )){
+	    return $this->get_param('recipient');
+	}else{
+	    return get_option( 'admin_email' );
+	}
+    }
+
     public function send(){
- dump($_POST);
-         die();
+ 
+         
         $user_body = $this->get_param( 'user_email_template' );
         $user_subject = $this->get_param( 'user_email_subject' );
         $admin_body = $this->get_param( 'admin_email_template' );
         $admin_subject = $this->get_param( 'admin_email_subject' );
         $send_to_user = $this->get_param( 'send_to_user' );
-        $recipient = $this->get_param( 'recipient' );
-        
+
+
+	//$recipient = $this->get_recipient();
+
+
         if( $user_body != '' ){
+	    //dump($this->get_param( 'request' ));
             foreach( $this->get_param( 'request' ) as $k => $v ) {
                 if( !is_array( $this->get_request( $k ) ) ) {
                     $user_body = str_ireplace( '['.$k.']',  $this->get_request( $k ), $user_body );
@@ -89,8 +102,8 @@ class Observer_Email implements Observer{
                 }
             }
         }
-        
-        if( wp_mail( $recipient, $admin_subject, $admin_body, $this->headers( array( 'from' => get_option( 'admin_email' ) ) ) ) ) {
+        //dump($recipient);
+        if( wp_mail( $this->get_recipient(), $admin_subject, $admin_body, $this->headers( array( 'from' => get_option( 'admin_email' ) ) ) ) ) {
             if($this->get_request( 'email' ) && $send_to_user != ''){
                 wp_mail( $this->get_request( 'email' ), $user_subject, $user_body, $this->headers( array( 'from' => get_option( 'admin_email' ) ) ) );
             }
