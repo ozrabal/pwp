@@ -172,17 +172,19 @@ class Contact extends Form /*implements Observable*/ {
         
     }
 
-    public function __construct( $args = false) {
-
-	if( !$args ) {
-	    return;
-	}
-        if( !is_array( $args ) ) {
-            $params = $this->get_definition( $args );
-        } else {
-            $params = $args;
+    public function __construct( $params = false) {
+       
+        $this->add_shortcodes();
+        
+        if( !is_array( $params ) ) {
+            $params = $this->get_definition( $params );
+        } 
+        if( !$params ) {
+            dbug( __( 'Invalid form name (slug)', 'pwp' ) );
+            return false;
         }
-	$this->add_shortcodes();
+       //Pwp::get_instance()->a('ss');
+	
 
         parent::__construct( $params['definition'] );
 
@@ -202,7 +204,7 @@ class Contact extends Form /*implements Observable*/ {
     private function get_definition( $slug = null ){
         
 	if( empty( $slug ) ) {
-	    echo ( __( 'Form definition not found or invalid form name (slug)', 'pwp' ) );
+	    dbug( __( 'Invalid form name (slug)', 'pwp' ) );
 	    return false;
 	}
 	$arg = array(
@@ -212,10 +214,10 @@ class Contact extends Form /*implements Observable*/ {
             'numberposts'   => 1
         );
         $form_definition = get_posts( $arg );
-            
             //dump($form_definition);
+            
             if( !empty( $form_definition ) ){
-                $meta = get_post_meta( $form_definition[0]->ID,'user_email_template',true );
+                //$meta = get_post_meta( $form_definition[0]->ID,'user_email_template',true );
                 
                 //dump($meta);
                 
@@ -230,12 +232,14 @@ class Contact extends Form /*implements Observable*/ {
                 $this->message_form_send = get_post_meta( $form_definition[0]->ID,'message_form_send',true );;
                 
                 //dump(get_post_meta( $form_definition[0]->ID,'definition',true ));
-                $a = get_post_meta( $form_definition[0]->ID,'definition',true );
+                //$a = get_post_meta( $form_definition[0]->ID,'definition',true );
+                //dump($a);
                 //return $a['definition'];
                 return get_post_meta( $form_definition[0]->ID,'definition',true );;
             }
-        
-        
+            
+	    return false;
+       
         
     }
 
@@ -357,7 +361,13 @@ class Contact extends Form /*implements Observable*/ {
      * @global $post
      */
     public function onsave(){
+        
+        //dump(filter_input( INPUT_POST, 'content' ));
+            //die();
+            
 	if( filter_input( INPUT_POST, 'content' ) ) {
+            
+            
             global $post;
             do_shortcode( stripslashes( filter_input( INPUT_POST, 'content' ) ) );
 	    if( isset( $this->shortcode['elements'] ) ) {

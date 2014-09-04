@@ -12,9 +12,11 @@ class Ajaxpagination {
     }
     
     public function __construct() {
+        
         add_action( 'template_redirect', array( $this, 'load' ) );
 
-	
+	     
+
     }
     
     public function load(){
@@ -47,7 +49,7 @@ class Ajaxpagination {
  
     function set_template( $template ) {
         
-        
+       
         return plugin_dir_path( __FILE__) . '/ajax-post-list.php';
     }
 }

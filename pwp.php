@@ -82,4 +82,26 @@ function pwp_plugin_initialize() {
     load_plugin_textdomain( 'pwp', false, basename( dirname( __FILE__ ) ) . '/languages/' );
     
 }
+//$d = new Dbug();
+
 add_action( 'widgets_init', array( 'Pwp', 'init' ),2 );
+
+/*
+//$d->get_messages();
+Pwp::get_instance()->d();
+class Dbug{
+    
+    public function __construct() {
+        $this->messages = null;
+    }
+    
+    public function add($m){
+        $this->messages[] = $m;
+    }
+    
+    public function get_messages(){
+        dump($this->messages);
+    }
+}
+ * 
+ */

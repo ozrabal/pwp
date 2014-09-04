@@ -26,12 +26,22 @@ class Pwp{
     }
 
     private function __construct() {
+        //$this->d = new Dbug();
         $this->name = __CLASS__;
         $this->base_dir = plugin_dir_path( __FILE__ );
         $this->get_modules_list();
         self::load_modules();
     }
-        
+    
+    /*
+    public function a($m){
+        $this->d->add($m);
+    }
+    
+    public  function d(){
+        dump($this->d->get_messages());
+    }
+*/
     private function get_modules_list(){
 	if ( is_dir( PWP_ROOT . '/modules' ) ) {
 	    $modules = array_diff( scandir( PWP_ROOT . '/modules' ), array( '..', '.', '.DS_Store', 'index.php' ) );
@@ -59,3 +69,5 @@ class Pwp{
 	}
     }
 }
+
+

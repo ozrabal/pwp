@@ -22,14 +22,13 @@ $b = get_post_meta(get_the_ID(),'video',true);
     
     
     
-    
     //dump(get_post_meta($GLOBALS['post']->ID,'video',true));
 
     return $content;
 }
 
 
-add_action('the_content','get_form');
+//add_action('the_content','get_form');
 function get_form($content){
     form('kontakt');
     return $content;
