@@ -21,9 +21,15 @@ abstract class Form {
      */
     public function __construct( Array $params ) {
 
+
+
+
 	$this->set_name($params['name']);
-        
-	if(filter_input(INPUT_POST, '_name')){
+
+	//$this->set_nonce('form_'.$this->get_name());
+
+
+	if(filter_input(INPUT_POST, '_'.$this->get_name().'_name')){
         
 	    $this->set_request(filter_input_array(INPUT_POST));
         }
@@ -48,7 +54,37 @@ abstract class Form {
         $this->print_form();
         */
     }
-    
+
+    private function set_nonce($name){
+
+	$this->_nonce = wp_create_nonce($name);
+	
+    }
+
+
+
+
+
+    protected function get_nonce(){
+	if(!empty($this->_nonce)){
+	    return $this->_nonce;
+	}
+}
+
+
+    protected function add_nonce_field() {
+	$this->addElement('hidden','_'.$this->get_name().'_nonce');
+
+            $this->elements['_'.$this->get_name().'_nonce']->set_value($this->get_nonce());
+    }
+
+    protected function add_formname_field() {
+	$this->addElement('text','_'.$this->get_name().'_name');
+            $this->elements['_'.$this->get_name().'_name']->set_value($this->get_name());
+    }
+
+
+
     protected function set_params( Array $params ){
 	foreach($params['elements'] as $element){
 
@@ -64,7 +100,11 @@ abstract class Form {
             }else{
                 echo ('Nieznany typ pola: '.$element['type']);
             }
-            
+
+	    //$this->add_nonce_field();
+if(!is_admin()){
+$this->add_formname_field();
+}
             if($this->get_request() && isset($element['validator'])){
                 
             $this->elements[$element['name']]->set_validator($element['validator']);
@@ -103,7 +143,7 @@ abstract class Form {
         if(isset($request[$this->name])){
             $this->request = $request[$this->name];
         }else{
-	    if(isset($request['_name']) && $request['_name'] == $this->name ){
+	    if(isset($request['_'.$this->get_name().'_name']) && $request['_'.$this->get_name().'_name'] == $this->name ){
 		$this->request = $request;
 	    }
 	}
@@ -160,6 +200,8 @@ abstract class Form {
             $element->valid();
 	    $this->body .= $element->render();
 	}
+
+	$this->body .= wp_nonce_field( 'form_'.$this->get_name(), '_'.$this->get_name().'_nonce', true, 0 );
 
 	$this->body .= '</form>';
 

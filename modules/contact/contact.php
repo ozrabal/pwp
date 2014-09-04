@@ -18,7 +18,7 @@ extract( shortcode_atts( array(
 form( $atts['name'] );
 }
 add_shortcode('form', 'form_shortcode');
-
+/*
 interface Observer {
     function update( $data );
 }
@@ -28,7 +28,7 @@ interface Observable {
     function notify();
 
 }
-
+*/
 add_filter( 'user_can_richedit', 'disable_for_cpt' );
 function disable_for_cpt( $default ) {
     global $post;
@@ -38,10 +38,13 @@ function disable_for_cpt( $default ) {
 }
 
 ///implements SplSubject
-class Contact extends Form implements Observable {
+class Contact extends Form /*implements Observable*/ {
 
     private $shortcode = array();
     private $observers = array();
+
+
+
 
     static function init(){
         
@@ -169,15 +172,46 @@ class Contact extends Form implements Observable {
         
     }
 
-    private function get_definition( $slug ){
-        if( !empty( $slug )  ){
-            $arg = array(
-                'name'          => sanitize_key( $slug ),
-                'post_type'     => 'form',
-                'post_status'   => 'publish',
-                'numberposts'   => 1
-            );
-            $form_definition = get_posts( $arg );
+    public function __construct( $args = false) {
+
+	if( !$args ) {
+	    return;
+	}
+        if( !is_array( $args ) ) {
+            $params = $this->get_definition( $args );
+        } else {
+            $params = $args;
+        }
+	$this->add_shortcodes();
+
+        parent::__construct( $params['definition'] );
+
+	if( is_array( $params['definition'] ) ) {
+	    $this->init_callback( $params['definition']['callback'] );
+	    parent::render();
+	    if( wp_verify_nonce( filter_input( INPUT_POST, '_' . $this->get_name() . '_nonce' ), 'form_' . $this->get_name() ) && !$this->get_errors() ) {
+		$this->submit();
+		$this->body = '';
+            } else if( $this->get_errors() ) {
+		$this->body = '<div class="alert alert-danger">' . __( 'In the form errors occurred', 'pwp' ) . '</div>' . $this->body;
+	    }
+	    $this->print_form();
+        }
+    }
+    
+    private function get_definition( $slug = null ){
+        
+	if( empty( $slug ) ) {
+	    echo ( __( 'Form definition not found or invalid form name (slug)', 'pwp' ) );
+	    return false;
+	}
+	$arg = array(
+	    'name'          => sanitize_key( $slug ),
+            'post_type'     => 'form',
+            'post_status'   => 'publish',
+            'numberposts'   => 1
+        );
+        $form_definition = get_posts( $arg );
             
             //dump($form_definition);
             if( !empty( $form_definition ) ){
@@ -200,13 +234,12 @@ class Contact extends Form implements Observable {
                 //return $a['definition'];
                 return get_post_meta( $form_definition[0]->ID,'definition',true );;
             }
-        }
         
-        echo ( __( 'Form definition not found, invalid form name (slug)', 'pwp' ) );
-        return false;
+        
+        
     }
 
-    public function attach( Observer $observer) {
+    public function attach(  $observer) {
         $this->observers[] = $observer;
     }
  
@@ -222,7 +255,10 @@ class Contact extends Form implements Observable {
 //	    $p = get_post(intval($request['event']));
 //	    $request['tytul'] = $p->post_title;
 //	}
-        $result = null;
+        //$result = null;
+
+	//dump($this->observers);
+//die();
         foreach ($this->observers as $observer) {
             
             $result = $observer->update(array(
@@ -237,7 +273,7 @@ class Contact extends Form implements Observable {
         
             
         }
-	dump($result);
+	
 	return $result;
     }
 
@@ -321,227 +357,72 @@ class Contact extends Form implements Observable {
      * @global $post
      */
     public function onsave(){
-        
-        
-        
-        if( isset( $_REQUEST['content'] ) ){
+	if( filter_input( INPUT_POST, 'content' ) ) {
             global $post;
-            do_shortcode( stripslashes( $_REQUEST['content'] ) );
-               
-            if( isset( $this->shortcode['elements'] ) ) {
+            do_shortcode( stripslashes( filter_input( INPUT_POST, 'content' ) ) );
+	    if( isset( $this->shortcode['elements'] ) ) {
                 foreach( $this->shortcode['elements'] as $key => $field ) {
                     if( isset( $this->repeatable[$field['name']] ) ) {
-                        unset($this->repeatable[$field['name']]['repeatable']);
+                        unset( $this->repeatable[$field['name']]['repeatable'] );
                         $this->shortcode['elements'][$key]['params']['options'] = $this->repeatable[$field['name']];
                     }
                 }
             }
             $meta = get_post_meta( $post->ID, 'pwp_form', true ); 
             $meta['definition'] = $this->shortcode;
-            update_post_meta($post->ID, 'definition', $meta);
+            update_post_meta( $post->ID, 'definition', $meta );
         }
     } 
 
-    public function __construct( $args = null) {
-        $this->options = Options::get_instance();
-        
-        
-        //strona administracyjna z zakladkami
-	//
-	//$admin = Administrator::init();
-        $admin = new Administrator();
-        $page = array(
-            'parent_slug'   => 'edit.php?post_type=form',
-            'page_title'    => __( 'Form settings page', 'pwp' ),
-            'menu_title'    => __( 'Form settings', 'pwp' ),
-            'capability'    => 'manage_options',
-            'menu_slug'	    => 'form-options',
-            'icon'	    => '',
-            'position'	    => null,
-        );
-        //$admin->add_page( $page );
-        
-        $admin->add_tab( 'Nowy tab', 'form-options' );
-        $options = new Options();
-        $options->set_name( 'a_options' )
-                ->set_action( 'options.php' )
-                ->set_title( __( 'Pierwsze opcje', 'pwp' ) );
-
-        $options->add_element( 'text', 'tekst' )
-                ->set_label( __( 'User email template', 'pwp' ) )
-                ->set_class( 'klasa' )
-                ->set_validator( array( 'notempty' ) );
-
-        $admin->add_options( $options, 'form-options' );
-        $admin->add_options( $options, 'nowy-tab' );
-
-        $admin->add_tab( 'Inny tab', 'form-options' );
-
-        $options_tab = new Options();
-        $options_tab->set_name( 'tab_options' )
-                ->set_action( 'options.php' )
-                ->set_title( __( 'opcje w tabie', 'pwp' ) );
-
-        $options_tab->add_element( 'text', 'tekstt' )
-                    ->set_label( __( 'pole w tab', 'pwp' ) )
-                    ->set_class( 'klasa' )
-                    ->set_validator( array( 'notempty' ) );
-
-        $options_tab->add_element( 'image', 'obrazek' )
-                    ->set_label( 'Obrazek' )
-                    ->set_comment( 'komentarz' )
-                    ->set_validator( array( 'notempty' ) );
-        $elements_repeater = array(
-            array(
-                'type' => 'text',
-		'name' => 'user_email_template',
-		'params'=> array(
-                    'label' => __( 'User email templatez', 'pwp' ),
-                    'class' => 'large-text',
-                ),
-            ),
-        );
-
-        $options_tab->add_element( 'repeatable', 'powtorz' )
-                    ->set_label( 'Powtarzalne' )
-                    ->set_comment( 'komentarz do repeatable' )
-                    ->add_elements( $elements_repeater );
-        $admin->add_options( $options_tab, 'inny-tab' );
-        
-        if ( current_user_can( 'edit_posts' ) && current_user_can( 'edit_pages' ) && 'form' == pwp_current_post_type() ) {  
+    private function add_shortcodes(){
+	if( current_user_can( 'edit_posts' ) && current_user_can( 'edit_pages' ) && 'form' == pwp_current_post_type() ) {
             add_shortcode( 'form', array( $this, 'add_form' ) );
             add_shortcode( 'field', array( $this, 'add_field' ) );
             add_action( 'save_post', array( $this, 'onsave' ) ,0 );
         }
+    }
 
-        if( isset( $args ) ) {
-            if( !is_array( $args ) ) {
-                $params = $this->get_definition( $args );
-            } else {
-                $params = $args;
-            }
-            //dump($params);
-      
-            parent::__construct($params['definition']);
-            
-            $this->addElement('text','_nonce');
-            $this->elements['_nonce']->set_value(wp_create_nonce('form_'.$this->get_name()));
-            
-            $this->addElement('text','_name');
-            $this->elements['_name']->set_value($this->get_name());
-//dump($params);
-            if(  is_array( $params['definition'] )){
-            if( isset( $params['definition']['callback'] ) ) {
-                
-                //dump($params['callback']);
+    private function init_callback($args = false){
+	if(  $args  ) {
+                /*
+                dump($params['definition']['callback']);
                 foreach ($params['definition']['elements'] as $element){
-                    if($element['type'] == 'file'){
+
+
+		    if($element['type'] == 'file'){
                         //dump($element);
                         $n = array('Observer_Upload', $params['definition']['callback']);
                          $params['definition']['callback'] = $n;
                     }
+
+
                 }
-                
-                $this->callback = $params['definition']['callback'];
-                if( is_array( $this->callback ) ) {
+
+		 */
+
+                $this->callback = explode(',',$args);
+		//dump($this->callback);
+                //if( is_array( $this->callback ) ) {
                     foreach( $this->callback as $callback ) {
                         $c = new $callback();
-                        $this->attach( $c );
+                        //$this->attach( $c );
+			$this->attach(new $callback() );
 		    }
                     //$this->attach( $cal );
-                } else {
-                    $n = new $this->callback();
-                    $this->attach( $n );
-                }
+                //} else {
+                //    $n = new $this->callback();
+                //    $this->attach( $n );
+                //}
             }
-            
-            
-            
-            $this->render();
-       
-	//dump(count($this->request));
-
-            //dump(filter_input(INPUT_POST,'wp_nonce'));
-         
-           if( wp_verify_nonce( filter_input(INPUT_POST,'_nonce'), 'form_'.$this->get_name() ) && $this->get_errors() == false ){
-            
-        //if(count($this->request) > 1 && $this->get_errors() == false){
-            //$this->render_after_submit = false;
-          //dump($this->get_errors());
-            
-           //dump($_POST);
-         //die();
-         
-         
-            $this->submit();
-            $this->body = '';
-            
-        }else if($this->get_errors()){
-            $this->body = '<div class="alert alert-danger">'.__( 'In the form errors occurred', 'pwp' ).'</div>'.$this->body;
-        }
-        
-        $this->print_form();
-            
-        }
-        }
     }
 
-    public function render(){
-        parent::render();
-    }
 
-    
-    function save(){
-	
-    }
-    
-    public function submit(){
-	//dump($this);
+
+
+    public function submit() {
 	if( $this->notify() ) {
-	    echo '<div class="alert alert-success">'.$this->message_form_send.'</div>';
+	    echo '<div class="alert alert-success">' . $this->message_form_send . '</div>';
 	}
     }
 }
 $contact = new Contact();
-
-
-
-/*
- [form name="rezerwacja" callback="Observer_Email"]
-[field type="file" name="plik" label="zalacznik"]
-
-[field type="comment" name="info" value="<small>Prosimy o podanie imienia i nazwiska oraz adresu e-mail lub numeru telefonu. W polu uwagi prosimy podać rodzaj biletu (np. przedsprzedaż), cenę itp.</small>" container="form-group"]
-[field type="text" name="imieinazwisko" validator="notempty" container="form-group" class="form-control" label="Imię i nazwisko"]
-[field type="email" name="email" validator="notempty,email" container="form-group" class="form-control" label="Adres email"]
-[field type="text" name="telefon" container="form-group" class="form-control" label="Numer telefonu"] [field type="select" name="iloscbiletow" container="form-group" class="form-control input-sm" label="Liczba rezerwowanych biletów" options="1|1,2|2,3|3,4|4,5|5,6|6,7|7,8|8,9|9,10|10"] [field type="textarea" name="uwagi" container="form-group" class="form-control" label="Uwagi"] [field type="comment" name="komentarz-newsletter" container="form-group" value="<small>Aby otrzymywać bieżące informacje o wydarzeniach w klubie Blue Note zapisz się do naszego newslettera</small>"] [field type="checkbox" name="newsletter" container="form-group" label="Chcę otrzymywać newsletter"] [field type="hidden" name="event" callback="get_the_ID,value" ] [field type="submit" name="tekst-submit" container="form-group" class="btn btn-primary btn-sm" value="Wyślij rezerwację"]
-
-
-<table style="border: solid 1px #666666; font-family: Arial, Helvetica, sans-serif; font-size: 14px;" width="600" border="0" cellspacing="0" cellpadding="7" align="center">
-<tbody>
-<tr>
-<td style="font-size: 14px; font-weight: bold; color: #666666; border-bottom: 4px solid #EAECF1;" colspan="2">[tytul]</td>
-</tr>
-<tr>
-<td style="padding: 10px;" width="20%">Imię i nazwisko</td>
-<td style="padding: 10px;" width="80%">[imieinazwisko]</td>
-</tr>
-<tr>
-<td style="padding: 10px;">E-mail</td>
-<td style="padding: 10px;">[email]</td>
-</tr>
-<tr>
-<td style="padding: 10px;">Telefon</td>
-<td style="padding: 10px;">[telefon]</td>
-</tr>
-<tr>
-<td style="padding: 10px;">Ilość biletów</td>
-<td style="padding: 10px;">[iloscbiletow]</td>
-</tr>
-<tr>
-<td style="padding: 10px;">Uwagi</td>
-<td style="padding: 10px;">[uwagi]</td>
-</tr>
-</tbody>
-</table>
- *
- */

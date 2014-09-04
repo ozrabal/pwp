@@ -868,3 +868,108 @@ function limitMediaLibraryItems_56456($where) {
     return $where;
 }
 
+
+
+
+//strona administracyjna z zakladkami
+	//
+	//$admin = Administrator::init();
+        $admin = new Administrator();
+        $page = array(
+            'parent_slug'   => 'edit.php?post_type=form',
+            'page_title'    => __( 'Form settings page', 'pwp' ),
+            'menu_title'    => __( 'Form settings', 'pwp' ),
+            'capability'    => 'manage_options',
+            'menu_slug'	    => 'form-options',
+            'icon'	    => '',
+            'position'	    => null,
+        );
+        //$admin->add_page( $page );
+
+        $admin->add_tab( 'Nowy tab', 'form-options' );
+        $options = new Options();
+        $options->set_name( 'a_options' )
+                ->set_action( 'options.php' )
+                ->set_title( __( 'Pierwsze opcje', 'pwp' ) );
+
+        $options->add_element( 'text', 'tekst' )
+                ->set_label( __( 'User email template', 'pwp' ) )
+                ->set_class( 'klasa' )
+                ->set_validator( array( 'notempty' ) );
+
+        $admin->add_options( $options, 'form-options' );
+        $admin->add_options( $options, 'nowy-tab' );
+
+        $admin->add_tab( 'Inny tab', 'form-options' );
+
+        $options_tab = new Options();
+        $options_tab->set_name( 'tab_options' )
+                ->set_action( 'options.php' )
+                ->set_title( __( 'opcje w tabie', 'pwp' ) );
+
+        $options_tab->add_element( 'text', 'tekstt' )
+                    ->set_label( __( 'pole w tab', 'pwp' ) )
+                    ->set_class( 'klasa' )
+                    ->set_validator( array( 'notempty' ) );
+
+        $options_tab->add_element( 'image', 'obrazek' )
+                    ->set_label( 'Obrazek' )
+                    ->set_comment( 'komentarz' )
+                    ->set_validator( array( 'notempty' ) );
+        $elements_repeater = array(
+            array(
+                'type' => 'text',
+		'name' => 'user_email_template',
+		'params'=> array(
+                    'label' => __( 'User email templatez', 'pwp' ),
+                    'class' => 'large-text',
+                ),
+            ),
+        );
+
+        $options_tab->add_element( 'repeatable', 'powtorz' )
+                    ->set_label( 'Powtarzalne' )
+                    ->set_comment( 'komentarz do repeatable' )
+                    ->add_elements( $elements_repeater );
+        $admin->add_options( $options_tab, 'inny-tab' );
+
+
+/*
+ [form name="rezerwacja" callback="Observer_Email"]
+[field type="file" name="plik" label="zalacznik"]
+
+[field type="comment" name="info" value="<small>Prosimy o podanie imienia i nazwiska oraz adresu e-mail lub numeru telefonu. W polu uwagi prosimy podać rodzaj biletu (np. przedsprzedaż), cenę itp.</small>" container="form-group"]
+[field type="text" name="imieinazwisko" validator="notempty" container="form-group" class="form-control" label="Imię i nazwisko"]
+[field type="email" name="email" validator="notempty,email" container="form-group" class="form-control" label="Adres email"]
+[field type="text" name="telefon" container="form-group" class="form-control" label="Numer telefonu"] [field type="select" name="iloscbiletow" container="form-group" class="form-control input-sm" label="Liczba rezerwowanych biletów" options="1|1,2|2,3|3,4|4,5|5,6|6,7|7,8|8,9|9,10|10"] [field type="textarea" name="uwagi" container="form-group" class="form-control" label="Uwagi"] [field type="comment" name="komentarz-newsletter" container="form-group" value="<small>Aby otrzymywać bieżące informacje o wydarzeniach w klubie Blue Note zapisz się do naszego newslettera</small>"] [field type="checkbox" name="newsletter" container="form-group" label="Chcę otrzymywać newsletter"] [field type="hidden" name="event" callback="get_the_ID,value" ] [field type="submit" name="tekst-submit" container="form-group" class="btn btn-primary btn-sm" value="Wyślij rezerwację"]
+
+
+<table style="border: solid 1px #666666; font-family: Arial, Helvetica, sans-serif; font-size: 14px;" width="600" border="0" cellspacing="0" cellpadding="7" align="center">
+<tbody>
+<tr>
+<td style="font-size: 14px; font-weight: bold; color: #666666; border-bottom: 4px solid #EAECF1;" colspan="2">[tytul]</td>
+</tr>
+<tr>
+<td style="padding: 10px;" width="20%">Imię i nazwisko</td>
+<td style="padding: 10px;" width="80%">[imieinazwisko]</td>
+</tr>
+<tr>
+<td style="padding: 10px;">E-mail</td>
+<td style="padding: 10px;">[email]</td>
+</tr>
+<tr>
+<td style="padding: 10px;">Telefon</td>
+<td style="padding: 10px;">[telefon]</td>
+</tr>
+<tr>
+<td style="padding: 10px;">Ilość biletów</td>
+<td style="padding: 10px;">[iloscbiletow]</td>
+</tr>
+<tr>
+<td style="padding: 10px;">Uwagi</td>
+<td style="padding: 10px;">[uwagi]</td>
+</tr>
+</tbody>
+</table>
+ *
+ */

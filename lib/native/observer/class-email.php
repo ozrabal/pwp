@@ -1,21 +1,22 @@
 <?php
 
-class Observer_Email implements Observer{
+class Observer_Email /*implements Observer*/{
     private $params;
 
     public function update( $params ) {
-        $this->set_params($params);
-        
+        $this->set_params( $params );
+        //dump(__METHOD__);
       
         
-         
-         //dump($this);
+         //return true;
+        
         if ($this->send()){
             
             return true;
             
 	}
 	return false;
+	
     }
 
     public function set_params($params){
