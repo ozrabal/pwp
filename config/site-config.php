@@ -30,7 +30,7 @@ $b = get_post_meta(get_the_ID(),'video',true);
 
 add_action('the_content','get_form');
 function get_form($content){
-    form('kontakt');
+    form('kontaktz');
     return $content;
 }
 

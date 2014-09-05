@@ -1,10 +1,23 @@
 <?php
-
+/**
+   * Contact
+   *
+   *
+   * @package    PWP
+   * @subpackage Contact
+   * @author     Piotr Łepkowski <piotr@webkowski.com>
+   */
 class Contact extends Form {
 
     private $shortcode = array();
     private $observers = array();
 
+    /**
+       *
+       * Incjalizacja modulu
+       *
+       * @return null
+       */
     static function init() {
 	
 	self::register_post_type();
@@ -248,81 +261,74 @@ class Contact extends Form {
 
     static function register_metabox(){
 
-	$metad = array(
-            array(
-                'name'      => 'pwp_form',
-                'title'     => __( 'Form parameters', 'pwp' ),
-                'post_type' => array( 'form' ),
-                'elements'  => array(
-                    array(
-                        'type' => 'text',
-                        'name' => 'user_email_subject',
-                        'params'=> array(
-                            'label' => __( 'Subject of user email', 'pwp' ),
-                            'class' => 'large-text',
-			    'validator' => array(
-				'notempty'
-			    ),
-                         ),
+	$box = array(
+            'name'      => 'pwp_form',
+            'title'     => __( 'Form parameters', 'pwp' ),
+            'post_type' => array( 'form' ),
+            'elements'  => array(
+                array(
+                    'type' => 'text',
+                    'name' => 'user_email_subject',
+                    'params'=> array(
+                        'label' => __( 'Subject of user email', 'pwp' ),
+                        'class' => 'large-text'
                     ),
-                    array(
-                        'type' => 'textarea',
-                        'name' => 'user_email_template',
-                        'params'=> array(
-                            'label' => __( 'User email template', 'pwp' ),
-                            'class' => 'large-text',
-                            'comment' => __( 'Template of the message that is sent to administrator when a user to fill in a form on the page.', 'pwp' )
-                        ),
+                ),
+                array(
+                    'type' => 'textarea',
+                    'name' => 'user_email_template',
+                    'params'=> array(
+                        'label' => __( 'User email template', 'pwp' ),
+                        'class' => 'large-text',
+                        'comment' => __( 'Template of the message that is sent to administrator when a user to fill in a form on the page.', 'pwp' )
                     ),
-                    array(
-                        'type' => 'text',
-                        'name' => 'admin_email_subject',
-                        'params'=> array(
-                            'label' => __( 'Subject of admin email', 'pwp' ),
-                            'class' => 'large-text',
-                         ),
+                ),
+                array(
+                    'type' => 'text',
+                    'name' => 'admin_email_subject',
+                    'params'=> array(
+                        'label' => __( 'Subject of admin email', 'pwp' ),
+		        'class' => 'large-text',
                     ),
-                    array(
-                        'type' => 'textarea',
-                        'name' => 'admin_email_template',
-                        'params'=> array(
-                            'label' => __( 'Admin email template', 'pwp' ),
-                            'class' => 'large-text',
-                            'comment' => __( 'Template of the message that is sent to a user when he fills a form on the page.', 'pwp' )
-                        ),
+                ),
+                array(
+                    'type' => 'textarea',
+                    'name' => 'admin_email_template',
+                    'params'=> array(
+                        'label' => __( 'Admin email template', 'pwp' ),
+                        'class' => 'large-text',
+                        'comment' => __( 'Template of the message that is sent to a user when he fills a form on the page.', 'pwp' )
                     ),
-                    array(
-                        'type' => 'text',
-                        'name' => 'recipient',
-                        'params'=> array(
-                            'label' => __( 'Form recipient email addres (comma separated)', 'pwp' ),
-                            'class' => 'large-text',
-                            'comment' => __( 'Email addresses of recipients submitted forms', 'pwp' )
-                        ),
+                ),
+                array(
+                    'type' => 'text',
+                    'name' => 'recipient',
+                    'params'=> array(
+                        'label' => __( 'Form recipient email addres (comma separated)', 'pwp' ),
+                        'class' => 'large-text',
+                        'comment' => __( 'Email addresses of recipients submitted forms', 'pwp' )
                     ),
-                    array(
-                        'type' => 'textarea',
-                        'name' => 'message_form_send',
-                        'params'=> array(
-                            'label' => __( 'Submit info', 'pwp' ),
-                            'class' => 'large-text',
-                            'comment' => __( 'Message displayed after submitting the form', 'pwp' )
-                        ),
+                ),
+                array(
+                    'type' => 'textarea',
+                    'name' => 'message_form_send',
+                    'params'=> array(
+                        'label' => __( 'Submit info', 'pwp' ),
+                        'class' => 'large-text',
+                        'comment' => __( 'Message displayed after submitting the form', 'pwp' )
                     ),
-		    array(
-                        'type' => 'checkbox',
-                        'name' => 'send_to_user',
-                        'params'=> array(
-                            'label' => __( 'Send copy of message to user', 'pwp' ),
-                            'comment' => __( 'If the box is checked the user filling out a form will receive a copy of the sent data', 'pwp' )
-			),
-                    ),
-                )
+                ),
+		array(
+                    'type' => 'checkbox',
+                    'name' => 'send_to_user',
+                    'params'=> array(
+                        'label' => __( 'Send copy of message to user', 'pwp' ),
+                        'comment' => __( 'If the box is checked the user filling out a form will receive a copy of the sent data', 'pwp' )
+		    ),
+                ),
             )
         );
-        foreach( $metad as $box ){
-            new Metabox( $box );
-        }
+        new Metabox( $box );
     }
     
     static function disable_rich_editor() {
