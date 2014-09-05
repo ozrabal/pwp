@@ -1,8 +1,7 @@
 <?php
 /**
-   * Contact
-   *
-   *
+   * Contact module class
+   * 
    * @package    PWP
    * @subpackage Contact
    * @author     Piotr Łepkowski <piotr@webkowski.com>
@@ -13,11 +12,8 @@ class Contact extends Form {
     private $observers = array();
 
     /**
-       *
-       * Incjalizacja modulu
-       *
-       * @return null
-       */
+     * Inicjalizacja modulu
+     */
     static function init() {
 	
 	self::register_post_type();
@@ -26,9 +22,16 @@ class Contact extends Form {
 	    new Contact();
 	}
     }
-
+    
+    /**
+     * Konstruktor
+     * 
+     * @param type $params
+     * @return boolean
+     */
     public function __construct( $params = false) {
-
+        
+        //shortcody dla pola edycji
         $this->add_shortcodes();
 
 	if( !$params ) {
@@ -52,8 +55,13 @@ class Contact extends Form {
 	    $this->print_form();
         }
     }
-
-    private function get_definition( $slug = null ) {
+    
+    /**
+     * pobiera definicje formularza z meta postu form o podanym slugu
+     * @param String $slug
+     * @return boolean
+     */
+    private function get_definition( String $slug = null ) {
 
 	if( empty( $slug ) ) {
 	    return false;
@@ -72,7 +80,12 @@ class Contact extends Form {
 	dbug( 'Invalid form name (slug) ' . $slug );
         return false;
     }
-
+    
+    /**
+     * 
+     * @param Int $form_id
+     * @return Array
+     */
     private function get_form_meta( $form_id ) {
 
 	$this->user_email_template = get_post_meta( $form_id,'user_email_template',true );
@@ -84,7 +97,11 @@ class Contact extends Form {
         $this->message_form_send = get_post_meta( $form_id,'message_form_send',true );
         return get_post_meta( $form_id,'definition',true );
     }
-
+    
+    /**
+     * Zapisuje definicje formularza na podstawie shortcode z edytora do pola meta
+     * @global Post $post
+     */
     public function onsave() {
 
 	if( filter_input( INPUT_POST, 'content' ) ) {
@@ -98,7 +115,10 @@ class Contact extends Form {
             update_post_meta( $post->ID, 'definition', $meta );
         }
     }
-
+    
+    /**
+     * obsluga pola powtarzalnego w definicji
+     */
     private function assign_repeatable() {
 
 	foreach( $this->shortcode['elements'] as $key => $field ) {
@@ -108,7 +128,10 @@ class Contact extends Form {
             }
         }
     }
-
+    
+    /**
+     * dodaje shortcode do edytora
+     */
     private function add_shortcodes() {
 	
 	if( current_user_can( 'edit_posts' ) && current_user_can( 'edit_pages' ) && 'form' == pwp_current_post_type() ) {
@@ -118,7 +141,11 @@ class Contact extends Form {
 	    add_filter( 'user_can_richedit', array( $this, 'disable_rich_editor' ) );
         }
     }
-        
+    
+    /**
+     * shortcode [form]
+     * @param Array $params
+     */    
     public function add_form( $params ) {
 
 	$form_atts = shortcode_atts( array(
@@ -131,7 +158,12 @@ class Contact extends Form {
         }
         $this->shortcode = $form_atts;
     }
-
+    
+    /**
+     * shortcode [field]
+     * @param Array $params
+     * @param Mixed $content
+     */
     public function add_field( $params, $content = null ) {
         $field_atts = shortcode_atts( array(
             'type'          => 'input',
@@ -161,7 +193,12 @@ class Contact extends Form {
             $this->shortcode['elements'][]= $field;
         }
     }
-
+    
+    /**
+     * ustawia parametry pola ze shortcode
+     * @param Array $field_atts
+     * @return Array
+     */
     private function create_settings( $field_atts ){
         $field['type'] = $field_atts['type'];
         $field['name'] = $field_atts['name'];
@@ -193,7 +230,11 @@ class Contact extends Form {
         }
         return $field;
     }
-
+    
+    /**
+     * ustawia funkcje obslugi formularza, jesli nie podano to Email
+     * @param string $args
+     */
     private function init_callback( $args = false ) {
 	if( !$args ) {
 	    $args = 'Observer_Email';
@@ -203,17 +244,28 @@ class Contact extends Form {
 	    $this->attach( new $callback() );
 	}
     }
-
+    
+    /**
+     * ustawia tablice obslugi formularza
+     * @param Object $callback_object
+     */
     public function attach( $callback_object ) {
         $this->observers[] = $callback_object;
     }
-
+    
+    /**
+     * wysylka formularza i wywolanie obslugi
+     */
     public function submit() {
 	if( $this->notify() ) {
 	    echo '<div class="alert alert-success">' . $this->message_form_send . '</div>';
 	}
     }
-
+    
+    /**
+     * wywoluje akcje w funkcji obslugujacej po submicie formularza
+     * @return boolean
+     */
     public function notify() {
 
 	$result = null;
@@ -232,7 +284,10 @@ class Contact extends Form {
 	}
 	return $result;
     }
-
+    
+    /**
+     * rejestracja typu postu form
+     */
     static function register_post_type() {
 
         $args = array(
@@ -259,6 +314,9 @@ class Contact extends Form {
 	register_post_type( 'form', $args );
     }
 
+    /**
+     * rejestracja pol meta dla typu postu form
+     */
     static function register_metabox(){
 
 	$box = array(
@@ -331,6 +389,10 @@ class Contact extends Form {
         new Metabox( $box );
     }
     
+    /**
+     * funkcja zwraca false 
+     * @return boolean
+     */
     static function disable_rich_editor() {
 	return false;
     }
