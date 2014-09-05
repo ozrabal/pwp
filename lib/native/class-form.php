@@ -19,9 +19,11 @@ abstract class Form {
      * 
      * @param array $params
      */
-    public function __construct( Array $params ) {
+    public function __construct(  $params ) {
 
-
+if(!is_array($params)){
+    return FALSE;
+}
 
 
 	$this->set_name($params['name']);

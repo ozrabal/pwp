@@ -1,0 +1,330 @@
+<?php
+
+class Contact extends Form {
+
+    private $shortcode = array();
+    private $observers = array();
+
+    static function init() {
+	
+	self::register_post_type();
+	self::register_metabox();
+	if( is_admin() && current_user_can( 'edit_posts' ) && current_user_can( 'edit_pages' ) && 'form' == pwp_current_post_type() ) {
+	    new Contact();
+	}
+    }
+
+    public function __construct( $params = false) {
+
+        $this->add_shortcodes();
+
+	if( !$params ) {
+	    return false;
+        }
+        if( !is_array( $params ) ) {
+            $params = $this->get_definition( $params );
+        }
+
+	parent::__construct( $params['definition'] );
+
+	if( is_array( $params['definition'] ) ) {
+	    $this->init_callback( $params['definition']['callback'] );
+	    parent::render();
+	    if( wp_verify_nonce( filter_input( INPUT_POST, '_' . $this->get_name() . '_nonce' ), 'form_' . $this->get_name() ) && !$this->get_errors() ) {
+		$this->submit();
+		$this->body = '';
+            } else if( $this->get_errors() ) {
+		$this->body = '<div class="alert alert-danger">' . __( 'In the form errors occurred', 'pwp' ) . '</div>' . $this->body;
+	    }
+	    $this->print_form();
+        }
+    }
+
+    private function get_definition( $slug = null ) {
+
+	if( empty( $slug ) ) {
+	    return false;
+	}
+	$arg = array(
+	    'name'          => sanitize_key( $slug ),
+            'post_type'     => 'form',
+            'post_status'   => 'publish',
+            'numberposts'   => 1
+        );
+        $form_definition = get_posts( $arg );
+
+	if( !empty( $form_definition ) ) {
+	    return $this->get_form_meta( $form_definition[0]->ID );
+	}
+	dbug( 'Invalid form name (slug) ' . $slug );
+        return false;
+    }
+
+    private function get_form_meta( $form_id ) {
+
+	$this->user_email_template = get_post_meta( $form_id,'user_email_template',true );
+        $this->admin_email_template = get_post_meta( $form_id,'admin_email_template',true );
+        $this->user_email_subject = get_post_meta( $form_id,'user_email_subject',true );
+        $this->admin_email_subject = get_post_meta( $form_id,'admin_email_subject',true );
+        $this->recipient = get_post_meta( $form_id,'recipient',true );
+        $this->send_to_user = get_post_meta( $form_id,'send_to_user',true );
+        $this->message_form_send = get_post_meta( $form_id,'message_form_send',true );
+        return get_post_meta( $form_id,'definition',true );
+    }
+
+    public function onsave() {
+
+	if( filter_input( INPUT_POST, 'content' ) ) {
+	    global $post;
+            do_shortcode( stripslashes( filter_input( INPUT_POST, 'content' ) ) );
+	    if( isset( $this->shortcode['elements'] ) ) {
+                $this->assign_repeatable();
+            }
+            $meta = get_post_meta( $post->ID, 'pwp_form', true );
+            $meta['definition'] = $this->shortcode;
+            update_post_meta( $post->ID, 'definition', $meta );
+        }
+    }
+
+    private function assign_repeatable() {
+
+	foreach( $this->shortcode['elements'] as $key => $field ) {
+	    if( isset( $this->repeatable[$field['name']] ) ) {
+		unset( $this->repeatable[$field['name']]['repeatable'] );
+		$this->shortcode['elements'][$key]['params']['options'] = $this->repeatable[$field['name']];
+            }
+        }
+    }
+
+    private function add_shortcodes() {
+	
+	if( current_user_can( 'edit_posts' ) && current_user_can( 'edit_pages' ) && 'form' == pwp_current_post_type() ) {
+            add_shortcode( 'form', array( $this, 'add_form' ) );
+            add_shortcode( 'field', array( $this, 'add_field' ) );
+            add_action( 'save_post', array( $this, 'onsave' ) ,0 );
+	    add_filter( 'user_can_richedit', array( $this, 'disable_rich_editor' ) );
+        }
+    }
+        
+    public function add_form( $params ) {
+
+	$form_atts = shortcode_atts( array(
+            'name'      => 'form_' . uniqid(),
+            'recipient' => get_option( 'admin_email' ),
+            'callback'  => ''
+        ), $params );
+        if( is_callable( $form_atts['callback'] ) ) {
+            $form_atts['callback'] = new $form_atts['callback']();
+        }
+        $this->shortcode = $form_atts;
+    }
+
+    public function add_field( $params, $content = null ) {
+        $field_atts = shortcode_atts( array(
+            'type'          => 'input',
+            'name'          => 'field_' . uniqid(),
+            'validator'     => '',
+            'class'         => '',
+            'title'         => '',
+            'label'         => '',
+            'container'     => '',
+            'options'       => '',
+            'value'         => '',
+            'callback'      => '',
+            'content'       => '',
+            'repeatable'    => null
+        ), $params );
+
+        if( $field_atts['type'] == 'repeatable' ) {
+            $field_atts['options'] = array();
+        }
+        $field = $this->create_settings( $field_atts );
+
+        if( $field_atts['repeatable'] ) {
+            unset( $field['params']['repeatable'] );
+            $this->repeatable[$field_atts['repeatable']][] = $field;
+            unset( $field );
+        } else {
+            $this->shortcode['elements'][]= $field;
+        }
+    }
+
+    private function create_settings( $field_atts ){
+        $field['type'] = $field_atts['type'];
+        $field['name'] = $field_atts['name'];
+        if( !empty( $field_atts['validator'] ) ) {
+            $field_atts['validator'] = explode( ',', $field_atts['validator'] );
+            $field['validator'] = $field_atts['validator'];
+        }
+        if( !empty($field_atts['callback'] ) ) {
+            $field_atts['callback'] = explode( ',', $field_atts['callback'] );
+            $field_atts['callback'] = $field_atts['callback'];
+        }
+        if( !empty($field_atts['container'] ) ) {
+            $field_atts['before'] = '<div class="' . $field_atts['container'] . '">';
+            $field_atts['after'] = '</div>';
+            unset( $field_atts['container'] );
+        }
+        if( !empty($field_atts['options'] ) ) {
+            $options = explode( ',', $field_atts['options'] );
+            foreach( $options as $option ) {
+                $option = explode( '|', $option );
+                $opt[$option[0]] = $option[1];
+            }
+            $field_atts['options'] = $opt;
+        }
+        foreach( $field_atts as $key => $att ) {
+            if( !in_array( $key, array( 'type', 'name', 'validator' ) ) && !empty( $att ) ) {
+                $field['params'][$key] = $att;
+            }
+        }
+        return $field;
+    }
+
+    private function init_callback( $args = false ) {
+	if( !$args ) {
+	    $args = 'Observer_Email';
+	}
+	$this->callback = explode( ',', $args );
+	foreach( $this->callback as $callback ) {
+	    $this->attach( new $callback() );
+	}
+    }
+
+    public function attach( $callback_object ) {
+        $this->observers[] = $callback_object;
+    }
+
+    public function submit() {
+	if( $this->notify() ) {
+	    echo '<div class="alert alert-success">' . $this->message_form_send . '</div>';
+	}
+    }
+
+    public function notify() {
+
+	foreach( $this->observers as $observer ) {
+	    $result = $observer->update( array(
+		    'object'		    => $result,
+		    'user_email_template'   => $this->user_email_template ,
+		    'admin_email_template'  => $this->admin_email_template,
+		    'user_email_subject'    => $this->user_email_subject,
+		    'admin_email_subject'   => $this->admin_email_subject,
+		    'send_to_user'	    => $this->send_to_user,
+		    'recipient'		    => $this->recipient,
+		    'request'		    => $this->get_request()
+		)
+	    );
+	}
+	return $result;
+    }
+
+    static function register_post_type() {
+
+        $args = array(
+            'labels'             => array(
+		'name'               => __( 'Forms', 'pwp' ),
+		'singular_name'      => __( 'Form', 'pwp' ),
+		'add_new'            => __( 'Add New', 'pwp' ),
+		'add_new_item'       => __( 'Add New Form', 'pwp' ),
+		'edit_item'          => __( 'Edit Form', 'pwp' ),
+		'new_item'           => __( 'New Form', 'pwp' ),
+		'all_items'          => __( 'All Forms', 'pwp' ),
+		'view_item'          => __( 'View Form', 'pwp' ),
+		'search_items'       => __( 'Search Forms', 'pwp' ),
+		'not_found'          => __( 'No forms found', 'pwp' ),
+		'not_found_in_trash' => __( 'No forms found in Trash', 'pwp' ),
+		'parent_item_colon'  => __( ':', 'pwp' ),
+		'menu_name'          => __( 'Forms', 'pwp' )
+	    ),
+            'public'             => false,
+            'show_ui'            => true,
+            'query_var'          => false,
+            'supports'           => array( 'title', 'custom-fields', 'editor' )
+        );
+	register_post_type( 'form', $args );
+    }
+
+    static function register_metabox(){
+
+	$metad = array(
+            array(
+                'name'      => 'pwp_form',
+                'title'     => __( 'Form parameters', 'pwp' ),
+                'post_type' => array( 'form' ),
+                'elements'  => array(
+                    array(
+                        'type' => 'text',
+                        'name' => 'user_email_subject',
+                        'params'=> array(
+                            'label' => __( 'Subject of user email', 'pwp' ),
+                            'class' => 'large-text',
+			    'validator' => array(
+				'notempty'
+			    ),
+                         ),
+                    ),
+                    array(
+                        'type' => 'textarea',
+                        'name' => 'user_email_template',
+                        'params'=> array(
+                            'label' => __( 'User email template', 'pwp' ),
+                            'class' => 'large-text',
+                            'comment' => __( 'Template of the message that is sent to administrator when a user to fill in a form on the page.', 'pwp' )
+                        ),
+                    ),
+                    array(
+                        'type' => 'text',
+                        'name' => 'admin_email_subject',
+                        'params'=> array(
+                            'label' => __( 'Subject of admin email', 'pwp' ),
+                            'class' => 'large-text',
+                         ),
+                    ),
+                    array(
+                        'type' => 'textarea',
+                        'name' => 'admin_email_template',
+                        'params'=> array(
+                            'label' => __( 'Admin email template', 'pwp' ),
+                            'class' => 'large-text',
+                            'comment' => __( 'Template of the message that is sent to a user when he fills a form on the page.', 'pwp' )
+                        ),
+                    ),
+                    array(
+                        'type' => 'text',
+                        'name' => 'recipient',
+                        'params'=> array(
+                            'label' => __( 'Form recipient email addres (comma separated)', 'pwp' ),
+                            'class' => 'large-text',
+                            'comment' => __( 'Email addresses of recipients submitted forms', 'pwp' )
+                        ),
+                    ),
+                    array(
+                        'type' => 'textarea',
+                        'name' => 'message_form_send',
+                        'params'=> array(
+                            'label' => __( 'Submit info', 'pwp' ),
+                            'class' => 'large-text',
+                            'comment' => __( 'Message displayed after submitting the form', 'pwp' )
+                        ),
+                    ),
+		    array(
+                        'type' => 'checkbox',
+                        'name' => 'send_to_user',
+                        'params'=> array(
+                            'label' => __( 'Send copy of message to user', 'pwp' ),
+                            'comment' => __( 'If the box is checked the user filling out a form will receive a copy of the sent data', 'pwp' )
+			),
+                    ),
+                )
+            )
+        );
+        foreach( $metad as $box ){
+            new Metabox( $box );
+        }
+    }
+    
+    static function disable_rich_editor() {
+	return false;
+    }
+}
