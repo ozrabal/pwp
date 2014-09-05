@@ -1,9 +1,14 @@
 <?php
 
+/**
+   * Metabox class
+   * 
+   * @package    PWP
+   * @subpackage Core
+   * @author     Piotr Łepkowski <piotr@webkowski.com>
+   */
 class Metabox extends Form {
     private
-	$name,
-	$title,
 	$callback,
 	$post_type,
 	$context,
@@ -11,27 +16,27 @@ class Metabox extends Form {
     ;
 
     public function __construct( $box ) {
-        if ( ! is_admin() ){
+        
+        if( !is_admin() ){
 	    return;
 	}
-        parent::__construct($box);
-        $this->config( $box );
-	$this->set_params( $box );
-	add_action( 'add_meta_boxes', array( $this, 'add_box' ) );
-        //dump($_POST);
-        //dump($box);
-        //dump($post);
-        //die();
-        if ( !defined( 'DOING_AJAX' ) && isset($_POST['post_type']) && in_array($_POST['post_type'], $box['post_type'])) {
-            add_action( 'save_post', array( $this, 'save' ) );
-            unset($_SESSION['p_'.$_POST['post']]);
-	}
         
+        parent::__construct( $box );
+        parent::set_params( $box );
+        
+        $this->config( $box );
+        
+        add_action( 'add_meta_boxes', array( $this, 'add_box' ) );
+
+        if( !defined( 'DOING_AJAX' ) && filter_input( INPUT_POST, 'post_type' ) && in_array( filter_input( INPUT_POST, 'post_type' ), $box['post_type'] ) ) {
+            add_action( 'save_post', array( $this, 'save' ) );
+            unset( $_SESSION['p_' . filter_input( INPUT_POST, 'post' )] );
+	}
     }
 
-    public function set_params( Array $params ) {
-        parent::set_params( $params );
-    }
+//    public function set_params( Array $params ) {
+//        parent::set_params( $params );
+//    }
 
     private function config( $config ) {
 	$defaults = array(
@@ -49,34 +54,37 @@ class Metabox extends Form {
 	
 	foreach( $defaults as $param => $value ) {
 	    if ( isset( $config[$param] ) ) {
-		$this->{ 'set_' . $param }( $config[$param] );
+                $this->{ 'set_' . $param }( $config[$param] );
 	    } else {
 		$this->{ 'set_' . $param }( $value );
 	    }
 	}
     }
     
-    public function set_name( $name ) {
-	$this->name = sanitize_key( $name );
-    }
+//    public function set_name( $name ) {
+//        parent::set_name($name);
+//	//$this->name = sanitize_key( $name );
+//        return $this;
+//   }
     
     public function set_allow_posts( $allow_posts ) {
         $this->allow_box = $allow_posts;
     }
     
-    public function get_name() {
-	return $this->name;
-    }
+    
+//    public function get_name() {
+//	return $this->name;
+//    }
 
-    public function set_title( $title ) {
-	$this->title = $title;
-        return $this;
-    }
+//    public function set_title( $title ) {
+//	$this->title = $title;
+//        return $this;
+//    }
 
-    public function get_title( $tag = '%s' ) {
-        if ( isset( $this->title ) )
-	    return sprintf( $tag, $this->title );
-    }
+//    public function get_title( $tag = '%s' ) {
+//        if ( isset( $this->title ) )
+//	    return sprintf( $tag, $this->title );
+//    }
     
     public function set_callback( $callback ) {
 	$this->callback = sanitize_key( $callback );
@@ -173,23 +181,28 @@ class Metabox extends Form {
 	}
     }
     
-    /*
+    /**
      * allow display metabox to specified post
-     * $rule string
-     * $params array
+     * @global type $current_screen
+     * @param string $rule
+     * @param array $params
+     * @return boolean
      */
     private function allow_box_add( $rule, $params ) {
-	global $current_screen;
-
+	
+        global $current_screen;
         if ( $rule && isset( $current_screen ) && $current_screen->action != 'add' ) {
             return $this->{ 'allow_' . $rule }( $params );
         }
         return true;
     }
     
-    /*
-     * check specufied rules allo metabox display in post edit screen
+    /**
+     * check specified rules allow metabox display in post edit screen
      * check if post id is in allowed set of ids
+     * @global object $post
+     * @param array $ids
+     * @return boolean
      */
     private function allow_id( $ids ) {
         global $post;
@@ -199,6 +212,9 @@ class Metabox extends Form {
         return false;
     }
     
+    /**
+     * display error message
+     */
     public function error_notice(){
         echo '<div class="error"><p>' . __( 'There were errors, not all parameters are saved.', 'pwp' ) . '</p></div>';
     }
