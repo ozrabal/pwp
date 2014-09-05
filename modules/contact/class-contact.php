@@ -61,7 +61,7 @@ class Contact extends Form {
      * @param String $slug
      * @return boolean
      */
-    private function get_definition( String $slug = null ) {
+    private function get_definition( $slug = null ) {
 
 	if( empty( $slug ) ) {
 	    return false;

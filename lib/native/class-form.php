@@ -8,10 +8,11 @@ abstract class Form {
         $body;
 
     private 
-        $name='',
+        
         $action;
     
     protected 
+            //$name='',
         $render_after_submit = true,
         $request = false,
         $errors = false;
@@ -172,14 +173,18 @@ $this->add_formname_field();
     
     public function set_title($title){
         $this->title = $title;
+        return $this;
     }
+    
     public function get_title($tag = '%s'){
         if(isset($this->title))
         return sprintf( $tag ,$this->title);
     }
+    
     public function set_name($name){
-        $this->name = $name;
+        $this->name = sanitize_key( $name );
 	return $this;
+        
     }
     
     public function get_name(){
