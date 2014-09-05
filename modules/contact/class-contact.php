@@ -203,6 +203,7 @@ class Contact extends Form {
 
     public function notify() {
 
+	$result = null;
 	foreach( $this->observers as $observer ) {
 	    $result = $observer->update( array(
 		    'object'		    => $result,

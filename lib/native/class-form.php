@@ -81,7 +81,7 @@ if(!is_array($params)){
     }
 
     protected function add_formname_field() {
-	$this->addElement('text','_'.$this->get_name().'_name');
+	$this->addElement('hidden','_'.$this->get_name().'_name');
             $this->elements['_'.$this->get_name().'_name']->set_value($this->get_name());
     }
 
