@@ -14,7 +14,12 @@ class Metabox extends Form {
 	$context,
 	$priority
     ;
-
+    
+    /**
+     * 
+     * @param array $box
+     * @return null
+     */
     public function __construct( $box ) {
         
         if( !is_admin() ){
@@ -27,17 +32,17 @@ class Metabox extends Form {
         $this->config( $box );
         
         add_action( 'add_meta_boxes', array( $this, 'add_box' ) );
-
+//dump($box);
         if( !defined( 'DOING_AJAX' ) && filter_input( INPUT_POST, 'post_type' ) && in_array( filter_input( INPUT_POST, 'post_type' ), $box['post_type'] ) ) {
             add_action( 'save_post', array( $this, 'save' ) );
             unset( $_SESSION['p_' . filter_input( INPUT_POST, 'post' )] );
 	}
     }
 
-//    public function set_params( Array $params ) {
-//        parent::set_params( $params );
-//    }
-
+    /**
+     * ustawia parametry startowe
+     * @param array $config
+     */
     private function config( $config ) {
 	$defaults = array(
 	    'name'          => 'pwp_meta',
@@ -61,60 +66,69 @@ class Metabox extends Form {
 	}
     }
     
-//    public function set_name( $name ) {
-//        parent::set_name($name);
-//	//$this->name = sanitize_key( $name );
-//        return $this;
-//   }
-    
+    /**
+     * ustawia typy postow lub id dozwolone dla metaboxu
+     * @param type $allow_posts
+     */
     public function set_allow_posts( $allow_posts ) {
         $this->allow_box = $allow_posts;
     }
-    
-    
-//    public function get_name() {
-//	return $this->name;
-//    }
 
-//    public function set_title( $title ) {
-//	$this->title = $title;
-//        return $this;
-//    }
-
-//    public function get_title( $tag = '%s' ) {
-//        if ( isset( $this->title ) )
-//	    return sprintf( $tag, $this->title );
-//    }
-    
-    public function set_callback( $callback ) {
+    /**
+     * ustawia funkcje renderujaca
+     * @param string $callback
+     */
+    public function set_callback( $callback  = 'render' ) {
 	$this->callback = sanitize_key( $callback );
     }
-
+    
+    /**
+     * zwraca nazwe funkcji renderujacej
+     * @return string
+     */
     public function get_callback() {
 	return $this->callback;
     }
-
+    
+    /**
+     * ustawia typ postu dla metaboxu
+     * @param string $post_type
+     */
     public function set_post_type( $post_type ) {
 	$this->post_type = $post_type;
     }
-
+    
+    /**
+     * ustawia context
+     * @param string $context
+     */
     public function set_context( $context ) {
 	$this->context = sanitize_key( $context );
     }
-
+    
+    /**
+     * zwraca context
+     * @return string
+     */
     public function get_context() {
 	return $this->context;
     }
-
+    
+    /**
+     * ustawia priorytet metaboxu
+     * @param int $priority
+     */
     public function set_priority( $priority ) {
 	$this->priority = $priority;
     }
-
+    /**
+     * zwraca priorytet boxu
+     * @return int
+     */
     public function get_priority() {
 	return $this->priority;
     }
-        
-    function save( $post_id ) {
+        function saves( $post_id ) {
         global $current_screen;
         
 	foreach( $this->elements as $element ) {
@@ -153,11 +167,75 @@ class Metabox extends Form {
         }
     }
     
+    
+    function save( $post_id ) {
+        
+        global $current_screen;
+        foreach( $this->elements as $element ) {
+            $old = get_post_meta( $post_id, $element->get_name(), true );
+            //dump($element->get_name());
+            //dump($_POST['video'] );
+            //dump(filter_input( INPUT_POST, $element->get_name(),FILTER_DEFAULT, FILTER_REQUIRE_ARRAY ));
+            
+            $save[$element->get_name()] = '';
+            
+            //if tablica to filter array przerobic
+           if($element->get_type() == 'repeatable'){
+            if ( filter_input( INPUT_POST, $element->get_name(),FILTER_DEFAULT, FILTER_REQUIRE_ARRAY ) ) {
+                
+                //dump(filter_input( INPUT_POST, $element->get_name(),FILTER_DEFAULT, FILTER_REQUIRE_ARRAY ));
+                
+                $save[$element->get_name()] = filter_input( INPUT_POST, $element->get_name(),FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+            }
+           }else{
+              if ( filter_input( INPUT_POST, $element->get_name() ) ) {
+                
+                //dump(filter_input( INPUT_POST, $element->get_name() ));
+                
+                $save[$element->get_name()] = filter_input( INPUT_POST, $element->get_name() );
+            } 
+           }
+            
+            $_SESSION['p_'.$post_id][$element->get_name()] = $save[$element->get_name()];
+            if ( isset( $current_screen ) && $current_screen->action != 'add' && $element->get_validator() ) {
+                $error = $this->is_error( $element, $save );
+            }
+        }
+        //die();
+        if(  !isset( $error ) ) {
+            
+             
+            
+            if ( isset( $old ) &&  is_array( $old ) ) {
+                $savee = array_merge( $old, $save );
+            } else {
+                $savee = $save;
+	    }
+            foreach( $savee as $meta_name => $meta_value ) {
+                update_post_meta( $post_id,  $meta_name, $meta_value );
+            }
+        }
+    }
+    
+    /**
+     * wykonuje walidacje i ustawia w sesji error jesli validacja nie poprawna
+     * @param object $element
+     * @param array $save
+     * @return array
+     */
+    private function is_error( $element, $save ) {
+        $error = $element->validate( $save[$element->get_name()], $element->get_validator() );
+        if( $error ) {
+            $_SESSION['metabox-error'][$this->get_name()][$element->get_name()]['message'] = array( 'error', $error );
+            return $error;
+        }
+    }
+    
     /*
      * add metabox to specified one or many post types
      */
     public function add_box() {
-        global $post;
+        
         if ( is_array( $this->post_type ) ) {
             foreach( $this->post_type as $post_type ) {
                 $this->set_box( $post_type );
@@ -168,10 +246,12 @@ class Metabox extends Form {
         }
     }
 
-    /*
-     * 
+    /**
+     * dodaje metabox do strony edycji postu
+     * @param string $post_type
      */
     private function set_box( $post_type ) {
+        
         if ( isset( $_SESSION['metabox-error'][$this->get_name()] ) && !isset( $_SESSION['noticed'] ) ) {
 	    add_action( 'admin_notices', array( $this, 'error_notice' ) );
             $_SESSION['noticed'] = true;
@@ -215,90 +295,48 @@ class Metabox extends Form {
     /**
      * display error message
      */
-    public function error_notice(){
+    public function error_notice() {
         echo '<div class="error"><p>' . __( 'There were errors, not all parameters are saved.', 'pwp' ) . '</p></div>';
     }
-
-
-    public function render(){
-	global $post;
- //global $wp_meta_boxes;
-       // dump( $wp_meta_boxes['page']);
-        
-        //dump($_SESSION);
-       //dump($this->elements); 
-       
-    //$v = get_post_meta($post->ID,$this->get_name(),true);
     
-        
-        
-    foreach ($this->elements as $element){
-        
-        if(isset($_SESSION['p_'.$post->ID][$element->name])){
-             $v[$element->name] = $_SESSION['p_'.$post->ID][$element->name];
-        }else{
-        
-        $v[$element->name] = get_post_meta($post->ID,$element->name,true);
-        }        
-        
-    }
-    
-    
-    
-    //dump($this->get_name());
-   
-    
-	$this->options = $v;
-	//$v = $this->options ;
-        
-        //dump($this->options); 
-//dump($v);
-
-
-
-	$this->body = '<table id="'.$this->get_name().'" class="form-table pwp-metabox"><tbody>';
-if(isset($this->elements)){
-	foreach ($this->elements as $element){
-
-
-           if(isset($_SESSION['metabox-error'][$this->get_name()][$element->get_name()])){
-               
-              //dump($_SESSION['metabox-error'][$this->get_name()][$element->get_name()]);
-            
-              $element->set_class('pwp-error');
-            
-            $element->set_message($_SESSION['metabox-error'][$this->get_name()][$element->get_name()]['message']);
-            //dump($_SESSION['metabox-error'][$this->get_name()][$element->get_name()]['message']);
-            //unset($_SESSION);
-             
-             
+    /**
+     * renderuje element formularza i wypenia go wartosciami
+     * @global object $post
+     * @param object $element
+     * @return string
+     */
+    private function render_element($element){
+        global $post;
+        if( isset($_SESSION['metabox-error'][$this->get_name()][$element->get_name()] ) ) {
+            $element->set_class( 'pwp-error' );
+            $element->set_message( $_SESSION['metabox-error'][$this->get_name()][$element->get_name()]['message'] );
         }
-             
-	    if(isset($v[$element->get_name()])){
-                
-                
-                
-		$element->set_value($v[$element->get_name()]);
-	    
-                
-                
-            }
-	    //$element->label->set_before('<div>');
-	    //$element->label->set_after('</div>');
-
-	   
-
-	    $this->body .= '<tr ><td>'. $element->render().'</tr></td>';
-
-	}
-}else{
-    echo 'Brak legalnych elementów w formularzu';
-}
-unset($_SESSION['metabox-error'][$this->get_name()]);
-	$this->body .= '</tbody></table>';
-
-	$this->print_form();
-        unset($_SESSION['noticed']);
+        if( isset($_SESSION['p_'.$post->ID][$element->name] ) ) {
+            $element->set_value( $_SESSION['p_'.$post->ID][$element->name] );
+        } else {
+            $element->set_value( get_post_meta( $post->ID, $element->name, true ) );
+        }  
+        return '<tr ><td>' . $element->render() . '</tr></td>';
     }
     
+    /**
+     * renderuje metabox i wypelnia go danymi
+     * @return boolean
+     */
+    public function render() {
+	
+        if( !empty( $this->elements ) ) {
+            $this->body = '<table id="' . $this->get_name() . '" class="form-table pwp-metabox"><tbody>';
+            foreach( $this->elements as $element ) {
+                $this->body .= $this->render_element( $element );
+            }
+            $this->body .= '</tbody></table>';
+            $this->print_form();
+            unset($_SESSION['metabox-error'][$this->get_name()]);
+            unset($_SESSION['noticed']);
+        } else {
+            dbug( 'Brak legalnych elementów w formularzu' );
+            return false;
+        }
+    }
 }

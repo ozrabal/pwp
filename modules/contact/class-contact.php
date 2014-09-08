@@ -329,8 +329,11 @@ class Contact extends Form {
                     'name' => 'user_email_subject',
                     'params'=> array(
                         'label' => __( 'Subject of user email', 'pwp' ),
-                        'class' => 'large-text'
+                        'class' => 'large-text',
+                        'validator'=>array('notempty','email')
+                        
                     ),
+                    
                 ),
                 array(
                     'type' => 'textarea',

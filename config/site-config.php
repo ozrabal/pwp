@@ -445,7 +445,7 @@ $video_gallery = array(
     'name'      => 'gallery',
     'title'     => __( 'Galeria video', 'pwp' ),
     'posts' =>array(67),
-    'post_type' => 'page',
+    'post_type' => array('page'),
     //'allow_posts' => array('rule' => 'id','params'=> array(63,67)),
     'elements'  => array(
 
@@ -490,7 +490,18 @@ $video_gallery = array(
 
 		)),
 
-	)
+	),
+             array(
+        'type'  => 'date',
+        'name'  => 'event_starta',
+        'params'    => array(
+            'label'     => __( 'Start', 'pwp' ),
+            'comment' => 'bla',
+'validator' => array('notempty'),
+
+        ),
+
+    ),
     )
 );
 new Metabox( $video_gallery );
