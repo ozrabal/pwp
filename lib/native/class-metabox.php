@@ -178,22 +178,27 @@ class Metabox extends Form {
             //dump(filter_input( INPUT_POST, $element->get_name(),FILTER_DEFAULT, FILTER_REQUIRE_ARRAY ));
             
             $save[$element->get_name()] = '';
-            
+            //dump(filter_input(INPUT_POST, $element->get_name(), FILTER_UNSAFE_RAW, FILTER_FORCE_ARRAY));
             //if tablica to filter array przerobic
-           if($element->get_type() == 'repeatable'){
+           //if($element->get_type() == 'repeatable'){
+	   if(filter_input(INPUT_POST, $element->get_name() ,FILTER_DEFAULT, FILTER_REQUIRE_ARRAY)){
+
             if ( filter_input( INPUT_POST, $element->get_name(),FILTER_DEFAULT, FILTER_REQUIRE_ARRAY ) ) {
                 
                 //dump(filter_input( INPUT_POST, $element->get_name(),FILTER_DEFAULT, FILTER_REQUIRE_ARRAY ));
                 
                 $save[$element->get_name()] = filter_input( INPUT_POST, $element->get_name(),FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
             }
+
            }else{
+
               if ( filter_input( INPUT_POST, $element->get_name() ) ) {
                 
                 //dump(filter_input( INPUT_POST, $element->get_name() ));
                 
                 $save[$element->get_name()] = filter_input( INPUT_POST, $element->get_name() );
-            } 
+            }
+
            }
             
             $_SESSION['p_'.$post_id][$element->get_name()] = $save[$element->get_name()];
@@ -201,6 +206,9 @@ class Metabox extends Form {
                 $error = $this->is_error( $element, $save );
             }
         }
+
+	dump($save);
+
         //die();
         if(  !isset( $error ) ) {
             
