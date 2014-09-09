@@ -1,5 +1,11 @@
 <?php
-
+/**
+   * Option class
+   * 
+   * @package    PWP
+   * @subpackage Core
+   * @author     Piotr Łepkowski <piotr@webkowski.com>
+   */
 class Options extends Form {
 
     public static $instance;
@@ -12,6 +18,9 @@ class Options extends Form {
     }
 
     function __construct() {
+        //parent::__construct(array());
+        
+        
 //        if( $_POST ) {
 //	    $_SESSION['request'] = $_POST;
 //	}

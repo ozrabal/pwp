@@ -734,6 +734,7 @@ $page = array(
 );
 $admins->add_page( $page );
 $admins->add_tab( 'Nowy tab', 'test-options' );
+
 $options = new Options();
 $options->set_name( 'a_options' )
         ->set_action( 'options.php' )
