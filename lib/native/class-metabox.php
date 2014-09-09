@@ -32,10 +32,12 @@ class Metabox extends Form {
         $this->config( $box );
         
         add_action( 'add_meta_boxes', array( $this, 'add_box' ) );
-//dump($box);
+
         if( !defined( 'DOING_AJAX' ) && filter_input( INPUT_POST, 'post_type' ) && in_array( filter_input( INPUT_POST, 'post_type' ), $box['post_type'] ) ) {
             add_action( 'save_post', array( $this, 'save' ) );
-            unset( $_SESSION['p_' . filter_input( INPUT_POST, 'post' )] );
+	    if( isset( $_SESSION['p_' . filter_input( INPUT_POST, 'post' )] ) ) {
+		unset( $_SESSION['p_' . filter_input( INPUT_POST, 'post' )] );
+	    }
 	}
     }
 
@@ -128,88 +130,57 @@ class Metabox extends Form {
     public function get_priority() {
 	return $this->priority;
     }
-        function saves( $post_id ) {
-        global $current_screen;
-        
-	foreach( $this->elements as $element ) {
-	    if ( isset( $_POST[$element->get_name()] ) ) {
-		$save[$element->get_name()] = $_POST[$element->get_name()];
-	    } else {
-                $save[$element->get_name()] = '';
-            }
-            $old = get_post_meta( $post_id, $element->get_name(), true );
-	    if ( isset( $current_screen ) && $current_screen->action != 'add' && $element->get_validator() /*&& isset( $_POST[$element->get_name()])*/ ) {
-                $o = $element->validate( $save[$element->get_name()], $element->get_validator());
-                if( $o ) { 
-                    // add_settings_error( $this->options[$current]->get_name(), 'error-settings', $element->label->get_name().' : '.$o );
-                    //add_settings_error( 'error-settings', 'error-settings', $element->label->get_name().' : '.$o );
-                    $element->set_class( 'pwp_error' );
-		    if ( !isset( $_SESSION['metabox-error'][$this->get_name()][$element->get_name()]['message'] ) ) {
-                        $_SESSION['metabox-error'][$this->get_name()][$element->get_name()]['message'] = array( 'error', $o );
-                    }
-                }
-            }
-            if ( isset( $_POST[$element->get_name()] ) ) {
-                $_SESSION['p_'.$post_id][$element->get_name()] = $_POST[$element->get_name()];
-            } else {
-                $_SESSION['p_'.$post_id][$element->get_name()] = '';
-            }
-        }
-        if( isset( $save ) && !isset( $o ) ) {
-            if ( isset( $old ) &&  is_array( $old ) ) {
-                $savee = array_merge( $old, $save );
-            } else {
-                $savee = $save;
-	    }
-            foreach( $savee as $meta_name => $meta_value ) {
-                update_post_meta( $post_id,  $meta_name, $meta_value );
-            }
-        }
+
+    /**
+     * pobiera dane z post po przeslaniu formularza i filtruje w zaleznosci czy to array (dla powtarzalnych) czy nie (dla zwyklych pol)
+     * @param string $element_name
+     * @return mixed
+     */
+    private function get_input_data( $element_name ){
+
+
+	return $data;
     }
-    
-    
+
+
     function save( $post_id ) {
         
         global $current_screen;
         foreach( $this->elements as $element ) {
             $old = get_post_meta( $post_id, $element->get_name(), true );
-            //dump($element->get_name());
-            //dump($_POST['video'] );
-            //dump(filter_input( INPUT_POST, $element->get_name(),FILTER_DEFAULT, FILTER_REQUIRE_ARRAY ));
+
             
             $save[$element->get_name()] = '';
-            //dump(filter_input(INPUT_POST, $element->get_name(), FILTER_UNSAFE_RAW, FILTER_FORCE_ARRAY));
-            //if tablica to filter array przerobic
-           //if($element->get_type() == 'repeatable'){
+
+	    // do get input data
 	   if(filter_input(INPUT_POST, $element->get_name() ,FILTER_DEFAULT, FILTER_REQUIRE_ARRAY)){
 
-            if ( filter_input( INPUT_POST, $element->get_name(),FILTER_DEFAULT, FILTER_REQUIRE_ARRAY ) ) {
-                
-                //dump(filter_input( INPUT_POST, $element->get_name(),FILTER_DEFAULT, FILTER_REQUIRE_ARRAY ));
+          
                 
                 $save[$element->get_name()] = filter_input( INPUT_POST, $element->get_name(),FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
-            }
+          
 
-           }else{
+           }
 
               if ( filter_input( INPUT_POST, $element->get_name() ) ) {
                 
-                //dump(filter_input( INPUT_POST, $element->get_name() ));
+                
                 
                 $save[$element->get_name()] = filter_input( INPUT_POST, $element->get_name() );
-            }
+            
 
            }
-            
+            //dotad i potem $save[$element->get_name()] = get_input_data
+
             $_SESSION['p_'.$post_id][$element->get_name()] = $save[$element->get_name()];
             if ( isset( $current_screen ) && $current_screen->action != 'add' && $element->get_validator() ) {
                 $error = $this->is_error( $element, $save );
             }
         }
 
-	dump($save);
+	
 
-        //die();
+        
         if(  !isset( $error ) ) {
             
              
