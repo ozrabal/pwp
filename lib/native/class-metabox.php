@@ -132,65 +132,46 @@ class Metabox extends Form {
     }
 
     /**
-     * pobiera dane z post po przeslaniu formularza i filtruje w zaleznosci czy to array (dla powtarzalnych) czy nie (dla zwyklych pol)
+     * pobiera dane z post po przeslaniu formularza i filtruje
+     * w zaleznosci czy to array (dla powtarzalnych) czy nie (dla zwyklych pol)
      * @param string $element_name
      * @return mixed
      */
-    private function get_input_data( $element_name ){
-
-
-	return $data;
+    private function get_input_data( $element_name ) {
+        if( filter_input( INPUT_POST, $element_name, FILTER_DEFAULT, FILTER_REQUIRE_ARRAY ) ) {
+            return filter_input( INPUT_POST, $element_name, FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+        }
+        if ( filter_input( INPUT_POST, $element_name ) ) {
+            return filter_input( INPUT_POST, $element_name );
+        }
+        return false;
     }
 
-
-    function save( $post_id ) {
+    /**
+     * zapisuje dane z metaboxu do meta postu
+     * @global object $current_screen
+     * @param int $post_id
+     */
+    public function save( $post_id ) {
         
         global $current_screen;
         foreach( $this->elements as $element ) {
             $old = get_post_meta( $post_id, $element->get_name(), true );
-
+            $save[$element->get_name()] = $this->get_input_data( $element->get_name() );
             
-            $save[$element->get_name()] = '';
-
-	    // do get input data
-	   if(filter_input(INPUT_POST, $element->get_name() ,FILTER_DEFAULT, FILTER_REQUIRE_ARRAY)){
-
-          
-                
-                $save[$element->get_name()] = filter_input( INPUT_POST, $element->get_name(),FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
-          
-
-           }
-
-              if ( filter_input( INPUT_POST, $element->get_name() ) ) {
-                
-                
-                
-                $save[$element->get_name()] = filter_input( INPUT_POST, $element->get_name() );
-            
-
-           }
-            //dotad i potem $save[$element->get_name()] = get_input_data
-
             $_SESSION['p_'.$post_id][$element->get_name()] = $save[$element->get_name()];
             if ( isset( $current_screen ) && $current_screen->action != 'add' && $element->get_validator() ) {
                 $error = $this->is_error( $element, $save );
             }
         }
 
-	
-
-        
-        if(  !isset( $error ) ) {
-            
-             
-            
+        if( !isset( $error ) ) {
             if ( isset( $old ) &&  is_array( $old ) ) {
-                $savee = array_merge( $old, $save );
+                $meta_save = array_merge( $old, $save );
             } else {
-                $savee = $save;
+                $meta_save = $save;
 	    }
-            foreach( $savee as $meta_name => $meta_value ) {
+            foreach( $meta_save as $meta_name => $meta_value ) {
                 update_post_meta( $post_id,  $meta_name, $meta_value );
             }
         }
