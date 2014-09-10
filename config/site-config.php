@@ -721,77 +721,80 @@ function pwp_file_list($directory = null,$filter){
 unset($admin);
 unset($options);
 /*opcje*/
-//$admins = new Administrator();
-$admins = Administrator::init();
-
-$page = array(
-    'page_title'    => __( 'Test settings page', 'pwp' ),
-    'menu_title'    => __( 'Test settings', 'pwp' ),
-    'capability'    => 'manage_options',
-    'menu_slug'	    => 'test-options',
-    'icon'	    => '',
-    'position'	    => null,
-);
-$admins->add_page( $page );
-$admins->add_tab( 'Nowy tab', 'test-options' );
-
-$options = new Options();
-$options->set_name( 'a_options' )
-        ->set_action( 'options.php' )
-        ->set_title( __( 'Pierwsze opcje', 'pwp' ) );
-$options->add_element( 'text', 'tekst' )
-        ->set_label( __( 'User email templatec', 'pwp' ) )
-        ->set_class( 'klasa' )
-        ->set_validator( array( 'notempty' ) );
-
-$admins->add_options( $options, 'test-options' );
-$admins->add_options( $options, 'nowy-tab' );
-$admins->add_tab( 'Inny tab', 'test-options' );
-$options_tabs = new Options();
-        $options_tabs->set_name( 'tab_options' )
-                ->set_action( 'options.php' )
-                ->set_title( __( 'opcje w tabie', 'pwp' ) );
-
-        $options_tabs->add_element( 'text', 'tekstt' )
-                    ->set_label( __( 'pole w tab', 'pwp' ) )
-                    ->set_class( 'klasa' )
-                    ->set_validator( array( 'notempty' ) );
-
-	$options_tabs->add_element( 'attachment', 'zalacznik' )
-                    ->set_label( __( 'Załacznik', 'pwp' ) )
-                    ->set_class( 'klasa' )
-                    ->set_validator( array( 'notempty' ) );
-
-        $options_tabs->add_element( 'image', 'obrazek' )
-                    ->set_label( 'Obrazek' )
-                    ->set_comment( 'komentarz' )
-                    ->set_validator( array( 'notempty' ) );
-
-
-	$elements_repeater = array(
-            array(
-                'type' => 'text',
-		'name' => 'user_email_templates',
-		'params'=> array(
-                    'label' => __( 'User email templatex', 'pwp' ),
-                    'class' => 'large-text',
-                ),
-            ),
-	    array(
-		'type' => 'text',
-		'name' => 'zalacznik',
-		'params'=> array(
-                    'label' => __( 'Ue', 'pwp' ),
-                    'class' => 'large-text',
-                ),
-	    )
-        );
-
-        $options_tabs->add_element( 'repeatable', 'powtorz' )
-                    ->set_title( 'Powtarzalne' )
-                    ->set_comment( 'komentarz do repeatable' )
-                    ->add_elements( $elements_repeater );
-        $admins->add_options( $options_tabs, 'inny-tab' );
+//$adminss = new Administrator();
+////$adminss = Administrator::init();
+//
+//$page = array(
+//    //'parent_slug' => 'edit.php?post_type=form',
+//    'page_title'    => __( 'Test settings page', 'pwp' ),
+//    'menu_title'    => __( 'Test settings', 'pwp' ),
+//    'capability'    => 'manage_options',
+//    'menu_slug'	    => 'test-optionss',
+//    'icon'	    => '',
+//    'position'	    => null,
+//);
+//$adminss->add_page( $page );
+//$adminss->add_tab( 'Nowy tab', 'test-optionss' );
+//
+//$options = new Options();
+//
+//$options->set_name( 'a_options' )
+//        ->set_action( 'options.php' )
+//        ->set_title( __( 'Pierwsze opcje', 'pwp' ) );
+//
+//$options->add_element( 'text', 'tekst' )
+//        ->set_label( __( 'User email templatec', 'pwp' ) )
+//        ->set_class( 'klasa' )
+//        ->set_validator( array( 'notempty' ) );
+//
+//$adminss->add_options( $options, 'test-optionss' );
+//$adminss->add_options( $options, 'nowy-tab' );
+//$adminss->add_tab( 'Inny tab', 'test-optionss' );
+//$options_tabs = new Options();
+//        $options_tabs->set_name( 'tab_options' )
+//                ->set_action( 'options.php' )
+//                ->set_title( __( 'opcje w tabie', 'pwp' ) );
+//
+//        $options_tabs->add_element( 'text', 'tekstt' )
+//                    ->set_label( __( 'pole w tab', 'pwp' ) )
+//                    ->set_class( 'klasa' )
+//                    ->set_validator( array( 'notempty' ) );
+//
+//	$options_tabs->add_element( 'attachment', 'zalacznik' )
+//                    ->set_label( __( 'Załacznik', 'pwp' ) )
+//                    ->set_class( 'klasa' )
+//                    ->set_validator( array( 'notempty' ) );
+//
+//        $options_tabs->add_element( 'image', 'obrazek' )
+//                    ->set_label( 'Obrazek' )
+//                    ->set_comment( 'komentarz' )
+//                    ->set_validator( array( 'notempty' ) );
+//
+//
+//	$elements_repeater = array(
+//            array(
+//                'type' => 'text',
+//		'name' => 'user_email_templates',
+//		'params'=> array(
+//                    'label' => __( 'User email templatex', 'pwp' ),
+//                    'class' => 'large-text',
+//                ),
+//            ),
+//	    array(
+//		'type' => 'text',
+//		'name' => 'zalacznik',
+//		'params'=> array(
+//                    'label' => __( 'Ue', 'pwp' ),
+//                    'class' => 'large-text',
+//                ),
+//	    )
+//        );
+//
+//        $options_tabs->add_element( 'repeatable', 'powtorz' )
+//                    ->set_title( 'Powtarzalne' )
+//                    ->set_comment( 'komentarz do repeatable' )
+//                    ->add_elements( $elements_repeater );
+//        $adminss->add_options( $options_tabs, 'inny-tab' );
 
 
 

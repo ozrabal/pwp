@@ -37,6 +37,7 @@ if(!is_array($params)){
 	    $this->set_request(filter_input_array(INPUT_POST));
         }
                 
+        
         $this->set_params($params);
         
     /*           
@@ -88,7 +89,9 @@ if(!is_array($params)){
 
 
 
-    protected function set_params( Array $params ){
+    protected function set_params( $params ){
+        
+        if(isset($params['elements'])){
 	foreach($params['elements'] as $element){
 
 	    $added = $this->addElement($element['type'],$element['name']);
@@ -113,6 +116,7 @@ $this->add_formname_field();
             $this->elements[$element['name']]->set_validator($element['validator']);
 	    }
 	}
+    }
     }
     
     public function set_errors($e){
