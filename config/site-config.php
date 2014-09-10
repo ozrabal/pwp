@@ -12,7 +12,7 @@ function dump_var($content){
     return $content;
 }
 
-add_action('the_content','get_form');
+//add_action('the_content','get_form');
 function get_form($content){
     form('kontaktz');
     return $content;
@@ -329,36 +329,36 @@ function validate_event_end() {
 
 
 
-//metabox pola dodatkowe w dyskografii
-$discography_meta = array(
-    //'name'      => 'category',
-    'title'     => __( 'Dodatkowe', 'pwp' ),
-    //'tax' => 'post_tag',
-    'elements'  => array(
-    array(
-        'type'  => 'date',
-        'name'  => 'release_date',
-        'params'    => array(
-            'label'     => __( 'Data wydania płyty', 'pwp' ),
-            //'validator' => array('notempty'),
-            'comment' => 'opis'
-         
-        )
-    ),
-	array(
-        'type'  => 'image',
-        'name'  => 'header',
-        'params'    => array(
-            'label'     => __( 'Obrazek w nagłówku strony', 'pwp' ),
-             'comment' => 'opis opis'
-         
-        )
-    ),
-    )
-);
-$d = new Taxmeta( $discography_meta );
-//$d->render();
-//dump($d);
+////metabox pola dodatkowe w dyskografii
+//$discography_meta = array(
+//    //'name'      => 'category',
+//    'title'     => __( 'Dodatkowe', 'pwp' ),
+//    //'tax' => 'post_tag',
+//    'elements'  => array(
+//    array(
+//        'type'  => 'date',
+//        'name'  => 'release_date',
+//        'params'    => array(
+//            'label'     => __( 'Data wydania płyty', 'pwp' ),
+//            //'validator' => array('notempty'),
+//            'comment' => 'opis'
+//
+//        )
+//    ),
+//	array(
+//        'type'  => 'image',
+//        'name'  => 'header',
+//        'params'    => array(
+//            'label'     => __( 'Obrazek w nagłówku strony', 'pwp' ),
+//             'comment' => 'opis opis'
+//
+//        )
+//    ),
+//    )
+//);
+//$d = new Taxmeta( $discography_meta );
+////$d->render();
+////dump($d);
 
 
 
@@ -417,7 +417,7 @@ array(
     ),
     )
 );
-new Metabox( $page_meta );
+//new Metabox( $page_meta );
 
 //metabox obrazek dodatkowy w brandach (logo na czarnym)
 $video_gallery = array(
@@ -483,7 +483,7 @@ $video_gallery = array(
     ),
     )
 );
-new Metabox( $video_gallery );
+//new Metabox( $video_gallery );
 
 
 
