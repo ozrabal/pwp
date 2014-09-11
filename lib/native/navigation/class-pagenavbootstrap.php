@@ -30,7 +30,7 @@ static function link_pages( $args = '' ) {
             $output .= $before . '<ul class="pagination pagination-sm pull-right hidden-print">';
             $laquo = $page == 1 ? 'class="disabled"' : '';
             $icon = $page == 1 ? 'icon-white' : '';
-            $output .= '<li ' . $laquo .'>' . _wp_link_page( $page - 1 ) . '<i class="glyphicon ' . $icon . ' glyphicon-chevron-left"></i></a></li>';
+            $output .= '<li ' . $laquo .'>' . _wp_link_page( $page - 1 ) . '<i class="fa fa-angle-left"></i></a></li>';
             for ( $i = 1; $i < ( $numpages + 1 ); $i = $i + 1 ) {
                 $j = str_replace('%',$i,$pagelink);
                 if ( ( $i != $page ) || ( ( !$more ) && ( $page ==1  ) ) ) {
@@ -46,7 +46,7 @@ static function link_pages( $args = '' ) {
             }
             $raquo = $page == $numpages ? 'class="disabled"' : '';
 	    $icon = $page == $numpages ? 'icon-white' : '';
-            $output .= '<li ' . $raquo .'>' . _wp_link_page( $page + 1 ) . '<i class="glyphicon  ' . $icon . ' glyphicon-chevron-right"></i></a></li>';
+            $output .= '<li ' . $raquo .'>' . _wp_link_page( $page + 1 ) . '<i class="fa fa-angle-right"></i></a></li>';
             $output .= '</ul>' . $after;
         } else {
             if ( $more ) {
