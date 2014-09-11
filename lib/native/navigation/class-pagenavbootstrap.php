@@ -104,7 +104,7 @@ static function paginate() {
 
 	/**	Previous Post Link */
 	if ( get_previous_posts_link() )
-		printf( '<li>%s</li>' . "\n", get_previous_posts_link('<i class="glyphicon glyphicon-chevron-left"></i>') );
+		printf( '<li>%s</li>' . "\n", get_previous_posts_link('<i class="fa fa-angle-left"></i>') );
 
 	/**	Link to first page, plus ellipses if necessary */
 	if ( ! in_array( 1, $links ) ) {
@@ -134,7 +134,7 @@ static function paginate() {
 
 	/**	Next Post Link */
 	if ( get_next_posts_link() )
-		printf( '<li>%s</li>' . "\n", get_next_posts_link('<i class="glyphicon glyphicon-chevron-right"></i>') );
+		printf( '<li>%s</li>' . "\n", get_next_posts_link('<i class="fa fa-angle-right"></i>') );
 
 	echo '</ul></div>' . "\n";
 

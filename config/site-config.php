@@ -1,49 +1,28 @@
 <?php
 
 //add_action('the_content','dump_var');
-
 function dump_var($content){
-$t = get_option( 'taxonomy_17' );
- //dump($t);
- 
-
-$c = get_option('tab_options');
-//dump($c);
-
-
-$a = get_post_meta(get_the_ID(),'subtitle',true);
-
-//dump($a);
-$b = get_post_meta(get_the_ID(),'video',true);
-
-//dump($b);
-
-    
-    
-    
-    
-    //dump(get_post_meta($GLOBALS['post']->ID,'video',true));
-
+    $t = get_option( 'taxonomy_17' );
+    $c = get_option('tab_options');
+    //dump($c);
+    $a = get_post_meta(get_the_ID(),'subtitle',true);
+    //dump($a);
+    $b = get_post_meta(get_the_ID(),'video',true);
+    //dump($b);
     return $content;
 }
 
-
-add_action('the_content','get_form');
+//add_action('the_content','get_form');
 function get_form($content){
     form('kontaktz');
     return $content;
 }
 
-
 //add_action('the_content','get_map');
-
 function get_map($content){
-
-
     $a = get_post_meta(get_the_ID(),'latlong',true);
-$a = explode(',', $a);
-dump($a);
-
+    $a = explode(',', $a);
+    dump($a);
 ?>
 <style>
 
@@ -87,17 +66,17 @@ wp_enqueue_script( 'maps', 'http://maps.google.com/maps/api/js?sensor=false' );
 
 
 
-function pwp_theme_setup() {
-    load_theme_textdomain( 'pwp', get_template_directory() . '/languages' );
-    register_nav_menu( 'primary', __( 'Primary Menu', 'pwp' ) );
-    add_theme_support( 'post-thumbnails' );
-    //add_image_size( 'gallery-thumbnail', 140, 85, array( 'center', 'center' ) );
-    //add_image_size( 'work-large', 1000, 1000,false);
-     //add_image_size( 'work-medium', 600, 600, false );
-    //add_image_size( 'image-square', 400, 400, array( 'center', 'center' ) );
-    //add_image_size( 'image-wide', 1170, 372, true);
-}
-add_action( 'after_setup_theme', 'pwp_theme_setup' );
+//function pwp_theme_setup() {
+//    load_theme_textdomain( 'pwp', get_template_directory() . '/languages' );
+//    register_nav_menu( 'primary', __( 'Primary Menu', 'pwp' ) );
+//    add_theme_support( 'post-thumbnails' );
+//    //add_image_size( 'gallery-thumbnail', 140, 85, array( 'center', 'center' ) );
+//    //add_image_size( 'work-large', 1000, 1000,false);
+//     //add_image_size( 'work-medium', 600, 600, false );
+//    //add_image_size( 'image-square', 400, 400, array( 'center', 'center' ) );
+//    //add_image_size( 'image-wide', 1170, 372, true);
+//}
+//add_action( 'after_setup_theme', 'pwp_theme_setup' );
 add_filter( 'show_admin_bar', '__return_false');
 
 function pwp_remove_recent_comments_style() {  
@@ -171,111 +150,111 @@ $site = new Site(
 );
 $site->remove_head_element();
 
-//typy tresci
-function register_post_types(){
-        //rejestracja typu postu 'work'
-         $slide_labels = array(
-            'name'               => __( 'Discography', 'pwp' ),
-            'singular_name'      => __( 'Discography', 'pwp' ),
-            'add_new'            => __( 'Add New', 'pwp' ),
-            'add_new_item'       => __( 'Add New work', 'pwp' ),
-            'edit_item'          => __( 'Edit slide', 'pwp' ),
-            'new_item'           => __( 'New slide', 'pwp' ),
-            'all_items'          => __( 'All slides', 'pwp' ),
-            'view_item'          => __( 'View slide', 'pwp' ),
-            'search_items'       => __( 'Search slides', 'pwp' ),
-            'not_found'          => __( 'No slides found', 'pwp' ),
-            'not_found_in_trash' => __( 'No slides found in Trash', 'pwp' ),
-            'parent_item_colon'  => __( ':', 'pwp' ),
-            'menu_name'          => __( 'Discography', 'pwp' )
-        );
-
-        $slide_args = array(
-            'labels'             => $slide_labels,
-            'public'             => true,
-            'publicly_queryable' => true,
-            'show_ui'            => true,
-            'show_in_menu'       => true,
-            'query_var'          => true,
-	    //'taxonomies'	 => array('post_tag'),
-            'rewrite'            => array( 'slug' => 'discography' ),
-            'capability_type'    => 'page',
-            'has_archive'        => true,
-            'hierarchical'       => false,
-            'menu_position'      => null,
-	    'supports'           => array( 'title','thumbnail','editor','page-attributes' )
-        );
-        register_post_type( 'discography', $slide_args );
-
-        $file_labels = array(
-            'name'               => __( 'Review', 'pwp' ),
-            'singular_name'      => __( 'Review', 'pwp' ),
-            'add_new'            => __( 'Add New', 'pwp' ),
-            'add_new_item'       => __( 'Add New file', 'pwp' ),
-            'edit_item'          => __( 'Edit file', 'pwp' ),
-            'new_item'           => __( 'New file', 'pwp' ),
-            'all_items'          => __( 'All files', 'pwp' ),
-            'view_item'          => __( 'View file', 'pwp' ),
-            'search_items'       => __( 'Search files', 'pwp' ),
-            'not_found'          => __( 'No files found', 'pwp' ),
-            'not_found_in_trash' => __( 'No files found in Trash', 'pwp' ),
-            'parent_item_colon'  => __( ':', 'pwp' ),
-            'menu_name'          => __( 'Reviews', 'pwp' )
-        );
-
-        $file_args = array(
-            'labels'             => $file_labels,
-            'public'             => true,
-            'publicly_queryable' => true,
-            'show_ui'            => true,
-            'show_in_menu'       => true,
-            'query_var'          => true,
-	    //'taxonomies'	 => false,
-            'rewrite'            => array( 'slug' => 'review' ),
-            'capability_type'    => 'page',
-            'has_archive'        => false,
-            'hierarchical'       => false,
-            'menu_position'      => null,
-	    'supports'           => array( 'title','thumbnail','editor','page-attributes' )
-        );
-        register_post_type( 'review', $file_args );
-
-
-	$file_labels = array(
-            'name'               => __( 'Event', 'pwp' ),
-            'singular_name'      => __( 'Event', 'pwp' ),
-            'add_new'            => __( 'Add New', 'pwp' ),
-            'add_new_item'       => __( 'Add New file', 'pwp' ),
-            'edit_item'          => __( 'Edit file', 'pwp' ),
-            'new_item'           => __( 'New file', 'pwp' ),
-            'all_items'          => __( 'All files', 'pwp' ),
-            'view_item'          => __( 'View file', 'pwp' ),
-            'search_items'       => __( 'Search files', 'pwp' ),
-            'not_found'          => __( 'No files found', 'pwp' ),
-            'not_found_in_trash' => __( 'No files found in Trash', 'pwp' ),
-            'parent_item_colon'  => __( ':', 'pwp' ),
-            'menu_name'          => __( 'Events', 'pwp' )
-        );
-
-        $file_args = array(
-            'labels'             => $file_labels,
-            'public'             => true,
-            'publicly_queryable' => true,
-            'show_ui'            => true,
-            'show_in_menu'       => true,
-            'query_var'          => true,
-	    //'taxonomies'	 => false,
-            'rewrite'            => array( 'slug' => 'event' ),
-            'capability_type'    => 'page',
-            'has_archive'        => true,
-            'hierarchical'       => false,
-            'menu_position'      => null,
-	    'supports'           => array( 'title','thumbnail','excerpt','editor','page-attributes' )
-        );
-        register_post_type( 'event', $file_args );
-        
-}
-add_action( 'init', 'register_post_types' );
+////typy tresci
+//function register_post_types(){
+//        //rejestracja typu postu 'work'
+//         $slide_labels = array(
+//            'name'               => __( 'Discography', 'pwp' ),
+//            'singular_name'      => __( 'Discography', 'pwp' ),
+//            'add_new'            => __( 'Add New', 'pwp' ),
+//            'add_new_item'       => __( 'Add New work', 'pwp' ),
+//            'edit_item'          => __( 'Edit slide', 'pwp' ),
+//            'new_item'           => __( 'New slide', 'pwp' ),
+//            'all_items'          => __( 'All slides', 'pwp' ),
+//            'view_item'          => __( 'View slide', 'pwp' ),
+//            'search_items'       => __( 'Search slides', 'pwp' ),
+//            'not_found'          => __( 'No slides found', 'pwp' ),
+//            'not_found_in_trash' => __( 'No slides found in Trash', 'pwp' ),
+//            'parent_item_colon'  => __( ':', 'pwp' ),
+//            'menu_name'          => __( 'Discography', 'pwp' )
+//        );
+//
+//        $slide_args = array(
+//            'labels'             => $slide_labels,
+//            'public'             => true,
+//            'publicly_queryable' => true,
+//            'show_ui'            => true,
+//            'show_in_menu'       => true,
+//            'query_var'          => true,
+//	    //'taxonomies'	 => array('post_tag'),
+//            'rewrite'            => array( 'slug' => 'discography' ),
+//            'capability_type'    => 'page',
+//            'has_archive'        => true,
+//            'hierarchical'       => false,
+//            'menu_position'      => null,
+//	    'supports'           => array( 'title','thumbnail','editor','page-attributes' )
+//        );
+//        register_post_type( 'discography', $slide_args );
+//
+//        $file_labels = array(
+//            'name'               => __( 'Review', 'pwp' ),
+//            'singular_name'      => __( 'Review', 'pwp' ),
+//            'add_new'            => __( 'Add New', 'pwp' ),
+//            'add_new_item'       => __( 'Add New file', 'pwp' ),
+//            'edit_item'          => __( 'Edit file', 'pwp' ),
+//            'new_item'           => __( 'New file', 'pwp' ),
+//            'all_items'          => __( 'All files', 'pwp' ),
+//            'view_item'          => __( 'View file', 'pwp' ),
+//            'search_items'       => __( 'Search files', 'pwp' ),
+//            'not_found'          => __( 'No files found', 'pwp' ),
+//            'not_found_in_trash' => __( 'No files found in Trash', 'pwp' ),
+//            'parent_item_colon'  => __( ':', 'pwp' ),
+//            'menu_name'          => __( 'Reviews', 'pwp' )
+//        );
+//
+//        $file_args = array(
+//            'labels'             => $file_labels,
+//            'public'             => true,
+//            'publicly_queryable' => true,
+//            'show_ui'            => true,
+//            'show_in_menu'       => true,
+//            'query_var'          => true,
+//	    //'taxonomies'	 => false,
+//            'rewrite'            => array( 'slug' => 'review' ),
+//            'capability_type'    => 'page',
+//            'has_archive'        => false,
+//            'hierarchical'       => false,
+//            'menu_position'      => null,
+//	    'supports'           => array( 'title','thumbnail','editor','page-attributes' )
+//        );
+//        register_post_type( 'review', $file_args );
+//
+//
+//	$file_labels = array(
+//            'name'               => __( 'Event', 'pwp' ),
+//            'singular_name'      => __( 'Event', 'pwp' ),
+//            'add_new'            => __( 'Add New', 'pwp' ),
+//            'add_new_item'       => __( 'Add New file', 'pwp' ),
+//            'edit_item'          => __( 'Edit file', 'pwp' ),
+//            'new_item'           => __( 'New file', 'pwp' ),
+//            'all_items'          => __( 'All files', 'pwp' ),
+//            'view_item'          => __( 'View file', 'pwp' ),
+//            'search_items'       => __( 'Search files', 'pwp' ),
+//            'not_found'          => __( 'No files found', 'pwp' ),
+//            'not_found_in_trash' => __( 'No files found in Trash', 'pwp' ),
+//            'parent_item_colon'  => __( ':', 'pwp' ),
+//            'menu_name'          => __( 'Events', 'pwp' )
+//        );
+//
+//        $file_args = array(
+//            'labels'             => $file_labels,
+//            'public'             => true,
+//            'publicly_queryable' => true,
+//            'show_ui'            => true,
+//            'show_in_menu'       => true,
+//            'query_var'          => true,
+//	    //'taxonomies'	 => false,
+//            'rewrite'            => array( 'slug' => 'event' ),
+//            'capability_type'    => 'page',
+//            'has_archive'        => true,
+//            'hierarchical'       => false,
+//            'menu_position'      => null,
+//	    'supports'           => array( 'title','thumbnail','excerpt','editor','page-attributes' )
+//        );
+//        register_post_type( 'event', $file_args );
+//
+//}
+//add_action( 'init', 'register_post_types' );
 
 
 
@@ -350,36 +329,36 @@ function validate_event_end() {
 
 
 
-//metabox pola dodatkowe w dyskografii
-$discography_meta = array(
-    //'name'      => 'category',
-    'title'     => __( 'Dodatkowe', 'pwp' ),
-    //'tax' => 'post_tag',
-    'elements'  => array(
-    array(
-        'type'  => 'date',
-        'name'  => 'release_date',
-        'params'    => array(
-            'label'     => __( 'Data wydania płyty', 'pwp' ),
-            //'validator' => array('notempty'),
-            'comment' => 'opis'
-         
-        )
-    ),
-	array(
-        'type'  => 'image',
-        'name'  => 'header',
-        'params'    => array(
-            'label'     => __( 'Obrazek w nagłówku strony', 'pwp' ),
-             'comment' => 'opis opis'
-         
-        )
-    ),
-    )
-);
-$d = new Taxmeta( $discography_meta );
-//$d->render();
-//dump($d);
+////metabox pola dodatkowe w dyskografii
+//$discography_meta = array(
+//    //'name'      => 'category',
+//    'title'     => __( 'Dodatkowe', 'pwp' ),
+//    //'tax' => 'post_tag',
+//    'elements'  => array(
+//    array(
+//        'type'  => 'date',
+//        'name'  => 'release_date',
+//        'params'    => array(
+//            'label'     => __( 'Data wydania płyty', 'pwp' ),
+//            //'validator' => array('notempty'),
+//            'comment' => 'opis'
+//
+//        )
+//    ),
+//	array(
+//        'type'  => 'image',
+//        'name'  => 'header',
+//        'params'    => array(
+//            'label'     => __( 'Obrazek w nagłówku strony', 'pwp' ),
+//             'comment' => 'opis opis'
+//
+//        )
+//    ),
+//    )
+//);
+//$d = new Taxmeta( $discography_meta );
+////$d->render();
+////dump($d);
 
 
 
@@ -438,7 +417,7 @@ array(
     ),
     )
 );
-new Metabox( $page_meta );
+//new Metabox( $page_meta );
 
 //metabox obrazek dodatkowy w brandach (logo na czarnym)
 $video_gallery = array(
@@ -504,7 +483,7 @@ $video_gallery = array(
     ),
     )
 );
-new Metabox( $video_gallery );
+//new Metabox( $video_gallery );
 
 
 
