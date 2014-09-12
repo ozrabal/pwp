@@ -14,6 +14,7 @@ class Administrator{
      * @return Administrator
      */
     public static function init() {
+        
         if( is_null( self::$instance ) ) {
             self::$instance = new self();
 	}
@@ -53,6 +54,7 @@ class Administrator{
      * @return string
      */
     private function get_slug( $_wp_http_referer, $type = 'page' ) {
+        
         $parts = explode( $type . '=', $_wp_http_referer );
         if( isset( $parts[1] ) ) {
 	    $slug = $parts[1];
@@ -69,6 +71,7 @@ class Administrator{
      * @param array $args
      */
     public function add_page( $args ) {
+        
         $this->page = $args;
         add_action( 'admin_menu', array( $this, 'add_menu' ) );
     }
@@ -79,6 +82,7 @@ class Administrator{
      * @param string $page_slug
      */
     public function add_options_group( Options $options, $page_slug ) {
+        
         $this->options[$page_slug] = $options;
         add_action( 'admin_init', array( $this, 'register_settings' ) );
     }
@@ -90,6 +94,7 @@ class Administrator{
      * @param string $page_slug
      */
     public function add_section( $section, $page_slug ) {
+        
         $this->sections[$page_slug] = $section;
     }
     
@@ -134,6 +139,7 @@ class Administrator{
      * @param string $tab
      */
     private function add_settings_field( $element ,$option, $tab ) {
+        
         $name = $element->get_name();
         if( isset( $element->label ) ) {
             $name = $element->label->get_name();
@@ -159,6 +165,7 @@ class Administrator{
      * dodaje stronedo menu administracyjnego
      */
     public function add_menu() {
+        
 	if( isset($this->page['parent_slug'] ) ) {
 	    add_submenu_page( $this->page['parent_slug'], $this->page['page_title'], $this->page['menu_title'], $this->page['capability'], $this->page['menu_slug'], array( $this, 'render_page' ), $this->page['icon'], $this->page['position'] );
 	} else {
@@ -172,6 +179,7 @@ class Administrator{
      * @param string $page_slug
      */
     public function add_tab( $name = null, $page_slug = null ) {
+        
         if( !empty($name) && !empty( $page_slug ) ) {
             $this->tabs[$page_slug][strtolower( str_replace( ' ', '-', $name ) )] = $name;
         }
@@ -181,6 +189,7 @@ class Administrator{
      * renderuje sekcje opcji w tabie lub na stronie
      */
     function render_section() {
+        
         $current = $this->current_page;
         if( $this->current_tab ) {
             $current = $this->current_tab;
@@ -194,6 +203,7 @@ class Administrator{
      * wyswietla bledy validacji opcji
      */
     private function display_error(){
+        
         $e = get_settings_errors( 'error-settings' );
         if( count( $e ) > 0 ) {
             echo '<div class="error settings-error below-h2" id="setting-error-error-settings"><p><strong>' . __( 'There were mistakes, not all changes have been saved', 'pwp' ) . '</strong></p></div>';
@@ -204,66 +214,68 @@ class Administrator{
     }
     
     /**
+     * ustawia klase css aktywnego taba w menu tabow
+     * @param string $tab
+     * @return string|null
+     */
+    private function set_active_tab( $tab ) {
+
+        if( $this->current_tab ) {
+            if( $this->current_tab == $tab ) {
+                return 'nav-tab-active';
+            }
+        }else{
+            $a = array_values( $this->tabs[$this->current_page] );
+            if( strtolower( str_replace( ' ', '-', $a[0] ) ) == $tab ) {
+                return 'nav-tab-active';
+            }
+        }
+    }
+    
+    /**
      * renderuje naglowki tabow
+     * @return string|null
      */
     public function render_tab_navigation() {
-        if(isset($this->tabs[$this->current_page])){
+        if( isset( $this->tabs[$this->current_page] ) ) {
             $page= '?';
-            if(isset($this->page['parent_slug'])){
-                $page = $this->page['parent_slug'].'&';
+            if( isset( $this->page['parent_slug'] ) ) {
+                $page = $this->page['parent_slug'] . '&';
             }
-            echo '<h2 class="nav-tab-wrapper">';
-            foreach($this->tabs[$this->current_page] as $tab => $tab_name){
-                
-                $active = null;
-                if($this->current_tab){
-                    if($this->current_tab == $tab){
-                        $active = 'nav-tab-active';
-                    }
-                }else{
-                    $a = array_values($this->tabs[$this->current_page]);
-                    if(strtolower(str_replace( ' ', '-', $a[0] )) == $tab){
-                        $active = 'nav-tab-active';
-                    }
-                }
-                
-                echo'<a href="'.$page.'page='.$this->page['menu_slug'].'&tab='.$tab.'" class="nav-tab '.$active.'">'.$tab_name.'</a>';
+            $html = '<h2 class="nav-tab-wrapper">';
+            foreach( $this->tabs[$this->current_page] as $tab => $tab_name ) {
+                $html .= '<a href="'.$page.'page='.$this->page['menu_slug'].'&tab='.$tab.'" class="nav-tab '.$this->set_active_tab($tab).'">'.$tab_name.'</a>';
             }
-            echo '</h2>';
+            $html .= '</h2>';
+            return $html;
         }
     }
     
     /**
      * renderuje strone ustawien
      */
-    public function render_page(){
+    public function render_page() {
         
         echo '<div class="wrap"><div id="icon-themes" class="icon32"></div><h2>' . $GLOBALS['title'] . '</h2>';
         $this->display_error();
-       
-	$this->render_tab_navigation();
+        echo $this->render_tab_navigation();
         echo '<form action="options.php" method="POST">';
-        
-        //settings_fields( str_replace('_', '-', $this->options[$this->page_slug]->get_name()) );
-        //settings_fields(  );
-        //do_settings_sections( $this->page['menu_slug'] );
-        //dump($this->current_page);
-        if(!$this->current_tab){
+        if( !$this->current_tab ) {
             settings_fields( $this->current_page );
             do_settings_sections( $this->current_page );
-            
-        }else{
-            settings_fields($this->current_tab);
+        } else {
+            settings_fields( $this->current_tab );
             do_settings_sections( $this->current_tab );
         }
-	
         submit_button();
-        echo '</form>';
-        echo '</div>';
+        echo '</form></div>';
     }
     
-    
-    
+    /**
+     * wywoluje validacje kazdego elementu formularza opcji
+     * @param array $values
+     * @return array
+     */
     function validate(Array $values = null ) {
         if( $this->current_tab ) {
             $current = $this->current_tab;
@@ -273,7 +285,7 @@ class Administrator{
         $this->option_values = get_option( $this->options[$current]->get_name() );
         foreach( $this->options[$current]->elements as $element ) {
 
-	    //dump($element);
+
 
             if( $element->get_validator() ) {
                 $o = $element->validate( $values[$element->get_name()], $element->get_validator());
