@@ -437,8 +437,8 @@ $options->add_element( 'text', 'tekst' )
         ->set_class( 'klasa' )
         ->set_validator( array( 'notempty' ) );
 
-$admins->add_options( $options, 'test-options' );
-$admins->add_options( $options, 'nowy-tab' );
+$admins->add_options_group( $options, 'test-options' );
+$admins->add_options_group( $options, 'nowy-tab' );
 $admins->add_tab( 'Inny tab', 'test-options' );
 
 $options_tabs = new Options();
@@ -485,6 +485,6 @@ $options_tabs = new Options();
                     ->set_title( 'Powtarzalne' )
                     ->set_comment( 'komentarz do repeatable' )
                     ->add_elements( $elements_repeater );
-        $admins->add_options( $options_tabs, 'inny-tab' );
+        $admins->add_options_group( $options_tabs, 'inny-tab' );
     }
 }

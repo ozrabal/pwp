@@ -25,276 +25,196 @@ class Administrator{
      */
     public function __construct() {
 
-        $this->current_page = $this->get_current_page();
-        $this->current_tab = $this->get_current_tab();
+        $this->current_page = $this->get_current( 'page' );
+        $this->current_tab = $this->get_current( 'tab' );
     }
 
     /**
-     * pobiera slug strony ustawien na podstawie wartosci w get lub post
+     * pobiera slug strony lub taba ustawien na podstawie wartosci w get lub post
+     * @param string $type page|tab
      * @return string|false
      */
-    private function get_current_page() {
-	
+    private function get_current( $type = 'page' ) {
+        
         if( filter_input( INPUT_POST, '_wp_http_referer' ) ) {
-            return $this->get_page_slug( filter_input( INPUT_POST, '_wp_http_referer' ) );
+            return $this->get_slug( filter_input( INPUT_POST, '_wp_http_referer' ), $type );
         } else {
-            if( filter_input( INPUT_GET, 'page' ) ) {
-                return filter_input( INPUT_GET, 'page' );
+            if( filter_input( INPUT_GET, $type ) ) {
+                return filter_input( INPUT_GET, $type );
             }
             return false;
         }
     }
-
+    
     /**
-     * pobiera slug strony ustawien z adresu referera
+     * 
      * @param string $_wp_http_referer
+     * @param string $type
      * @return string
      */
-    private function get_page_slug( $_wp_http_referer ) {
-	
-	$parts = explode( 'page=', $_wp_http_referer );
+    private function get_slug( $_wp_http_referer, $type = 'page' ) {
+        $parts = explode( $type . '=', $_wp_http_referer );
         if( isset( $parts[1] ) ) {
-	    $page = $parts[1];
-	    $t = strpos( $page, '&' );
-	    if( $t !== FALSE ) {
-                $page = substr( $parts[1], 0, $t );
+	    $slug = $parts[1];
+	    $s = strpos( $slug, '&' );
+	    if( $s !== FALSE ) {
+                $slug = substr( $parts[1], 0, $s );
             }
-	    return trim( $page );
+	    return trim( $slug );
 	}
     }
 
-    private function get_tab_slug( $_wp_http_referer ){
-	$parts = explode( 'tab=', $_wp_http_referer );
-        if( isset( $parts[1] ) ) {
-                $tab = $parts[1];
-		$t = strpos($tab, '&' );
-		if( $t !== false ) {
-		    $t = substr($parts[1],0,$t);
-		} else {
-		    return $tab;
-		}
-		return trim($t);
-            }
-    }
-
-
-    private function get_current_tab() {
-
-       if( filter_input( INPUT_POST, '_wp_http_referer' ) ) {
-            return $this->get_tab_slug(filter_input( INPUT_POST, '_wp_http_referer' ));
-        } else {
-	    if( filter_input( INPUT_GET, 'tab' ) ) {
-		return filter_input( INPUT_GET, 'tab' );
-            }
-        }
-        return false;
-    }
-
-    
-
-
-    
-    public function add_page( Array $args ) {
+    /**
+     * ustawia obsluge akcji admin_menu
+     * @param array $args
+     */
+    public function add_page( $args ) {
         $this->page = $args;
-        //if($this->current_page == $this->page['menu_slug']){
-            add_action('admin_menu', array($this, 'add_menu'));
-        //}
+        add_action( 'admin_menu', array( $this, 'add_menu' ) );
     }
     
-    public function add_options( Options $options, $page_slug ){
-        //if($this->current_page == $this->page['menu_slug']){
-
-	
-            $this->options[$page_slug] = $options;
-
-	   
-            $this->page_slug = $page_slug;
-            add_action( 'admin_init', array($this,'register_settings' ));
-            
-        //}
+    /**
+     * dodaje grupe opcji do strony
+     * @param Options $options
+     * @param string $page_slug
+     */
+    public function add_options_group( Options $options, $page_slug ) {
+        $this->options[$page_slug] = $options;
+        add_action( 'admin_init', array( $this, 'register_settings' ) );
     }
-    public function add_section($section, $page_slug){
+    
+    
+    /**
+     * dodaje sekcje opcji do strony
+     * @param Options $section
+     * @param string $page_slug
+     */
+    public function add_section( $section, $page_slug ) {
         $this->sections[$page_slug] = $section;
     }
+    
+    /**
+     * rejestruje opcje w systemie
+     */
     public function register_settings(){
-        //z tego options tylko aktualne, te z taba albo strony
-	//dump($_POST);
-
-	//die();
-        //dump($this->options[$this->current_tab]);
-if(isset($_POST['_wp_http_referer'])){
-      //$this->active_tab = $this->current_page();
-      
-     
-}
-
-
-	
- if($this->current_tab){
+        
+        $current = $this->current_page;
+        if( $this->current_tab ) {
             $current = $this->current_tab;
-        }else{
-            $current = $this->current_page;
         }
-
-	
-	foreach ($this->options as $tab => $option){
-	    if($tab == $current){
-        register_setting(
-               // $option->get_name(),
-            //str_replace('_', '-', $option->get_name()), // group, used for settings_fields()
-         $tab ,
-            $option->get_name(),  // option name, used as key in database
-            array($this,'validate')      // validation callback
-        );
-if(isset($this->sections[$tab]['title'])){
-    $section_title = $this->sections[$tab]['title'];
-}else{
-    $section_title=null;
-}
-        add_settings_section(
-            str_replace('_', '-', $option->get_name()), // ID
-               // $tab,
-            $section_title, // Title
-            array($this, 'render_section'), // print output
-            //$this->page['menu_slug'] // menu slug, see t5_sae_add_options_page()
-            //$this->page_slug
-                $tab
-                //$option->get_name()
-
-        );
-
-        foreach($option->elements as $element){
-
-	    if(isset($element->label)){
-	    $name = $element->label->get_name();
-	    }else{
-		$name = $element->get_name();
-	    }
-
-            add_settings_field(
-                $element->get_name(),
-                $name,
-                array( $this, 'render_element' ),
-                //$this->page['menu_slug'],  // menu slug, see t5_sae_add_options_page()
-                //$this->page_slug,
-                    $tab,
-                    //$option->get_name(),
-
-                str_replace('_', '-', $option->get_name()),
-                    //$tab,
-                    ///$option->get_name(),
-                array(
-                    'element' =>$element,
-                    'label_for'   => $element->get_name(),
-                )
-            );
+        foreach( $this->options as $tab => $option ) {
+            if( $tab == $current ) {
+                $this->set_settings_form( $tab, $option );
+            }
         }
-
-	    }
-        }
-
-//        foreach ($this->options as $tab => $option){
-//        register_setting(
-//               // $option->get_name(),
-//            //str_replace('_', '-', $option->get_name()), // group, used for settings_fields()
-//         $tab ,
-//            $option->get_name(),  // option name, used as key in database
-//            array($this,'validate')      // validation callback
-//        );
-//
-//        add_settings_section(
-//            str_replace('_', '-', $option->get_name()), // ID
-//               // $tab,
-//            'Tytuł sekcji', // Title
-//            array($this, 'render_section'), // print output
-//            //$this->page['menu_slug'] // menu slug, see t5_sae_add_options_page()
-//            //$this->page_slug
-//                $tab
-//                //$option->get_name()
-//
-//        );
-//
-//        foreach($option->elements as $element){
-//            add_settings_field(
-//                $element->get_name(),
-//                $element->label->get_name(),
-//                array( $this, 'render_element' ),
-//                //$this->page['menu_slug'],  // menu slug, see t5_sae_add_options_page()
-//                //$this->page_slug,
-//                    $tab,
-//                    //$option->get_name(),
-//
-//                str_replace('_', '-', $option->get_name()),
-//                    //$tab,
-//                    ///$option->get_name(),
-//                array(
-//                    'element' =>$element,
-//                    'label_for'   => $element->get_name(),
-//                )
-//            );
-//        }
-//        }
     }
     
-    function render_element($element){
-        unset($element['element']->label);
-        if(isset($_SESSION[$element['element']->get_name()])){
-            $element['element']->set_class($_SESSION[$element['element']->get_name()]['class']);
-            $element['element']->set_message($_SESSION[$element['element']->get_name()]['message']);
-            unset($_SESSION[$element['element']->get_name()]);
+    /**
+     * rejestruje opcje i przydziela do odpwiedniej sekcji
+     * @param string $tab
+     * @param Option $option
+     */
+    private function set_settings_form( $tab, $option ) {
+        
+        register_setting( $tab, $option->get_name(), array( $this, 'validate' ) );
+        $section_title = null;
+        if( isset( $this->sections[$tab]['title'] ) ) {
+            $section_title = $this->sections[$tab]['title'];
+        } 
+        add_settings_section( str_replace( '_', '-', $option->get_name() ), $section_title, array( $this, 'render_section' ), $tab );
+        foreach( $option->elements as $element ) {
+            $this->add_settings_field( $element, $option, $tab );
         }
-        echo $element['element']->render();
     }
-
-    public function add_menu(){
-	if(isset($this->page['parent_slug'])){
-	    add_submenu_page( $this->page['parent_slug'], $this->page['page_title'], $this->page['menu_title'], $this->page['capability'], $this->page['menu_slug'], array($this,'render_page'), $this->page['icon'], $this->page['position'] );
-	}else{
-            
-	    add_menu_page( $this->page['page_title'], $this->page['menu_title'], $this->page['capability'], $this->page['menu_slug'], array($this,'render_page'), $this->page['icon'], $this->page['position'] );
+    
+    /**
+     * dodaje element do formularza
+     * @param Formelement $element
+     * @param Option $option
+     * @param string $tab
+     */
+    private function add_settings_field( $element ,$option, $tab ) {
+        $name = $element->get_name();
+        if( isset( $element->label ) ) {
+            $name = $element->label->get_name();
+        }
+        add_settings_field( $element->get_name(), $name, array( $this, 'render_element' ), $tab, str_replace('_', '-', $option->get_name()),array( 'field' => $element, 'label_for' => $element->get_name() ) );
+    }
+      
+    /**
+     * renderuje element formularza
+     * @param Formelement $element
+     */
+    function render_element( $element ) {
+        
+        unset( $element['field']->label );
+        if( isset( $_SESSION[$element['field']->get_name()] ) ) {
+            $element['field']->set_class( $_SESSION[$element['field']->get_name()]['class'] );
+            $element['field']->set_message( $_SESSION[$element['field']->get_name()]['message'] );
+            unset( $_SESSION[$element['field']->get_name()] );
+        }
+        echo $element['field']->render();
+    }
+    /**
+     * dodaje stronedo menu administracyjnego
+     */
+    public function add_menu() {
+	if( isset($this->page['parent_slug'] ) ) {
+	    add_submenu_page( $this->page['parent_slug'], $this->page['page_title'], $this->page['menu_title'], $this->page['capability'], $this->page['menu_slug'], array( $this, 'render_page' ), $this->page['icon'], $this->page['position'] );
+	} else {
+            add_menu_page( $this->page['page_title'], $this->page['menu_title'], $this->page['capability'], $this->page['menu_slug'], array( $this, 'render_page' ), $this->page['icon'], $this->page['position'] );
 	}
     }
     
-    public function add_tab($name, $page_slug){
-        $this->tabs[$page_slug][strtolower(str_replace( ' ', '-', $name ))] = $name;
-        
+    /**
+     * dodaje zakladke (tab)
+     * @param string $name
+     * @param string $page_slug
+     */
+    public function add_tab( $name = null, $page_slug = null ) {
+        if( !empty($name) && !empty( $page_slug ) ) {
+            $this->tabs[$page_slug][strtolower( str_replace( ' ', '-', $name ) )] = $name;
+        }
     }
     
-    function render_section(){
+    /**
+     * renderuje sekcje opcji w tabie lub na stronie
+     */
+    function render_section() {
+        $current = $this->current_page;
         if( $this->current_tab ) {
             $current = $this->current_tab;
-        } else {
-            $current = $this->current_page;
         }
-       if(isset($this->sections[$current]['content'])){
-        
-       echo '<p>'.$this->sections[$current]['content'].'</p>';
-       }
+        if( isset( $this->sections[$current]['content'] ) ) {
+            echo '<p>' . $this->sections[$current]['content'] . '</p>';
+        }
     }
     
-    public function render_page(){
-        
-        echo '<div class="wrap">';
-        echo '<div id="icon-themes" class="icon32"></div>';
-        echo '<h2>'.$GLOBALS['title'].'</h2>';
-        //settings_errors();
-        $e = get_settings_errors('error-settings');
-       if(count($e) > 0){
-           
-           echo '<div class="error settings-error below-h2" id="setting-error-error-settings"> 
-<p><strong>'.__('There were mistakes, not all changes have been saved', 'pwp').'</strong></p></div>';
-        //dump($e);
-       }else{
+    /**
+     * wyswietla bledy validacji opcji
+     */
+    private function display_error(){
+        $e = get_settings_errors( 'error-settings' );
+        if( count( $e ) > 0 ) {
+            echo '<div class="error settings-error below-h2" id="setting-error-error-settings"><p><strong>' . __( 'There were mistakes, not all changes have been saved', 'pwp' ) . '</strong></p></div>';
+            dbug( $e );
+        } else {
            settings_errors();
-       }
-       
-	if(isset($this->tabs[$this->current_page])){
+        }
+    }
+    
+    /**
+     * renderuje naglowki tabow
+     */
+    public function render_tab_navigation() {
+        if(isset($this->tabs[$this->current_page])){
             $page= '?';
             if(isset($this->page['parent_slug'])){
                 $page = $this->page['parent_slug'].'&';
             }
             echo '<h2 class="nav-tab-wrapper">';
             foreach($this->tabs[$this->current_page] as $tab => $tab_name){
+                
                 $active = null;
                 if($this->current_tab){
                     if($this->current_tab == $tab){
@@ -306,10 +226,22 @@ if(isset($this->sections[$tab]['title'])){
                         $active = 'nav-tab-active';
                     }
                 }
+                
                 echo'<a href="'.$page.'page='.$this->page['menu_slug'].'&tab='.$tab.'" class="nav-tab '.$active.'">'.$tab_name.'</a>';
             }
             echo '</h2>';
         }
+    }
+    
+    /**
+     * renderuje strone ustawien
+     */
+    public function render_page(){
+        
+        echo '<div class="wrap"><div id="icon-themes" class="icon32"></div><h2>' . $GLOBALS['title'] . '</h2>';
+        $this->display_error();
+       
+	$this->render_tab_navigation();
         echo '<form action="options.php" method="POST">';
         
         //settings_fields( str_replace('_', '-', $this->options[$this->page_slug]->get_name()) );
@@ -329,6 +261,8 @@ if(isset($this->sections[$tab]['title'])){
         echo '</form>';
         echo '</div>';
     }
+    
+    
     
     function validate(Array $values = null ) {
         if( $this->current_tab ) {
