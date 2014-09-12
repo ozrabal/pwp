@@ -5,47 +5,67 @@ class Administrator{
             $tabs = array(),
             $current_page,
             $current_tab
-	   
     ;
-static $instance = null;
 
-     public static function init() {
-        if ( is_null( self::$instance ) )
+    static $instance = null;
+
+    /**
+     * singleton
+     * @return Administrator
+     */
+    public static function init() {
+        if( is_null( self::$instance ) ) {
             self::$instance = new self();
+	}
         return self::$instance;
     }
 
-
-
+    /**
+     * konstruktor
+     */
     public function __construct() {
+
         $this->current_page = $this->get_current_page();
         $this->current_tab = $this->get_current_tab();
     }
-    
+
+    /**
+     * pobiera slug strony ustawien na podstawie wartosci w get lub post
+     * @return string|false
+     */
     private function get_current_page() {
-        if( isset( $_POST['_wp_http_referer'] ) ) {
-            $parts = explode( 'page=', $_POST['_wp_http_referer'] );
-            if( isset( $parts[1] ) ) {
-            $page = $parts[1];
-            $t = strpos( $page, '&' );
-            if( $t !== FALSE ) {
-                $page = substr( $parts[1], 0, $t );
-            }
-            $current_page = trim( $page );
-            return $current_page;
-            }
+	
+        if( filter_input( INPUT_POST, '_wp_http_referer' ) ) {
+            return $this->get_page_slug( filter_input( INPUT_POST, '_wp_http_referer' ) );
         } else {
-            if( isset( $_REQUEST['page'] ) ) {
-                return $_REQUEST['page'];
+            if( filter_input( INPUT_GET, 'page' ) ) {
+                return filter_input( INPUT_GET, 'page' );
             }
             return false;
         }
     }
-    
-    private function get_current_tab() {
-       if( isset( $_POST['_wp_http_referer'] ) ) {
-            $parts = explode( 'tab=', $_POST['_wp_http_referer'] );
-            if( isset( $parts[1] ) ) {
+
+    /**
+     * pobiera slug strony ustawien z adresu referera
+     * @param string $_wp_http_referer
+     * @return string
+     */
+    private function get_page_slug( $_wp_http_referer ) {
+	
+	$parts = explode( 'page=', $_wp_http_referer );
+        if( isset( $parts[1] ) ) {
+	    $page = $parts[1];
+	    $t = strpos( $page, '&' );
+	    if( $t !== FALSE ) {
+                $page = substr( $parts[1], 0, $t );
+            }
+	    return trim( $page );
+	}
+    }
+
+    private function get_tab_slug( $_wp_http_referer ){
+	$parts = explode( 'tab=', $_wp_http_referer );
+        if( isset( $parts[1] ) ) {
                 $tab = $parts[1];
 		$t = strpos($tab, '&' );
 		if( $t !== false ) {
@@ -53,16 +73,26 @@ static $instance = null;
 		} else {
 		    return $tab;
 		}
-		return $t;
-		//return $page = $parts[1];
+		return trim($t);
             }
+    }
+
+
+    private function get_current_tab() {
+
+       if( filter_input( INPUT_POST, '_wp_http_referer' ) ) {
+            return $this->get_tab_slug(filter_input( INPUT_POST, '_wp_http_referer' ));
         } else {
-	    if( isset( $_REQUEST['tab'] ) ) {
-		return $_REQUEST['tab'];
+	    if( filter_input( INPUT_GET, 'tab' ) ) {
+		return filter_input( INPUT_GET, 'tab' );
             }
         }
         return false;
     }
+
+    
+
+
     
     public function add_page( Array $args ) {
         $this->page = $args;
