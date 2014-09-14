@@ -276,7 +276,8 @@ class Administrator{
      * @param array $values
      * @return array
      */
-    function validate(Array $values = null ) {
+    public function validate( Array $values = null ) {
+        
         if( $this->current_tab ) {
             $current = $this->current_tab;
         } else {
@@ -284,35 +285,29 @@ class Administrator{
         }
         $this->option_values = get_option( $this->options[$current]->get_name() );
         foreach( $this->options[$current]->elements as $element ) {
-
-
-
             if( $element->get_validator() ) {
-                $o = $element->validate( $values[$element->get_name()], $element->get_validator());
-                //$this->set_message($element, $o, $current);
-                
-                //dump($o);
-                if( $o ) { 
-                    //dump(implode('|', $o['error']));
-                   // add_settings_error( $this->options[$current]->get_name(), 'error-settings', $element->label->get_name().' : '.$o );
-                                       add_settings_error( 'error-settings', 'error-settings', $element->label->get_name().' : '.$o );
-
-                    $values[$element->get_name()] = $this->option_values[$element->get_name()];
-                    $element->set_class( 'error' );
-                    $_SESSION[$element->get_name()]['class'] = 'pwp-error';
-                    $_SESSION[$element->get_name()]['message'] = array( 'error', $o );
-                }
+                $values = $this->is_error( $element, $values );
             }
-            
         }
-	
-    //die();
-	
         return $values;
     }
     
-   
-    
-    
+    /**
+     * wykonuje walidacje i ustawia w sesji error jesli validacja nie poprawna
+     * zwraca wartosc elementu
+     * @param object $element
+     * @param array $values
+     * @return array
+     */
+    private function is_error( $element, $values ) {
+        $error = $element->validate( $values[$element->get_name()], $element->get_validator() );
+        if( $error ) { 
+            add_settings_error( 'error-settings', 'error-settings', $element->label->get_name() . ' : ' . $error );
+            $values[$element->get_name()] = $this->option_values[$element->get_name()];
+            $element->set_class( 'error' );
+            $_SESSION[$element->get_name()]['class'] = 'pwp-error';
+            $_SESSION[$element->get_name()]['message'] = array( 'error', $error );
+        }
+        return $values;
+    }
 }
-
