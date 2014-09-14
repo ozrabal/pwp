@@ -329,34 +329,34 @@ function validate_event_end() {
 
 
 
-////metabox pola dodatkowe w dyskografii
-//$discography_meta = array(
-//    //'name'      => 'category',
-//    'title'     => __( 'Dodatkowe', 'pwp' ),
-//    //'tax' => 'post_tag',
-//    'elements'  => array(
-//    array(
-//        'type'  => 'date',
-//        'name'  => 'release_date',
-//        'params'    => array(
-//            'label'     => __( 'Data wydania płyty', 'pwp' ),
-//            //'validator' => array('notempty'),
-//            'comment' => 'opis'
-//
-//        )
-//    ),
-//	array(
-//        'type'  => 'image',
-//        'name'  => 'header',
-//        'params'    => array(
-//            'label'     => __( 'Obrazek w nagłówku strony', 'pwp' ),
-//             'comment' => 'opis opis'
-//
-//        )
-//    ),
-//    )
-//);
-//$d = new Taxmeta( $discography_meta );
+//metabox pola dodatkowe w dyskografii
+$discography_meta = array(
+    'name'      => 'category',
+    'title'     => __( 'Dodatkowe', 'pwp' ),
+    'tax' => 'category',
+    'elements'  => array(
+    array(
+        'type'  => 'date',
+        'name'  => 'release_date',
+        'params'    => array(
+            'label'     => __( 'Data wydania płyty', 'pwp' ),
+            //'validator' => array('notempty'),
+            'comment' => 'opis'
+
+        )
+    ),
+	array(
+        'type'  => 'image',
+        'name'  => 'header',
+        'params'    => array(
+            'label'     => __( 'Obrazek w nagłówku strony', 'pwp' ),
+             'comment' => 'opis opis'
+
+        )
+    ),
+    )
+);
+$d = new Taxmeta( $discography_meta );
 ////$d->render();
 ////dump($d);
 

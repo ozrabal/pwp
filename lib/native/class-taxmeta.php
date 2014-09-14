@@ -1,6 +1,13 @@
 <?php
 
-class Taxmeta extends Form{
+/**
+   * Taxmeta class
+   * 
+   * @package    PWP
+   * @subpackage Core
+   * @author     Piotr Łepkowski <piotr@webkowski.com>
+   */
+class Taxmeta extends Form {
     
     private 
             $taxonomy = 'category',
@@ -14,16 +21,17 @@ class Taxmeta extends Form{
     public
 	    $body = '';
     
+    /**
+     * konstruktor
+     * @param array $params
+     */
     public function __construct( array $params ) {
         
+        parent::__construct( $params );
         $params = array_merge( $this->defaults, $params );
-
-	$this->set_name( $params['name'] );
         $this->set_title( $params['title'] );
         $this->set_taxonomy( $params['tax'] ) ;
-        $this->set_params( $params );
-        
-	if ( filter_input( INPUT_GET, 'tag_ID', FILTER_SANITIZE_NUMBER_INT, FILTER_NULL_ON_FAILURE ) ) {
+        if ( filter_input( INPUT_GET, 'tag_ID', FILTER_SANITIZE_NUMBER_INT, FILTER_NULL_ON_FAILURE ) ) {
 	    $this->set_term_id( filter_input( INPUT_GET, 'tag_ID', FILTER_SANITIZE_NUMBER_INT ) );
 	}
         add_action( $this->taxonomy . '_add_form_fields', array($this, 'render'), 2, 2 );
@@ -36,36 +44,56 @@ class Taxmeta extends Form{
 	    add_action( 'admin_notices', array( $this, 'error_notice' ) );
 	    unset( $_SESSION['tax-errors'] );
 	}
-        //parent::__construct($params);
+        
     }
 
-    public function set_taxonomy( $taxonomy ) {
+    /**
+     * ustawia taxonomie dla ktorej dodajemy pola meta
+     * @param string $taxonomy
+     */
+    public function set_taxonomy( $taxonomy = 'category' ) {
 	$this->taxonomy = $taxonomy;
     }
-
+    
+    /**
+     * zwraca nazwe taxonomii dla ktorej sa ustawione metapola
+     * @return string
+     */
     public function get_taxonomy() {
 	return $this->taxonomy;
     }
     
+    /**
+     * ustawia term id
+     * @param int $term_id
+     */
     private function set_term_id( $term_id ) {
 	$this->term_id = $term_id;
     }
-
+    
+    /**
+     * pobiera term id
+     * @return int
+     */
     private function get_term_id() {
 	return $this->term_id;
     }
-
+    
+    /**
+     * uswa wartosc metapol dla danego term
+     * @param int $term_id
+     */
     public function delete( $term_id ) {
-	delete_option( 'taxonomy_' . $term_id );
+	delete_option( 'taxonomy_' . intval( $term_id ) );
     }
-
+    
+    
     public function save( $term_id ) {
+        
         $this->set_term_id( $term_id );
-        //global $current_screen;
-        if ( isset( $_POST[$this->get_name()] ) /*&& $current_screen->base == 'edit-tags'*/) {
-	    //pobieramy stare wartosci
-	    //$term_meta = get_option( 'taxonomy_' . $this->get_term_id() );
+        if ( filter_input( INPUT_POST, $this->get_name() ) ) {
 	    foreach( $this->elements as $element ) {
+                //if ( filter_input( INPUT_POST, $variable_name ) ) {
 		if ( isset( $_POST[$this->get_name()][$element->get_name()] ) ) {
 		    $save[$element->get_name()] = $_POST[$this->get_name()][$element->get_name()];
 		} else {
