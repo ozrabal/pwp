@@ -1,9 +1,15 @@
 <?php
+
 /**
- * 
- */
+   * Form class
+   *
+   * @package    PWP
+   * @subpackage Core
+   * @author     Piotr Łepkowski <piotr@webkowski.com>
+   */
 abstract class Form {
-    public 
+
+    public
         $elements,
         $body;
 
@@ -12,221 +18,307 @@ abstract class Form {
         $action;
     
     protected 
-            //$name='',
         $render_after_submit = true,
         $request = false,
         $errors = false;
+
     /**
-     * 
+     * konstruktor
      * @param array $params
      */
     public function __construct(  $params ) {
 
-if(!is_array($params)){
-    return FALSE;
-}
+	if( !is_array( $params ) ) {
+	    return false;
+	}
 
-
-	$this->set_name($params['name']);
-
-	//$this->set_nonce('form_'.$this->get_name());
-
-
-	if(filter_input(INPUT_POST, '_'.$this->get_name().'_name')){
-        
-	    $this->set_request(filter_input_array(INPUT_POST));
-        }
-                
-        
-        $this->set_params($params);
-        
-    /*           
-       $this->render();
-       
-	//dump(count($this->request));
-
-        if(count($this->request) > 1 && $this->get_errors() == false){
-            //$this->render_after_submit = false;
-            
-            $this->submit();
-            $this->body = '';
-            
-        }else if($this->get_errors()){
-            $this->body = '<div class="alert alert-danger">'.__( 'In the form errors occurred', 'pwp' ).'</div>'.$this->body;
-        }
-        
-        $this->print_form();
-        */
-    }
-
-    private function set_nonce($name){
-
-	$this->_nonce = wp_create_nonce($name);
+	$this->set_name( $params['name'] );
 	
+	if( filter_input( INPUT_POST, '_' . $this->get_name() . '_name' ) ) {
+	    $this->set_request( filter_input_array( INPUT_POST ) );
+        }
+	$this->set_params( $params );
     }
 
+    /**
+     * ustawia nonce do wysylki
+     * @param string $name
+     */
+    private function set_nonce( $name ) {
+	$this->_nonce = wp_create_nonce( $name );
+    }
 
-
-
-
-    protected function get_nonce(){
-	if(!empty($this->_nonce)){
+    /**
+     * pobiera nonce
+     * @return string
+     */
+    protected function get_nonce() {
+	if( !empty( $this->_nonce ) ) {
 	    return $this->_nonce;
 	}
-}
+    }
 
-
+    /**
+     * dodaje do formularza ukryte pole nonce _{nazwa formularza}_nonce
+     */
     protected function add_nonce_field() {
-	$this->addElement('hidden','_'.$this->get_name().'_nonce');
-
-            $this->elements['_'.$this->get_name().'_nonce']->set_value($this->get_nonce());
+	$this->addElement( 'hidden', '_' . $this->get_name() . '_nonce' );
+	$this->elements['_' . $this->get_name() . '_nonce']->set_value( $this->get_nonce() );
     }
 
+    /**
+     * dodaje do formularza ukryte pole name _{nazwa formularza}_name
+     */
     protected function add_formname_field() {
-	$this->addElement('hidden','_'.$this->get_name().'_name');
-            $this->elements['_'.$this->get_name().'_name']->set_value($this->get_name());
+	if( !is_admin() ) {
+	    $this->addElement( 'hidden', '_' . $this->get_name() . '_name' );
+	    $this->elements['_' . $this->get_name() . '_name']->set_value( $this->get_name() );
+	}
     }
 
+    /**
+     * ustawia paramerty pola formularza
+     * @param array $element
+     */
+    private function set_element_params( $element ) {
 
+	foreach( $element['params'] as $param => $value ) {
+	    $this->elements[$element['name']]->{ 'set_' . $param }( $value );
+        }
+    }
 
-    protected function set_params( $params ){
+    /**
+     * ustawia validator dla elementu
+     * @param array $element
+     */
+    private function set_element_validator( $element ) {
+	if( $this->get_request() && isset( $element['validator'] ) ) {
+	    $this->elements[$element['name']]->set_validator( $element['validator'] );
+	}
+    }
+
+    /**
+     * ustawia parametry poszczegolnych elementow formularza
+     * @param array $params
+     */
+    protected function set_params( $params ) {
         
-        if(isset($params['elements'])){
-	foreach($params['elements'] as $element){
+	$this->set_method( $params );
 
-	    $added = $this->addElement($element['type'],$element['name']);
-	    //dump();
-
-            if($added && isset($element['params']) && is_array($element['params'])){
-                foreach($element['params'] as $param => $value){
-                    // np set_class()
-                    $this->elements[$element['name']]->{'set_'.$param}($value);
-                
-                }
-            }else{
-                echo ('Nieznany typ pola: '.$element['type']);
-            }
-
-	    //$this->add_nonce_field();
-if(!is_admin()){
-$this->add_formname_field();
-}
-            if($this->get_request() && isset($element['validator'])){
-                
-            $this->elements[$element['name']]->set_validator($element['validator']);
+        if( isset( $params['elements'] ) ) {
+	    foreach( $params['elements'] as $element ) {
+		$added = $this->addElement( $element['type'], $element['name'] );
+		if( $added && isset( $element['params'] ) && is_array( $element['params'] ) ) {
+		    $this->set_element_params( $element );
+		}
+		$this->add_formname_field();
+		$this->set_element_validator( $element );
 	    }
 	}
     }
-    }
-    
-    public function set_errors($e){
+
+    /**
+     * ustawia wartosci bledow
+     * @param mixed|array|object $e
+     */
+    public function set_errors( $e ) {
         $this->errors = $e;
     }
 
-    public function get_errors(){
+    /**
+     * zwraca bledy
+     * @return mixed|array|object
+     */
+    public function get_errors() {
         return $this->errors;
     }
 
+    /**
+     * __call
+     * @param string $name
+     * @param array $arguments
+     * @return Form
+     */
     public function __call( $name, $arguments ) {
-        print_r('Klasa '.__CLASS__.' nie posiada metody '.$name);
+        dbug( 'Klasa ' . __CLASS__ . ' nie posiada metody ' . $name . print_r( $arguments ) );
         return $this;
     }
 
-    public function add_element($type, $name){
-	return $this->addElement($type, $name);
+    /**
+     * wrapper dla addElement
+     * @param string $type
+     * @param string $name
+     * @return Formelement
+     */
+    public function add_element( $type, $name ) {
+	return $this->addElement( $type, $name );
     }
 
-    public function addElement($type, $name) {
-	$type = 'Formelement_'.ucfirst($type);
-        if( class_exists( $type , true)){
-            $this->elements[$name] = new $type($this, $name);
+
+    /**
+     * dodaje element do formularza, inicjuje obiekt
+     * @param string $type
+     * @param string $name
+     * @return Formelement
+     */
+    public function addElement( $type, $name ) {
+	$type = 'Formelement_' . ucfirst( $type );
+        if( class_exists( $type , true ) ) {
+            $this->elements[$name] = new $type( $this, $name );
             return $this->elements[$name];
         }
-        return false;
+	dbug( 'Nieznany typ pola: ' . $type . 'w formularzu ' . $this->get_name() );
+	return false;
     }
-    
-    public function set_request($request){
 
-        if(isset($request[$this->name])){
+    /**
+     * ustawia wewnetrzna zmienna request z POST
+     * @param array $request
+     */
+    public function set_request( $request ) {
+
+        if( isset( $request[$this->name] ) ) {
             $this->request = $request[$this->name];
-        }else{
-	    if(isset($request['_'.$this->get_name().'_name']) && $request['_'.$this->get_name().'_name'] == $this->name ){
+        } else {
+	    if( isset( $request['_' . $this->get_name() . '_name'] ) && $request['_' . $this->get_name() . '_name'] == $this->name ) {
 		$this->request = $request;
 	    }
 	}
     }
-    
+
+    /**
+     * okresla czy jestemy w ekranie edycji (postu, taxonomii..)
+     * @return boolean
+     */
     protected function is_edit(){
-        if(isset($_GET['action']) && $_GET['action'] == 'edit'){
-            return true;
+	if( filter_input( INPUT_GET, 'action' ) == 'edit' ) {
+	    return true;
         }
         return false;
     }
-    
-    public function get_request($value = null){
+
+    /**
+     * pobiera caly request lub konkretna wartosc
+     * @param string $value
+     * @return boolean
+     */
+    public function get_request( $value = null ) {
         
         //if podany klucz zwraca value else zwraca array
-        if(!empty($value)){
-            if(isset($this->request[$value])){
+        if( !empty( $value ) ) {
+            if( isset( $this->request[$value] ) ) {
                 return $this->request[$value];
             }
             return false;
         }
         return $this->request;
     }
-    
-    public function set_title($title){
+
+    /**
+     * ustawia tytul formularza
+     * @param string $title
+     * @return \Form
+     */
+    public function set_title( $title ) {
         $this->title = $title;
         return $this;
     }
-    
-    public function get_title($tag = '%s'){
-        if(isset($this->title))
-        return sprintf( $tag ,$this->title);
+
+    /**
+     * zwraca tytul formularza i dekoruje tagami html
+     * @param string $tag
+     * @return string
+     */
+    public function get_title( $tag = '%s' ) {
+        if( isset( $this->title ) )
+        return sprintf( $tag, $this->title );
     }
-    
-    public function set_name($name){
+
+    /**
+     * ustawia nazwe formularza
+     * @param type $name
+     * @return \Form
+     */
+    public function set_name( $name ) {
         $this->name = sanitize_key( $name );
 	return $this;
-        
     }
-    
-    public function get_name(){
+
+    /**
+     * zwraca nazwe formularza (slug)
+     * @return string
+     */
+    public function get_name() {
         return $this->name;
     }
-    public function set_action($action){
+
+    /**
+     * ustawia akcje formularza
+     * @param string $action
+     * @return \Form
+     */
+    public function set_action( $action = null ) {
 	$this->action = $action;
         return $this;
     }
-    public function get_action(){
+
+    /**
+     * zwraca akcje formularza
+     * @return string
+     */
+    public function get_action() {
 	return $this->action;
     }
+
+    /**
+     * ustawia metode wysylki formularza (POST/GET)
+     * @param array $params
+     * @return \Form
+     */
+    public function set_method( $params ) {
+	if( isset( $params['method'] ) && in_array( $params['method'], array( 'POST', 'GET' ) ) ) {
+	    $this->method = $params['method'];
+	} else {
+	    $this->method = 'POST';
+	}
+	return $this;
+    }
+
+    /**
+     * zwraca metode wysylki formularza
+     * @return string
+     */
+    public function get_method() {
+	return $this->method;
+    }
+
+    /**
+     * renderuje html formularza
+     * @return string
+     */
+    public function render() {
     
-    public function render(){
-        
-
-	$this->body = '<form method="POST" name="'.$this->get_name().'" enctype="multipart/form-data"  action="">';
-
+	$this->body = '<form method="' . $this->get_method() . '" name="' . $this->get_name() . '" enctype="multipart/form-data"  action="' . $this->get_action() . '">';
 	foreach ($this->elements as $element){
             $element->valid();
 	    $this->body .= $element->render();
 	}
-
-	$this->body .= wp_nonce_field( 'form_'.$this->get_name(), '_'.$this->get_name().'_nonce', true, 0 );
-
+	$this->body .= wp_nonce_field( 'form_' . $this->get_name(), '_' . $this->get_name() . '_nonce', true, 0 );
 	$this->body .= '</form>';
-
 	return $this->body;
-        
     }
-    
-    public function print_form(){
+
+    /**
+     * drukuje formularz
+     */
+    public function print_form() {
         echo $this->body;
     }
-    
-    public function submit(){
-        echo '<div class="alert alert-success">'.__( 'wysłano').'</div>';
+
+    /**
+     * wyswietla komunikat o wyslaniu formularza
+     */
+    public function submit() {
+        echo '<div class="alert alert-success">' . __( 'Form send', 'pwp' ) .'</div>';
     }
 }
-
-
