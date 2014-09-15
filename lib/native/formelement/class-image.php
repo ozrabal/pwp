@@ -15,8 +15,7 @@ class Formelement_Image extends Formelement{
     public function __construct( $form, $name) {
 	
        
-	add_action('init', array($this,'enqueue_scripts'));
-        add_action('admin_init', array($this,'enqueue_scripts'));
+	
 	parent::__construct( $form, $name );
     }
     function enqueue_scripts() {
@@ -62,7 +61,10 @@ wp_enqueue_script('field-image',  plugins_url( '/field-image.js', __FILE__ ), ar
     public function render() {
 
 	
-
+add_action('init', array($this,'enqueue_scripts'));
+        //add_action('admin_init', array($this,'enqueue_scripts'));
+        
+        $this->enqueue_scripts();
         parent::render();
         wp_enqueue_media();
 	$this->set_class('field-box');
