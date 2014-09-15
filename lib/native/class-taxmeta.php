@@ -44,7 +44,11 @@ class Taxmeta extends Form {
 	    add_action( 'admin_notices', array( $this, 'error_notice' ) );
 	    unset( $_SESSION['tax-errors'] );
 	}
-        
+
+	$this->body = '<h3>' . $this->get_title() . '</h3>';
+	if ( $this->is_edit() ) {
+            $this->body = '<tr class="form-field"><td><h3>' . $this->get_title() . '</h3></td></tr>';
+        }
     }
 
     /**
@@ -87,48 +91,69 @@ class Taxmeta extends Form {
 	delete_option( 'taxonomy_' . intval( $term_id ) );
     }
     
-    
+    /**
+     * zapisuje wartosc metapola do opcji taxonomy_{id}
+     * @param int $term_id
+     */
     public function save( $term_id ) {
-        
-        $this->set_term_id( $term_id );
-        if ( filter_input( INPUT_POST, $this->get_name() ) ) {
+
+	unset($_SESSION['tax-errors']);
+	$this->set_term_id( $term_id );
+        if ( filter_input( INPUT_POST, $this->get_name(), FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY ) ) {
+	    $term_meta = filter_input( INPUT_POST, $this->get_name(), FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY );
 	    foreach( $this->elements as $element ) {
-                //if ( filter_input( INPUT_POST, $variable_name ) ) {
-		if ( isset( $_POST[$this->get_name()][$element->get_name()] ) ) {
-		    $save[$element->get_name()] = $_POST[$this->get_name()][$element->get_name()];
+		if ( isset( $term_meta[$element->get_name()] ) ) {
+		    $save[$element->get_name()] = $term_meta[$element->get_name()];
 		} else {
 		    $save[$element->get_name()] = '';
 		}
-		//validacja
-		if( $element->get_validator() ) {
-		    $invalid = $element->validate( $save[$element->get_name()], $element->get_validator() );
-		    if( $invalid ) {
-			$element->set_class( 'pwp_error' );
-			$_SESSION[$element->get_name()]['class'] = 'pwp-error';
-			$_SESSION[$element->get_name()]['message'] = array( 'error', $invalid );
-			$_SESSION['tax-errors'] = true;
-		    }
-		}
+		$save = $this->validate( $element, $save );
 	    }
 	    if ( isset( $save ) && !isset( $_SESSION['tax-errors'] ) ) {
 		update_option( 'taxonomy_' . $this->get_term_id(), $save );
 	    }
 	}
     }
-    
-    function error_notice() {
-	echo '<div class="error"><p>' . __( 'There were mistakes, not all changes have been saved', 'pwp' ) . '</p></div>';
+
+    /**
+     * przeprowadza walidacje 
+     * @param Formelement $element
+     * @param array $save
+     * @return array
+     */
+    private function validate( $element, $save ) {
+
+	if( $element->get_validator() ) {
+	    $invalid = $element->validate( $save[$element->get_name()], $element->get_validator() );
+	    if( $invalid ) {
+		$element->set_class( 'pwp_error' );
+		$_SESSION[$element->get_name()]['class'] = 'pwp-error';
+		$_SESSION[$element->get_name()]['message'] = array( 'error', $invalid );
+		$_SESSION['tax-errors'] = true;
+	    }
+	}
+	return $save;
     }
 
+    /**
+     * ustawia klase dla javascriptu validacji not empty
+     * @param Formelement $element
+     * @return string
+     */
+    private function js_notempty_css( $element ) {
+	
+	if ( $element->get_validator( 'Validator_Notempty' ) ) {
+	    return 'form-required';
+	}
+    }
+
+    /**
+     * renderuje formularz z polami
+     */
     public function render() {
+
 	$this->options = get_option( 'taxonomy_' . $this->get_term_id() );
-        if ( $this->is_edit() ) {
-            $this->body .= '<tr class="form-field"><td><h3>' . $this->get_title() . '</h3></td></tr>';
-        } else {
-            $this->body .= '<h3>' . $this->get_title() . '</h3>';
-        }
-        foreach ( $this->elements as $element ) {
-	    //komunikat o bledzie jesli wywolanie po submicie
+	foreach ( $this->elements as $element ) {
 	    if ( isset( $_SESSION[$element->get_name()] ) ) {
 		$element->set_class( $_SESSION[$element->get_name()]['class'] );
 		$element->set_message( $_SESSION[$element->get_name()]['message'] );
@@ -137,23 +162,11 @@ class Taxmeta extends Form {
             if ( isset( $this->options[$element->get_name()] ) ) {
 		$element->set_value( $this->options[$element->get_name()] );
 	    }
-	    //dopasowanie do wyswietlania w komorkach tabeli
-            if ( $this->is_edit() ) {
-                $element->label->set_after( '</th><td>' );
-            }
-	    //klasa dla validatora wymaganych pol w JS
-	    if ( $element->get_validator( 'Validator_Notempty' ) ) {
-                if ( $this->is_edit() ) {
-		$this->body .= '<tr class="form-required"><th>' . $element->render() . '</td></tr></td>';
-                } else {
-                    $this->body .= '<div class="form-required">' . $element->render() . '</div>';
-                }
+	    if ( $this->is_edit() ) {
+		$element->label->set_after( '</th><td>' );
+                $this->body .= '<tr class="' . $this->js_notempty_css( $element ) . ' form-field"><th scope="row">' . $element->render() . '</td></tr></td>';
             } else {
-                if ( $this->is_edit() ) {
-                    $this->body .= '<tr class="form-field"><th scope="row">' . $element->render() . '</td></tr></td>';
-                }else{
-                    $this->body .= '<div class="form-field">' . $element->render() . '</div>';
-                }
+		$this->body .= '<div class="' . $this->js_notempty_css($element) . ' form-field">' . $element->render() . '</div>';
             }
 	}
 	$this->print_form();

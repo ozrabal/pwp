@@ -340,7 +340,7 @@ $discography_meta = array(
         'name'  => 'release_date',
         'params'    => array(
             'label'     => __( 'Data wydania płyty', 'pwp' ),
-            //'validator' => array('notempty'),
+            'validator' => array('notempty'),
             'comment' => 'opis'
 
         )
