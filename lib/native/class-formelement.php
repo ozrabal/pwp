@@ -1,27 +1,54 @@
 <?php
-
+/**
+   * Formelement class
+   *
+   * @package    PWP
+   * @subpackage Core
+   * @author     Piotr Łepkowski <piotr@webkowski.com>
+   */
 abstract class Formelement{
-    protected   
-            //$form,
-            $message,
-            $value
-            ;
+    
+    protected $message, $value;
+
     private $disabled;
 
+    /**
+     * __toString
+     * @return string
+     */
     public function __toString() {
 	return $this->get_type();
     }
+
+    /**
+     * konstruktor
+     * @param Form|Formelement_Repeatable $form
+     * @param string $name
+     */
     public function __construct( $form, $name ) {
 	$this->form = $form;
         $this->set_name( $name );
     }
+
+    /**
+     * __call
+     * @param string $name
+     * @param array $arguments
+     * @return \Formelement
+     */
     public function __call( $name, $arguments = null ) {
-        echo'Klasa ' . __CLASS__ . ' nie posiada metody ' . $name;
+        dbug( 'Klasa ' . __CLASS__ . ' nie posiada metody ' . $name . print_r( $arguments ) );
         return $this;
     }
 
-    public function set_disabled( $value ) {
-	$this->disabled = $value;
+    /**
+     * ustawia wlasnosc disabled
+     * @param string $value
+     */
+    public function set_disabled( $value = 'disabled' ) {
+	if( isset( $value ) ) {
+	    $this->disabled = 'disabled';
+	}
     }
 
     public function get_disabled(){
