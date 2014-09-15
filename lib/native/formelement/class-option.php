@@ -1,24 +1,43 @@
 <?php
+/**
+   * Formelement_Option class
+   *
+   * @package    PWP
+   * @subpackage Core
+   * @author     Piotr Łepkowski <piotr@webkowski.com>
+   */
+class Formelement_Option extends Formelement {
+    protected $type = 'option', $select;
 
-class Formelement_Option extends Formelement{
-    protected $type = 'option';
-    protected $select;
-
+    /**
+     * konstruktor
+     * @param \Form $form
+     * @param string $name
+     * @param Formelement_Select $select
+     */
     public function __construct( \Form $form, $name, Formelement_Select $select ) {
+        
         parent::__construct( $form, $name );
         $this->select = $select;
     }
 
-    public function selected(){
-        //if($this->get_value() == $this->form->get_request( $this->select->get_name())){
-        if(isset($this->selected) && $this->selected == true)
-        return ' selected="selected" ';
-            
-        //}
-    }
+    /**
+     * zwraca atrybut html selected
+     * @return string
+     */
+    public function selected() {
 
+        if( isset( $this->selected ) && $this->selected == true ) {
+            return ' selected="selected" ';
+        }
+    }
+    
+    /**
+     * renderuje pole option
+     * @return string
+     */
     public function render() {
-        //dump($this->form->get_request());
-        return '<option '.$this->value().$this->selected().'>'.$this->get_name().'</option>';
+
+        return '<option ' . $this->value() . $this->selected() . '>' . $this->get_name() . '</option>';
     }
 }

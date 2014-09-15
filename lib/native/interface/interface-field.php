@@ -1,11 +1,14 @@
 <?php
 /**
-   * Formelement_Hidden class
+   * Field Interface
    *
    * @package    PWP
    * @subpackage Core
    * @author     Piotr Łepkowski <piotr@webkowski.com>
    */
-class Formelement_hidden extends Formelement_Input {
-    protected $type = 'hidden';
+interface Interface_Field {
+    /**
+     * funkcja renderujaca pole
+     */
+    function render();
 }

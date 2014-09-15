@@ -1,5 +1,11 @@
 <?php
-
+/**
+   * Formelement_Map class
+   *
+   * @package    PWP
+   * @subpackage Core
+   * @author     Piotr Łepkowski <piotr@webkowski.com>
+   */
 class Formelement_Map extends Formelement_Input {
     protected $type = 'map';
 

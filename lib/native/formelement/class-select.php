@@ -1,5 +1,11 @@
 <?php
-
+/**
+   * Formelement_Select class
+   *
+   * @package    PWP
+   * @subpackage Core
+   * @author     Piotr Łepkowski <piotr@webkowski.com>
+   */
 class Formelement_Select extends Formelement{
     protected $type = 'select';
 

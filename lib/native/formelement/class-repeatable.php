@@ -1,4 +1,11 @@
 <?php
+/**
+   * Formelement_Repeatable class
+   *
+   * @package    PWP
+   * @subpackage Core
+   * @author     Piotr Łepkowski <piotr@webkowski.com>
+   */
 class Formelement_Repeatable extends Formelement{
     protected
 	$type = 'repeatable',
