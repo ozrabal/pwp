@@ -69,9 +69,18 @@ class Administrator{
     /**
      * ustawia obsluge akcji admin_menu
      * @param array $args
+     * @todo domyslne parametry ustawiac w konstruktorze osobna funkcja
      */
     public function add_page( $args ) {
         
+	if( !isset( $args['icon'] ) ) {
+	    $args['icon'] = null;
+	}
+
+	if( !isset( $args['position'] ) ) {
+	    $args['position'] = null;
+	}
+
         $this->page = $args;
         add_action( 'admin_menu', array( $this, 'add_menu' ) );
     }
