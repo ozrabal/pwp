@@ -370,17 +370,20 @@ $page_meta = array(
     //'allow_posts' => array('rule' => 'id','params'=> array(63)),
     'elements'  => array(
 
-array(
-        'type'  => 'map',
-        'name'  => 'latlong',
-        'params'    => array(
-            'label'     => __( 'Location', 'pwp' ),
-            'comment' => 'Lokalizacja'
-
-
-        ),
-
-    ),
+//array(
+//        'type'  => 'map',
+//        'name'  => 'latlong',
+//        'params'    => array(
+//            'label'     => __( 'Location', 'pwp' ),
+//            'comment' => 'Lokalizacja'
+//
+//
+//        ),
+//
+//    ),
+        
+        
+        
      array(
         'type'  => 'date',
         'name'  => 'event_start',
@@ -394,27 +397,27 @@ array(
     ),
 
 
-        array(
-        'type'  => 'date',
-        'name'  => 'event_stop',
-        'params'    => array(
-            'label'     => __( 'Stop', 'pwp' ),
-            'comment' => 'bla',
-'validator' => array('notempty'),
-
-        ),
-            
-    ),
-    array(
-        'type'  => 'checkbox',
-        'name'  => 'expanded',
-        'params'    => array(
-            'label'     => __( 'Pokazuj zwinięte', 'pwp' ),
-	    'comment' => 'Domyślnie panele są rozwinięte i niezwijalne',
-
+//        array(
+//        'type'  => 'date',
+//        'name'  => 'event_stop',
+//        'params'    => array(
+//            'label'     => __( 'Stop', 'pwp' ),
+//            'comment' => 'bla',
 //'validator' => array('notempty'),
-        )
-    ),
+//
+//        ),
+//            
+//    ),
+//    array(
+//        'type'  => 'checkbox',
+//        'name'  => 'expanded',
+//        'params'    => array(
+//            'label'     => __( 'Pokazuj zwinięte', 'pwp' ),
+//	    'comment' => 'Domyślnie panele są rozwinięte i niezwijalne',
+//
+////'validator' => array('notempty'),
+//        )
+//    ),
     )
 );
 //new Metabox( $page_meta );
@@ -423,11 +426,20 @@ array(
 $video_gallery = array(
     'name'      => 'gallery',
     'title'     => __( 'Galeria video', 'pwp' ),
-    'posts' =>array(67),
+    //'posts' =>array(67),
     'post_type' => array('page'),
     //'allow_posts' => array('rule' => 'id','params'=> array(63,67)),
     'elements'  => array(
+	array(
+	    'type'	=> 'text',
+	    'name'	=> 'normalne',
+	    'params'	=> array(
+	        'label'	    => __( 'URL filmu', 'pwp' ),
+	        'comment'   => __( 'Plik załącznika tylko w jpg', 'pwp' ),
+	        'class'	    => 'large-text',
 
+            )
+	),
 	array(
 	    'type'=>'repeatable',
 	    'name'=>'video',
@@ -435,7 +447,7 @@ $video_gallery = array(
 'params' => array(
 		'title' => 'Film',
 
-	    'options' => array(
+	    'repeater' => array(
 		array(
 	    'type'	=> 'text',
 	    'name'	=> 'url',
@@ -470,20 +482,20 @@ $video_gallery = array(
 		)),
 
 	),
-             array(
-        'type'  => 'date',
-        'name'  => 'event_starta',
-        'params'    => array(
-            'label'     => __( 'Start', 'pwp' ),
-            'comment' => 'bla',
-'validator' => array('notempty'),
-
-        ),
-
-    ),
+//             array(
+//        'type'  => 'date',
+//        'name'  => 'event_starta',
+//        'params'    => array(
+//            'label'     => __( 'Start', 'pwp' ),
+//            'comment' => 'bla',
+//'validator' => array('notempty'),
+//
+//        ),
+//
+//    ),
     )
 );
-//new Metabox( $video_gallery );
+new Metabox( $video_gallery );
 
 
 

@@ -21,13 +21,13 @@ class Metabox extends Form {
      * @return null
      */
     public function __construct( $box ) {
-        
+
         if( !is_admin() ){
 	    return;
 	}
-        
+       
         parent::__construct( $box );
-        parent::set_params( $box );
+        //parent::set_params( $box );
         
         $this->config( $box );
         

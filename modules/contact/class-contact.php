@@ -484,7 +484,7 @@ $options_tabs = new Options();
         $options_tabs->add_element( 'repeatable', 'powtorz' )
                     ->set_title( 'Powtarzalne' )
                     ->set_comment( 'komentarz do repeatable' )
-                    ->add_elements( $elements_repeater );
+                    ->set_repeater( $elements_repeater );
         $admins->add_options_group( $options_tabs, 'inny-tab' );
     }
 }

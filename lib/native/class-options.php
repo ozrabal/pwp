@@ -30,8 +30,10 @@ class Options extends Form {
         if( !$args ) {
             return false;
         }
+        
         parent::__construct( $args );
         $this->options = get_option( $this->get_name(), true );
+
     }
     
     /**
