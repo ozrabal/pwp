@@ -6,82 +6,106 @@
    * @subpackage Core
    * @author     Piotr Łepkowski <piotr@webkowski.com>
    */
-class Formelement_Repeatable extends Formelement{
+class Formelement_Repeatable extends Formelement {
+    
     protected
-	$type = 'repeatable',
-	$request,
-        $body = null,
-        $iter = -1
-    ;
+	$type = 'repeatable', $request, $body = null;
     
-    function enqueue_media_repeatable() {
-	wp_enqueue_script( 'jquery-ui-sortable', array( 'jquery' ) );
-        wp_enqueue_script( 'field-repeatable', plugins_url( '/field-repeatable.js', __FILE__ ), array( 'jquery' ), PWP_VERSION );
-    }
-    
+    /**
+     * 
+     * @param Form $form
+     * @param string $name
+     */
     public function __construct( $form, $name ) {
         parent::__construct( $form, $name );
-        add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_media_repeatable' ) ); 
-        add_action( 'enqueue_scripts', array( $this, 'enqueue_media_repeatable' ) );
     }
 
-    public function set_options( $params ) {
-        return $this->add_elements( $params );
+    /**
+     * dolacza skrypty js
+     */
+    private function enqueue_media_repeatable() {
+        
+	wp_enqueue_script( 'jquery-ui-sortable', array( 'jquery' ) );
+        wp_enqueue_script( 'field-repeatable', plugins_url( '/field-repeatable.js', __FILE__ ), array( 'jquery', 'jquery-ui-sortable' ), PWP_VERSION, true );
     }
+    
+    /**
+     * ustawia elementy pola
+     * @param array $params
+     * @return \Formelement_Repeatable
+     */
+    public function set_repeater( $params ) {
 
-    public function add_elements( $params ) {
         $element_count = 0;
-	if ( ( $this->form instanceof Options )  && isset( $this->form->options[$this->get_name()] ) ) {
+	if( ( $this->form instanceof Options )  && isset( $this->form->options[$this->get_name()] ) ) {
             $element_count = count( $this->form->options[$this->get_name()] );
         }
-        if ( $element_count == 0 ) {
+        if( $element_count == 0 ) {
 	    $element_count = 1;
 	}
+        $iter = -1;
         for ( $i=1; $i <= $element_count; $i++ ) {
-            $this->iter += 1;
+            $iter += 1;
             foreach ( $params as $element ) {
-                $added = $this->add_element( $element['type'], $element['name'] );
+                $added = $this->add_element( $element['type'], $element['name'], $iter );
                 if ( $added && isset( $element['params'] ) && is_array( $element['params'] ) ) {
-                    foreach ( $element['params'] as $param => $value ) {
-                    // np set_class()
-                    $this->elements[$this->iter][$element['name']]->{'set_'.$param}($value);
-                    }
+                    $this->set_element_params( $element, $iter );
                 } else {
-                    echo '<div class="error"><p>' . __( 'Unknown field type <strong>', 'pwp' ) . $element['type'] . __( '</strong> in repeatable set ') . $this->form->get_title() . '</p></div>';
+                    dbug( '<div class="error"><p>Nieznany typ pola: <strong>' . $element['type'] . '</strong>, w polu powtarzalnym: '. $this->form->get_name() . '</p></div>' );
                 }
             }
         }
         return $this;
     }
     
-    public function add_element( $type, $name ) {
+    /**
+     * ustawia paremetry elementu pola
+     * @param Formelement $element
+     * @param integer $iter
+     */
+    private function set_element_params( $element, $iter ) {
+        foreach ( $element['params'] as $param => $value ) {
+            $this->elements[$iter][$element['name']]->{ 'set_'.$param }( $value );
+        }
+    }
+    
+    /**
+     * inicjuje obiekt elementu pola
+     * @param string $type
+     * @param string $name
+     * @param integer $iter
+     * @return boolean
+     */
+    public function add_element( $type, $name, $iter ) {
         $type = 'Formelement_' . ucfirst( $type );
         if ( class_exists( $type ) ) {
-            $this->elements[$this->iter][$name] = new $type( $this, $name );
-            return $this->elements[$this->iter][$name];
+            $this->elements[$iter][$name] = new $type( $this, $name );
+            return $this->elements[$iter][$name];
         }
         return false;
     }
     
+    /**
+     * renderuje pole powtarzalne
+     * @return string
+     */
     public function render() {
-        $this->p = $this->form->get_name() . '[' . $this->get_name() . ']';
+        
+        $this->enqueue_media_repeatable();
+        
         if ( $this->form instanceof Options ) {
-            $this->set_name( $this->p );
+            $this->set_name( $this->form->get_name() . '[' . $this->get_name() . ']' );
         }
-        $this->body .= $this->get_before() . $this->get_label();
-        $this->body .= '<div ' . $this->cssclass() . '>';
+        $this->body .= $this->get_before() . $this->get_label() . '<div ' . $this->cssclass() . '>';
         if ( isset( $this->elements ) ) {
+            
             if ( is_admin() ) {
                 $this->body .= '<table class="meta ds-input-table repeatable"><tbody class="ui-sortable-container">'; 
             } else {
                 $this->body .= '<div ' . $this->set_class( 'ui-sortable' )->cssclass() . '>';
             }
             $a = $this->get_value();
-            /*
-            if ( count($a) < 1 ) {
-                $a = 1;
-            }
-            */
+
             for ( $i = 0; $i<count( $a ); $i++ ) {
                 if ( is_admin() ) {
                     $this->body .= '<tr class="row sortable-item repeatable-item inline-edit-row quick-edit-row alternate"><td class="order "><div class="dashicons dashicons-menu"></div></td><td>';
@@ -119,8 +143,11 @@ class Formelement_Repeatable extends Formelement{
             } else {
                 $this->body .= '</div>';
             }
+            
             $this->body .= '<a href="#" class="repeatable-add button"><span class="pwp-icon dashicons dashicons-plus"></span>'. __( 'Add ', 'pwp' ) . $this->get_title() . '</a>';
-        } else {
+        
+            
+            } else {
             $this->body = '<div class="pwp-error"><p class="description">' . __( 'No declaration field: ', 'pwp') . $this->get_title() . '</p></div>';
         }
         $this->body .= $this->get_comment( '<p class="description">%s</p>' );
@@ -128,20 +155,13 @@ class Formelement_Repeatable extends Formelement{
         return $this->body;
     }
     
-    public function set_request( $request ) {
-        if ( isset( $request[$this->name] ) ) {
-            $this->request = $request[$this->name];
-        }
+    
+    private function render_backend(){
+        
+    }
+    
+    private function render_frontend(){
+        
     }
 
-    public function get_request( $value = null ) {
-        //if podany klucz zwraca value else zwraca array
-        if ( !empty( $value ) ) {
-            if ( isset( $this->request[$value] ) ) {
-                return $this->request[$value];
-            }
-            return false;
-        }
-        return $this->request;
-    }
 }
