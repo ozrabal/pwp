@@ -3,7 +3,7 @@
    * Cookiealert module class
    *
    * @package    PWP
-   * @subpackage Contact
+   * @subpackage Cookiealert
    * @author     Piotr Łepkowski <piotr@webkowski.com>
    */
 
