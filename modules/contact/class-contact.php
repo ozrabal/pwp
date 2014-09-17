@@ -451,6 +451,10 @@ $options_tabs = new Options();
                     ->set_class( 'klasa' )
                     ->set_validator( array( 'notempty' ) );
 
+//	$options_tabs->add_element( 'folder', 'teczka' )
+//                    ->set_label( __( 'Folder', 'pwp' ) )
+//                    ->set_class( 'klasa' );
+
 	$options_tabs->add_element( 'attachment', 'zalacznik' )
                     ->set_label( __( 'Załacznik', 'pwp' ) )
                     ->set_class( 'klasa' )
