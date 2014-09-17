@@ -47,10 +47,10 @@ span.error{
 .attachment-preview .thumbnail{
      overflow: hidden;
 }
-.attachment-fieldset .attachment-preview, .attachment-preview .thumbnail {
+.field-box .attachment-fieldset .attachment-preview,.field-box .attachment-preview .thumbnail {
     height: 110px;
     width: 110px;
-overflow: hidden;
+    overflow: hidden;
 }
 .attachment-preview .thumbnail img{
     smargin: 0 auto;
