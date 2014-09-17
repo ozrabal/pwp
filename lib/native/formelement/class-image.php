@@ -1,5 +1,4 @@
 <?php
-
 /**
    * Formelement_Image class
    *
@@ -7,23 +6,14 @@
    * @subpackage Core
    * @author     Piotr Łepkowski <piotr@webkowski.com>
    */
-class Formelement_Image extends Formelement{
-    private 
-        $type = 'image';
-    
+class Formelement_Image extends Formelement {
+    private $type = 'image';
+
     /**
-     * 
-     * @param Form $form
-     * @param String $name
+     * dolacza skrypty js
      */
-    public function __construct( $form, $name) {
-	
-       
-	
-	parent::__construct( $form, $name );
-    }
-    function enqueue_scripts() {
-wp_enqueue_script('field-image',  plugins_url( '/field-image.js', __FILE__ ), array( 'jquery' ),PWP_VERSION  );
+    public function enqueue_scripts() {
+	wp_enqueue_script( 'field-image',  plugins_url( '/field-image.js', __FILE__ ), array( 'jquery' ), PWP_VERSION );
 
      // wp_enqueue_script( 'field-image');
  //wp_localize_script( 'field-image', 'type', 'image' );
