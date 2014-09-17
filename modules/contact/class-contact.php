@@ -335,6 +335,16 @@ class Contact extends Form {
                     ),
                     
                 ),
+		 array(
+                    'type' => 'wysiwyg',
+                    'name' => 'auser_email_template',
+                    'params'=> array(
+                        'label' => __( 'User email template', 'pwp' ),
+                        'class' => 'large-text',
+			'options' => array('tinymce' => true),
+                        'comment' => __( 'Template of the message that is sent to administrator when a user to fill in a form on the page.', 'pwp' )
+                    ),
+                ),
                 array(
                     'type' => 'textarea',
                     'name' => 'user_email_template',
@@ -397,7 +407,7 @@ class Contact extends Form {
      * @return boolean
      */
     static function disable_rich_editor() {
-	return false;
+	return true;
     }
     
     private static function settings(){
@@ -465,6 +475,10 @@ $options->add_element( 'text', 'tekst' )
         ->set_label( __( 'User email templatec', 'pwp' ) )
         ->set_class( 'klasa' )
         ->set_validator( array( 'notempty' ) );
+
+$options->add_element( 'wysiwyg', 'edytor' )
+        ->set_label( __( 'Edytor', 'pwp' ) )
+        ->set_class( 'klasa' )->set_options( array('tinymce' => true) );
 
 $admins->add_options_group( $options, 'test-options' );
 $admins->add_options_group( $options, 'nowy-tab' );
