@@ -426,7 +426,36 @@ $args = array(
 );
 
 $options = new Options($args);
+//pobiera kategorie do selecta
+function get_roles(  ) {
 
+
+    global $wp_roles;
+    $default_roles = array();
+    //$default_roles = array('administrator','editor', 'author', 'contributor', 'subscriber', 'pending');
+
+
+     $roles = $wp_roles->get_names();
+    // dump($roles);
+
+     $roless['Bez ograniczeń'] = '';
+foreach($roles as  $role => $name){
+    if(!in_array( $role, $default_roles)){
+    $roless[$name] = $role;
+    }
+}
+
+     //dump($roless);
+return $roless;
+     /*
+    $categories = get_categories( $args );
+    $cat[__('Wybierz kategorię')] = '';
+    foreach( $categories as $category ) {
+	$cat[$category->name] = $category->term_id;
+    }
+    return $cat;
+    */
+}
 
 //$options->set_name( 'a_options' )
 //        ->set_action( 'options.php' )
@@ -451,6 +480,12 @@ $options_tabs = new Options();
                     ->set_class( 'klasa' )
                     ->set_validator( array( 'notempty' ) );
 
+$options_tabs->add_element( 'select', 'selekt' )
+                    ->set_label( __( 'wybor', 'pwp' ) )
+                    ->set_class( 'klasa' )
+                    ->set_options( get_roles() );
+
+
 //	$options_tabs->add_element( 'folder', 'teczka' )
 //                    ->set_label( __( 'Folder', 'pwp' ) )
 //                    ->set_class( 'klasa' );
@@ -464,7 +499,6 @@ $options_tabs = new Options();
                     ->set_label( 'Obrazek' )
                     ->set_comment( 'komentarz' )
                     ->set_validator( array( 'notempty' ) );
-
 
 	$elements_repeater = array(
             array(
