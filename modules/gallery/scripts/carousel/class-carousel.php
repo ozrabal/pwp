@@ -80,6 +80,7 @@ class Carousel extends Gallery{
 	if ( is_feed() ) {
 		$output = "\n";
 		foreach ( $attachments as $att_id => $attachment )
+		    
 		$img = wp_get_attachment_image_src($att_id, $size);
 
 			$output .= '<img src="'. $img[0] .'" alt="" />\n';
@@ -90,10 +91,14 @@ class Carousel extends Gallery{
 
 
 	$pager = '<a class="left carousel-control" href="#'.$this->selector.'" data-slide="prev">
-    <span class="glyphicon glyphicon-chevron-left"></span>
+    <span class="btn">
+<i class="fa fa-angle-left"></i>
+</span>
   </a>
   <a class="right carousel-control" href="#'.$this->selector.'" data-slide="next">
-    <span class="glyphicon glyphicon-chevron-right"></span>
+    <span class="btn">
+<i class="fa fa-angle-right"></i>
+</span>
   </a>';
 
 
@@ -119,7 +124,8 @@ $output .= '<div class="carousel-inner">';
 
 
 		$img = wp_get_attachment_image_src($id, $size);
-		$link = '<img src="'. $img[0] .'" alt="" class="'.$this->params['image_class'].'"/>';
+		
+		$link = '<a href="'. $img[0] .'" class="lightbox" rel="gallery"><img src="'. $img[0] .'" alt="" class="'.$this->params['image_class'].'"/></a>';
 		//$pager .= '<img src="'. $img[0] .'" alt="" />';
                 
 		$output .= '<div class="item '.$active.'">';
