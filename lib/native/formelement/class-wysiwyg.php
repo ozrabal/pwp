@@ -54,73 +54,28 @@ class Formelement_Wysiwyg extends Formelement {
     }
 
     /**
+     * dolacza skrypty js
+     */
+    public function enqueue_scripts() {
+
+	wp_enqueue_script( 'field-wysiwyg',  plugins_url( '/field-wysiwyg.js', __FILE__ ), array( 'jquery' ), PWP_VERSION );
+    }
+    
+    /**
      * renderuje pole z edytorem
      * @return string
      */
     public function render() {
-
-	if( $this->form instanceof Formelement_Repeatable ) {
+        
+        $this->enqueue_scripts();
+        if( $this->form instanceof Formelement_Repeatable ) {
 	    return $this->render_repeatable();
 	}
 	parent::render();
 	ob_start();
-	echo"
-
-<script>
-
-
-var _triggerAllEditors = function(event, creatingEditor) {
-		var postbox, textarea;
-
-		postbox = jQuery(event.target);
-		textarea = postbox.find('textarea.wp-editor-area');
-
-		textarea.each(function(index, element) {
-			var editor, is_active;
-
-			editor = tinyMCE.EditorManager.get(element.id);
-			is_active = jQuery(this).parents('.tmce-active').length;
-
-			if (creatingEditor) {
-				if (!editor && is_active) {
-					tinyMCE.execCommand('mceAddControl', true, element.id);
-				}
-			}
-			else {
-				if (editor && is_active) {
-					editor.save();
-					tinyMCE.execCommand('mceRemoveControl', true, element.id);
-				}
-			}
-		});
-	};
-jQuery('#poststuff').on('sortstart', function(event) {
-	_triggerAllEditors(event, false);
-}).on('sortstop', function(event) {
-	_triggerAllEditors(event, true);
-});
-
-
-
-</script>
-
-";
-
-        
-$this->options['textarea_name'] = $this->name(false);
-	
-wp_editor( $this->get_value(), $this->get_id(), $this->get_options() );
-        
-        
-        
+        $this->options['textarea_name'] = $this->name( false );
+	wp_editor( $this->get_value(), $this->get_id(), $this->get_options() );
         $editor = ob_get_clean();
-	//echo $this->get_name();
-
-	return $this->get_before().$this->get_label().$editor.$this->get_message().$this->get_comment('<p class="description">%s</p>').$this->get_after();
-//return $this->get_before().$this->get_label().$editor.'<textarea '.$this->id().$this->cssclass().'>'.$this->get_value().'</textarea>'.$this->get_message().$this->get_comment('<p class="description">%s</p>').$this->get_after();
-
-
+	return $this->get_before() . $this->get_label() . $editor . $this->get_message() . $this->get_comment( '<p class="description">%s</p>' ) . $this->get_after();
     }
-
-
 }
