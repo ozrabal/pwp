@@ -64,6 +64,7 @@ class Formelement_Repeatable extends Formelement {
      * @param integer $iter
      */
     private function set_element_params( $element, $iter ) {
+
         foreach ( $element['params'] as $param => $value ) {
             $this->elements[$iter][$element['name']]->{ 'set_'.$param }( $value );
         }
@@ -77,8 +78,9 @@ class Formelement_Repeatable extends Formelement {
      * @return boolean
      */
     public function add_element( $type, $name, $iter ) {
+
         $type = 'Formelement_' . ucfirst( $type );
-        if ( class_exists( $type ) ) {
+        if( class_exists( $type ) ) {
             $this->elements[$iter][$name] = new $type( $this, $name );
             return $this->elements[$iter][$name];
         }
@@ -92,76 +94,80 @@ class Formelement_Repeatable extends Formelement {
     public function render() {
         
         $this->enqueue_media_repeatable();
-        
-        if ( $this->form instanceof Options ) {
-            $this->set_name( $this->form->get_name() . '[' . $this->get_name() . ']' );
+	if( $this->form instanceof Options ) {
+	    $this->set_name( $this->form->get_name() . '[' . $this->get_name() . ']' );
         }
         $this->body .= $this->get_before() . $this->get_label() . '<div ' . $this->cssclass() . '>';
-        if ( isset( $this->elements ) ) {
-            
-            if ( is_admin() ) {
-                $this->body .= '<table class="meta ds-input-table repeatable"><tbody class="ui-sortable-container">'; 
-            } else {
-                $this->body .= '<div ' . $this->set_class( 'ui-sortable' )->cssclass() . '>';
-            }
-            $a = $this->get_value();
-
-            for ( $i = 0; $i<count( $a ); $i++ ) {
-                if ( is_admin() ) {
-                    $this->body .= '<tr class="row sortable-item repeatable-item inline-edit-row quick-edit-row alternate"><td class="order "><div class="dashicons dashicons-menu"></div></td><td>';
-                    $this->body .= $this->get_title( '<h4>%s</h4>' );
-                } else {
-                    $this->body .='<div class="order sortable-item repeatable-item"><a class="order"><span class="glyphicon glyphicon-resize-vertical"></span>';
-                    $this->body .= $this->get_title( '<span class="repeatable-title">%s</span>' );
-                    $this->body .= '</a>';
-                }
-                foreach ( $this->elements[0] as $element ) {
-                    $n = $element->get_name();
-                    if ( $this->form instanceof Options ) {
-                        $element->set_name( $this->get_name() . '[' . $i . '][' . $n . ']' );
-                    } else {
-                        $element->set_name( $this->get_name() . '[' . $i . '][' . $n . ']' );
-                    }
-                    $element->set_id( $n . '_' . $i );
-                    $element->label->set_for( $n . '_' . $i );
-                    //$element->set_name('['.$i.']['.$element->get_name().']');
-                    if ( isset( $a[$i][$n] ) ) {
-                        $element->set_value( $a[$i][$n] );
-                    }
-                    $this->body .= $element->render();
-                    $element->set_name( $n );
-                }
-                if ( is_admin() ) {
-                    $this->body .= '</td><td class="remove"><a class="repeatable-remove dashicons dashicons-no" href="#"></a></td></tr>';
-                } else {
-                    $this->body .= '<a class="repeatable-remove dashicons dashicons-no" href="#"><span class="glyphicon glyphicon-minus"></span></a></div>';
-                }
-                $this->body .= $this->get_after();
-            }
+        if( isset( $this->elements ) ) {
             if( is_admin() ) {
-                $this->body .= '</tbody></table>';
-            } else {
-                $this->body .= '</div>';
-            }
-            
+		$this->render_backend();
+	    } else {
+		$this->render_frontend();
+	    }
             $this->body .= '<a href="#" class="repeatable-add button"><span class="pwp-icon dashicons dashicons-plus"></span>'. __( 'Add ', 'pwp' ) . $this->get_title() . '</a>';
-        
-            
-            } else {
+	} else {
             $this->body = '<div class="pwp-error"><p class="description">' . __( 'No declaration field: ', 'pwp') . $this->get_title() . '</p></div>';
         }
-        $this->body .= $this->get_comment( '<p class="description">%s</p>' );
-        $this->body .= '</div>';
+        $this->body .= $this->get_comment( '<p class="description">%s</p>' ) . '</div>';
         return $this->body;
     }
-    
-    
-    private function render_backend(){
-        
-    }
-    
-    private function render_frontend(){
-        
+
+    /**
+     * renderuje element pola
+     * @param array $value
+     * @param integer $index
+     */
+    private function render_repeatable_element( $value, $index ) {
+
+	foreach( $this->elements[0] as $element ) {
+	    $name = $element->get_name();
+            if( $this->form instanceof Options ) {
+		$element->set_name( $this->get_name() . '[' . $index . '][' . $name . ']' );
+            } else {
+		$element->set_name( $this->get_name() . '[' . $index . '][' . $name . ']' );
+            }
+            $element->set_id( $name . '_' . $index );
+            $element->label->set_for( $name . '_' . $index );
+	    if( isset( $value[$index][$name] ) ) {
+		$element->set_value( $value[$index][$name] );
+            }
+            $this->body .= $element->render();
+            $element->set_name( $name );
+        }
     }
 
+    /**
+     * renderuje zawartosc pola powtarzalnego w backendzie
+     */
+    private function render_backend() {
+
+	$this->body .= '<table class="meta ds-input-table repeatable"><tbody class="ui-sortable-container">';
+	$value = $this->get_value();
+	for( $index = 0; $index < count( $value ); $index++ ) {
+	    $this->body .= '<tr class="row sortable-item repeatable-item inline-edit-row quick-edit-row alternate"><td class="order"><div class="dashicons dashicons-menu"></div></td><td>';
+	    $this->body .= $this->get_title( '<h4>%s</h4>' );
+            $this->render_repeatable_element( $value, $index );
+	    $this->body .= '</td><td class="remove"><a class="repeatable-remove dashicons dashicons-no" href="#"></a></td></tr>';
+	    $this->body .= $this->get_after();
+        }
+        $this->body .= '</tbody></table>';
+    }
+
+    /**
+     * renderuje zawartosc pola powtarzalnego we frontendzie
+     */
+    private function render_frontend(){
+
+	$this->body .= '<div ' . $this->set_class( 'ui-sortable' )->cssclass() . '>';
+        $value = $this->get_value();
+        for ( $index = 0; $index < count( $value ); $index++ ) {
+	    $this->body .='<div class="order sortable-item repeatable-item"><a class="order"><span class="glyphicon glyphicon-resize-vertical"></span>';
+            $this->body .= $this->get_title( '<span class="repeatable-title">%s</span>' );
+            $this->body .= '</a>';
+	    $this->render_repeatable_element( $value, $index );
+	    $this->body .= '<a class="repeatable-remove dashicons dashicons-no" href="#"><span class="glyphicon glyphicon-minus"></span></a></div>';
+	    $this->body .= $this->get_after();
+        }
+	$this->body .= '</div>';
+    }
 }
