@@ -29,7 +29,8 @@ class Cart {
 	    Pwp::load_module( 'session' );
 	}
 	
-	$_SESSION['cart'] = $this;
+	
+        $_SESSION['cart'] = $this;
 
 	//$this->cart
 
@@ -49,6 +50,8 @@ class Cart {
 
     public function cart_panel () {
 	dump($this);
+        //dump($_SESSION);
+        
 	echo 'zobacz koszyk';
     }
     
