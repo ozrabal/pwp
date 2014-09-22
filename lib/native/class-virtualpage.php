@@ -106,8 +106,8 @@ class Virtualpage
 	unset($this->body);
 	call_user_func_array($func, array(&$this, $p));
 
-	if (! isset($this->body)) //assert
-	    wp_die("Virtual Themed Pages: must save ->body [VTP07]");
+	//if (! isset($this->body)) //assert
+	    //wp_die("Virtual Themed Pages: must save ->body [VTP07]");
 
 	return($wp);
     }

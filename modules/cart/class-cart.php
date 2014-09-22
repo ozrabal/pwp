@@ -40,6 +40,7 @@ class Cart extends Module{
 	if(isset($_SESSION['cart'])){
 	    $this->items = $_SESSION['cart'];
 	}
+$this->page =  new Virtualpage();
 
 	$wp_error = $this->route();
        
@@ -57,7 +58,7 @@ dump(count($this->items));
 	register_widget( 'Cart_Widget' );
 //$this->update_cart();
 
-
+    
 
     }
 
@@ -130,20 +131,21 @@ $this->update_cart();
 	
 
 
-	echo '<a href="'.esc_url( home_url( '/?cart=show' ) ).'">zobacz koszyk</a>';
+	echo '<a href="'.esc_url( home_url( '/cart/?cart=show' ) ).'">zobacz koszyk</a>';
 
 
 
 
     }
 
-    public function show_Action(){
-	//dump(__METHOD__);
-	$vp =  new Virtualpage();
-    $vp->add('/cartt/', array( $this,'mytest_contentfunc'));
-//dump($vp);
+    public function index_Action(){
 
- 
+        dump($this->page);
+        $this->page->add('/cart/', array( $this, 'mytest_contentfunc'));
+
+  
+        
+        
     }
 
 
@@ -153,25 +155,24 @@ $this->update_cart();
 
 	//dump($v);
 	// extract an id from the URL
-	$id = 'none';
-	if (preg_match('/cartt/', $url, $m))
-	    $id = $m[0];
+	//$id = 'none';
+	//if (preg_match('/cartt/', $url, $m))
+	//    $id = $m[0];
 	// could wp_die() if id not extracted successfully...
 //dump($v);
-
+//dump($this->items);
 	array_walk( $this->items, array( $this,'show_title' ) );
-
-	$v->title = "Zawartosc koszykna";
-	$v->body = 'koszyk' . $this->it;
-	$v->template = 'page'; // optional
-	$v->subtemplate = 'billing'; // optional
+	$this->page->body = 'koszyk' . $this->it;
+	$this->page->title = "Zawartosc koszykna";
+       	$this->page->template = 'page'; // optional
+	$this->page->subtemplate = 'billing'; // optional
 
 	//dump($v);
 
     }
 
   public function show_title($item){
-
+      //dump($item);
       $this->it .=  $item->post_title .'<br>';
 
       
