@@ -1151,54 +1151,54 @@ class Virtual_Themed_Pages_BC
 
 // Example code - you'd use something very like this in a plugin
 //
-if (1)
-{
-    // require 'BC_Virtual_Themed_pages.php';
-    // this code segment requires the WordPress environment
-
-    $vp =  new Virtual_Themed_Pages_BC();
-    $vp->add('#/mypattern/unique#i', 'mytest_contentfunc');
-
-    // Example of content generating function
-    // Must set $this->body even if empty string
-    function mytest_contentfunc($v, $url)
-    {
-
-	//dump($url);
-	// extract an id from the URL
-	$id = 'none';
-	if (preg_match('#unique/(\d+)#', $url, $m))
-	    $id = $m[1];
-	// could wp_die() if id not extracted successfully...
-
-	$v->title = "My Virtual Page Title";
-	$v->body = "Some body content for my virtual page test - id $id\n";
-	$v->template = 'page'; // optional
-	$v->subtemplate = 'billing'; // optional
-    }
-
-
-    $vp->add('#/uzytkownik#i', 'mytest_contentfunca');
-$vp->add('#/user#i', 'mytest_contentfunca');
-    // Example of content generating function
-    // Must set $this->body even if empty string
-    function mytest_contentfunca($v, $url)
-    {
-
-	//dump($url);
-	// extract an id from the URL
-	$id = 'none';
-	if (preg_match('#unique/(\d+)#', $url, $m))
-	    $id = $m[1];
-	// could wp_die() if id not extracted successfully...
-
-	$v->title = __( 'sUser profile page', 'pwp');
-	$v->body = "Some body content for my virtual page test - id $id\n";
-	$v->template = plugin_dir_path( __FILE__ ).'template.php'; // optional
-	$v->subtemplate = 'billing'; // optional
-    }
-
-}
+//if (1)
+//{
+//    // require 'BC_Virtual_Themed_pages.php';
+//    // this code segment requires the WordPress environment
+//
+//    $vp =  new Virtual_Themed_Pages_BC();
+//    $vp->add('#/mypattern/unique#i', 'mytest_contentfunc');
+//
+//    // Example of content generating function
+//    // Must set $this->body even if empty string
+//    function mytest_contentfunc($v, $url)
+//    {
+//
+//	//dump($url);
+//	// extract an id from the URL
+//	$id = 'none';
+//	if (preg_match('#unique/(\d+)#', $url, $m))
+//	    $id = $m[1];
+//	// could wp_die() if id not extracted successfully...
+//
+//	$v->title = "My Virtual Page Title";
+//	$v->body = "Some body content for my virtual page test - id $id\n";
+//	$v->template = 'page'; // optional
+//	$v->subtemplate = 'billing'; // optional
+//    }
+//
+//
+//    $vp->add('#/uzytkownik#i', 'mytest_contentfunca');
+//$vp->add('#/user#i', 'mytest_contentfunca');
+//    // Example of content generating function
+//    // Must set $this->body even if empty string
+//    function mytest_contentfunca($v, $url)
+//    {
+//
+//	//dump($url);
+//	// extract an id from the URL
+//	$id = 'none';
+//	if (preg_match('#unique/(\d+)#', $url, $m))
+//	    $id = $m[1];
+//	// could wp_die() if id not extracted successfully...
+//
+//	$v->title = __( 'sUser profile page', 'pwp');
+//	$v->body = "Some body content for my virtual page test - id $id\n";
+//	$v->template = plugin_dir_path( __FILE__ ).'template.php'; // optional
+//	$v->subtemplate = 'billing'; // optional
+//    }
+//
+//}
 
 
 
