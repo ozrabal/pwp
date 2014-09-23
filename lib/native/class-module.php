@@ -35,13 +35,20 @@ class Module {
             //$this->action = $this->_defaults[$this->action_slug];
 	    $this->action = 'index';
         }
+
+	//dump($this->action);
+
         if ( $this->is_action() ) {
-            if ( method_exists( $this, $this->action . '_Action' ) )
+            if ( method_exists( $this, $this->action . '_Action' ) ){
                 call_user_func( array( $this, $this->action . '_Action' ), array() );
+	    }else{
+		call_user_func( array( $this, 'index_Action' ), array() );
+	    }
         }else{
             $wp_error = new WP_Error();
             $wp_error->add('router', __( 'Action not allowed' ), 'message' );
-            return $wp_error;
+	    die($wp_error->get_error_message());
+            //return $wp_error;
         }
     }
 
