@@ -71,8 +71,12 @@ class Virtualpage
 	$matched = 0;
 	foreach ($this->vpages as $regexp => $func)
 	{
-	    if (preg_match($regexp, $p))
+	    //dump($regexp);
+	    if (preg_match($regexp, $p,$matches))
 	    {
+
+		//dump($matches);
+
 		$matched = 1;
 		break;
 	    }
