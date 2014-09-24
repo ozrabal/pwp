@@ -27,8 +27,8 @@ class Cart extends Module{
     public function __construct() {
 	
 	parent::__construct();
-self::register_post_type();
-self::register_metabox();
+        self::register_post_type();
+        self::register_metabox();
 	$this->action_slug = 'cart';
 
 	if( !session_id() ) {
