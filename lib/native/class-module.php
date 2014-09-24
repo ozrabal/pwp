@@ -4,7 +4,7 @@ class Module {
 
     protected $actions;
 
-    public function __construct(){
+    public function __construct() {
 	$this->get_actions();
     }
 
@@ -16,7 +16,6 @@ class Module {
     }
 
     protected function is_action(){
-        //$this->get_actions();
         if ( !in_array( $this->action, $this->actions, true ) && false === has_filter( 'login_form_' . $this->action ) ) {
             return false;
         }
@@ -28,15 +27,16 @@ class Module {
     public function route(){
 
         if( get_query_var( $this->action_slug ) ) {
-            $this->action = get_query_var($this->action_slug);
-        } else if ( isset( $_GET[$this->action_slug] ) ) {
-            $this->action = $_GET[$this->action_slug];
+            $this->action = get_query_var( $this->action_slug );
+        } else if ( filter_input( INPUT_GET, $this->action_slug ) ) {
+            $this->action = filter_input( INPUT_GET, $this->action_slug );
+        } else if ( filter_input( INPUT_POST, $this->action_slug ) ) {
+            $this->action = filter_input( INPUT_POST, $this->action_slug );
         } else {
-            //$this->action = $this->_defaults[$this->action_slug];
 	    $this->action = 'index';
         }
 
-	//dump($this->action);
+	
 
         if ( $this->is_action() ) {
             if ( method_exists( $this, $this->action . '_Action' ) ){
