@@ -25,7 +25,7 @@ class Module {
 
 
 
-    public function route(  ){
+    public function route(){
 
         if( get_query_var( $this->action_slug ) ) {
             $this->action = get_query_var($this->action_slug);
