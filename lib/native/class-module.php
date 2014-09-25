@@ -1,11 +1,12 @@
 <?php
 
-class Module {
+abstract class Module {
 
     protected $actions;
 
     public function __construct() {
 	$this->get_actions();
+        spl_autoload_register( array( $this, 'module_class_autoloader' ) );
     }
 
     protected function get_actions() {
@@ -51,6 +52,51 @@ class Module {
             //return $wp_error;
         }
     }
+
+static function module_class_autoloader( $classname ) {
+    
+    $path = explode('_', strtolower( $classname ));
+    $end = end($path);
+    $module = explode('_', strtolower( $classname ));
+    
+    array_pop($path);
+    if(isset($path[0]) && $path[0] == 'interface'){
+        $end = 'interface-'.$end;
+    }else{
+        $end = 'class-'.$end;
+    }
+   
+    $path[] = $end;
+    $classname = implode('/',$path);
+    $classname = str_replace( '_', '/', strtolower( $classname ) );
+    //$classfile = sprintf( '%slib/native/%s.php', ABSPATH.'wp-content/plugins/pwp/', str_replace( '_', '-', strtolower( $classname ) ));
+
+    $dirs_excluded = array_filter(glob(PWP_ROOT.'modules/_*',GLOB_ONLYDIR), 'is_dir');
+    
+    $dirs_all = array_filter(glob(PWP_ROOT.'modules/*',GLOB_ONLYDIR), 'is_dir');
+    $dirs = array_diff( $dirs_all, $dirs_excluded);
+    //dump($dirs);
+    
+ 
+    
+    
+    
+            
+            foreach($dirs as $dir){
+            $classfile = sprintf( $dir.'/%s.php', 'class-'. implode( '-',$module  ));
+            //dump($module);
+            //dump($classfile);
+            
+            
+            //die();
+            if ( file_exists( $classfile ) ) {
+            include_once( $classfile );
+            break;
+            }
+        
+        }
+    }
+
 
 
 }

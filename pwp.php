@@ -55,13 +55,39 @@ function pwp_class_autoloader( $classname ) {
     $classname = str_replace( '_', '/', strtolower( $classname ) );
     $classfile = sprintf( '%slib/native/%s.php', ABSPATH.'wp-content/plugins/pwp/', str_replace( '_', '-', strtolower( $classname ) ));
 
+    $dirs_excluded = array_filter(glob(PWP_ROOT.'modules/_*',GLOB_ONLYDIR), 'is_dir');
+    
+    $dirs_all = array_filter(glob(PWP_ROOT.'modules/*',GLOB_ONLYDIR), 'is_dir');
+    $dirs = array_diff( $dirs_all, $dirs_excluded);
+    //dump($dirs);
+    
+ 
+    
+    
     if ( file_exists( $classfile ) ) {
         include_once( $classfile );
     } else {
         $classfile = sprintf( '%smodules/%s/%s.php', ABSPATH.'wp-content/plugins/pwp/', $module[0], 'class-'. implode( '-',$module  ));
         if ( file_exists( $classfile ) ) {
             include_once( $classfile );
-        }
+            
+       }
+        
+//        else{
+//            
+//            foreach($dirs as $dir){
+//            $classfile = sprintf( $dir.'/%s.php', 'class-'. implode( '-',$module  ));
+//            //dump($module);
+//            //dump($classfile);
+//            
+//            
+//            //die();
+//            if ( file_exists( $classfile ) ) {
+//            include_once( $classfile );
+//            break;
+//            }
+//        }
+//        }
     }
 }
 

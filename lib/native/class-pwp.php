@@ -73,6 +73,7 @@ class Pwp{
 	if ( file_exists( PWP_ROOT . '/modules/' . $module . '/' . $module . '.php' ) ) {
 	    require_once PWP_ROOT . '/modules/' . $module . '/' . $module . '.php';
 	    do_action( 'pwp_init_' . $module, array( 'init' ) );
+            
 	} else {
 	    dbug( 'File not found: ' . PWP_ROOT . '/modules/' . $module . '/' . $module . '.php' );
 	}

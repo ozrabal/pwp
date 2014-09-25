@@ -25,7 +25,7 @@ class Cart extends Module{
 
 
     public function __construct() {
-	
+	//$this->module = 'cart';
 	parent::__construct();
         self::register_post_type();
         self::register_metabox();
@@ -298,7 +298,7 @@ echo '<h3> Wartość zakupów: '.$this->calculate_grand_total().'</h3>';
 
     public function index_Action(){
 
-        dump(__METHOD__);
+        //dump(__METHOD__);
         //$this->page->add('#(cart)|(\/[?])(.[a-z]*)[=](.[a-z]*)#', array( $this, 'mytest_contentfunc'));
 
    //$this->page->add('/(cart)(\\/[?])(.[a-z]*)[=](.[a-z]*)/i', array( $this, 'mytest_contentfunc'));
