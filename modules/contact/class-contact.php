@@ -9,7 +9,7 @@
 class Contact extends Form {
 
     private $shortcode = array();
-    private $observers = array();
+    private $callback_array = array();
 
     /**
      * Inicjalizacja modulu
@@ -237,11 +237,11 @@ class Contact extends Form {
      */
     private function init_callback( $args = false ) {
 	if( !$args ) {
-	    $args = 'Observer_Email';
+	    $args = 'Callback_Email';
 	}
 	$this->callback = explode( ',', $args );
-	foreach( $this->callback as $callback ) {
-	    $this->attach( new $callback() );
+	foreach( $this->callback as $callback_class ) {
+	    $this->attach( new $callback_class() );
 	}
     }
     
@@ -250,7 +250,7 @@ class Contact extends Form {
      * @param Object $callback_object
      */
     public function attach( $callback_object ) {
-        $this->observers[] = $callback_object;
+        $this->callback_array[] = $callback_object;
     }
     
     /**
@@ -269,8 +269,8 @@ class Contact extends Form {
     public function notify() {
 
 	$result = null;
-	foreach( $this->observers as $observer ) {
-	    $result = $observer->update( array(
+	foreach( $this->callback_array as $callback ) {
+	    $result = $callback->do_callback( array(
 		    'object'		    => $result,
 		    'user_email_template'   => $this->user_email_template ,
 		    'admin_email_template'  => $this->admin_email_template,
