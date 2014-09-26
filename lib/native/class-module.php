@@ -4,6 +4,8 @@ abstract class Module {
 
     protected $actions;
 
+    //static $module;
+
     public function __construct() {
 	$this->get_actions();
         spl_autoload_register( array( $this, 'module_class_autoloader' ) );
@@ -65,7 +67,9 @@ static function module_class_autoloader( $classname ) {
     }else{
         $end = 'class-'.$end;
     }
-   
+
+    //dump(self::$module);
+
     $path[] = $end;
     $classname = implode('/',$path);
     $classname = str_replace( '_', '/', strtolower( $classname ) );
