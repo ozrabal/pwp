@@ -25,8 +25,9 @@ class Cart extends Module{
 
 
     public function __construct() {
-	//$this->module = 'cart';
+
 	parent::__construct();
+
         self::register_post_type();
         self::register_metabox();
 	$this->action_slug = 'cart';
@@ -386,11 +387,25 @@ public function accept_Action(){
 //store our post ID in a variable $pid
 $pid = wp_insert_post($new_post);
 
+
+dump(get_current_user_id());
+
+$order_id = time().'-'.$pid.'-'.  intval(get_current_user_id());
+dump($order_id);
+
+$my_post = array(
+      'ID'           => $pid,
+      'post_title' => $order_id
+  );
+ wp_update_post( $my_post );
+
+
 //we now use $pid (post id) to help add out post meta data
-add_post_meta($pid, 'order_id', time().'_'.$pid.'_'.md5($pid), true);
+add_post_meta($pid, 'order_id', $order_id, true);
 add_post_meta($pid, 'order_item', $this->items, true);
 
-
+$this->items = null;
+unset($_SESSION['cart']);
     }
     
     public function unregistered_pay_content(){

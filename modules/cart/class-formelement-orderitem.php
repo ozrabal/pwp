@@ -21,5 +21,29 @@ class Formelement_Orderitem extends Formelement {
 
     private function items(){
 	dump($this->get_value());
+
+$product = '<table>';
+	$items = $this->get_value();
+
+	foreach( $items as $item ){
+	    $product .= $this->create_row($item);
+	   
+	}
+$product .= '</table>';
+	return $product;
+
+    }
+
+    private function create_row($item){
+	$post = get_post($item->ID);
+$price = get_post_meta( $post->ID, 'price', true );
+	$body = '<tr>';
+$body .= '<td>'.$post->ID.'</td>';
+$body .= '<td><a href="'.$post->guid.'" target="_blank">'.$post->post_title.'</a></td>';
+$body .= '<td>'.$item->qty.'</td>';
+$body .= '<td>'.$item->price.'</td>';
+$body .= '<td>'.$item->subtotal.'</td>';
+	$body .= '</tr>';
+	return $body;
     }
 }
