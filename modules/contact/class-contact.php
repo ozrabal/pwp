@@ -336,12 +336,11 @@ class Contact extends Form {
                     
                 ),
 		 array(
-                    'type' => 'wysiwyg',
-                    'name' => 'auser_email_template',
+                    'type' => 'textarea',
+                    'name' => 'user_email_template',
                     'params'=> array(
                         'label' => __( 'User email template', 'pwp' ),
                         'class' => 'large-text',
-			'options' => array('tinymce' => true),
                         'comment' => __( 'Template of the message that is sent to administrator when a user to fill in a form on the page.', 'pwp' )
                     ),
                 ),

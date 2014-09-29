@@ -1,6 +1,6 @@
 <?php
 
-class Observer_Upload /*implements Observer */{
+class Callback_Upload implements Interface_Callback {
     private $params;
 
     public function update( $params ) {
@@ -14,6 +14,11 @@ class Observer_Upload /*implements Observer */{
         
 	return true;
     }
-    
-    
+
+    public function do_callback( $params ) {
+        dump(__METHOD__);
+        dump($params);
+        return true;
+    }
+
 }
