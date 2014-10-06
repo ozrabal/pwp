@@ -167,7 +167,7 @@ class Cart extends Module{
    
 
     private function in_cart($item){
-
+if(!empty($this->items)){
 		foreach($this->items as $key => $cart_item){
 
 		    
@@ -180,6 +180,7 @@ class Cart extends Module{
 
 
 		}
+}
 		return null;
 	}
 
@@ -288,12 +289,14 @@ echo 'Cena: '.$price;
     
 
 	
-
+if(!empty($this->items)){
 
 	echo '<a href="'.esc_url( home_url( '/cart' ) ).'">zobacz koszyk</a>';
 
 echo '<h3> Wartość zakupów: '.$this->calculate_grand_total().'</h3>';
-
+}else{
+    echo 'koszyk jest pusty';
+}
 
     }
 
@@ -338,7 +341,7 @@ echo '<h3> Wartość zakupów: '.$this->calculate_grand_total().'</h3>';
 
 	foreach( $this->items as $item ){
 
-	    $this->page->body .= $item->post_title .' [ '.$item->qty.' ] '.$item->subtotal .'<br>';
+	    $this->page->body .= $item->post_title .'<a href="">-</a> [ '.$item->qty.' ]<a href="">+</a> '.$item->subtotal .'<a href="">x</a><br>';
 	}
 
 $this->page->body .= '<hr> Razem: ';
