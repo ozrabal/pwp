@@ -59,35 +59,15 @@ function pwp_class_autoloader( $classname ) {
     
     $dirs_all = array_filter(glob(PWP_ROOT.'modules/*',GLOB_ONLYDIR), 'is_dir');
     $dirs = array_diff( $dirs_all, $dirs_excluded);
-    //dump($dirs);
-    
- 
-    
-    
+
     if ( file_exists( $classfile ) ) {
         include_once( $classfile );
     } else {
         $classfile = sprintf( '%smodules/%s/%s.php', ABSPATH.'wp-content/plugins/pwp/', $module[0], 'class-'. implode( '-',$module  ));
         if ( file_exists( $classfile ) ) {
             include_once( $classfile );
-            
-       }
-        
-//        else{
-//            
-//            foreach($dirs as $dir){
-//            $classfile = sprintf( $dir.'/%s.php', 'class-'. implode( '-',$module  ));
-//            //dump($module);
-//            //dump($classfile);
-//            
-//            
-//            //die();
-//            if ( file_exists( $classfile ) ) {
-//            include_once( $classfile );
-//            break;
-//            }
-//        }
-//        }
+	}
+
     }
 }
 
@@ -108,26 +88,4 @@ function pwp_plugin_initialize() {
     load_plugin_textdomain( 'pwp', false, basename( dirname( __FILE__ ) ) . '/languages/' );
     
 }
-//$d = new Dbug();
-
-add_action( 'widgets_init', array( 'Pwp', 'init' ),2 );
-
-/*
-//$d->get_messages();
-Pwp::get_instance()->d();
-class Dbug{
-    
-    public function __construct() {
-        $this->messages = null;
-    }
-    
-    public function add($m){
-        $this->messages[] = $m;
-    }
-    
-    public function get_messages(){
-        dump($this->messages);
-    }
-}
- * 
- */
+add_action( 'widgets_init', array( 'Pwp', 'init' ), 2 );
