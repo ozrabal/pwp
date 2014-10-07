@@ -10,5 +10,5 @@ interface Interface_Callback {
     /**
      * funkcja renderujaca pole
      */
-    function do_callback( $params );
+    function do_callback( $params, $object );
 }

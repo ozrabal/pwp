@@ -3,29 +3,50 @@
 
 class Callback_Email implements Interface_Callback{
 
-   private $params;
+   private $params, $attachments = null;
    
     public function __construct() {
-	dump(__CLASS__);
+	//dump(__CLASS__);
+
     }
 
 
 
 
-    public function do_callback( $params ) {
+    public function do_callback( $params,$object ) {
         $this->set_params( $params );
         //dump(__METHOD__);
+$this->object = $object;
+dump($params);
+dump($object);
 
-
+	$this->set_attachments( $params );
          //return true;
 
         if ($this->send()){
 
-            return true;
+            return $this;
 
 	}
 	return false;
 
+    }
+
+    public function set_attachments( $params ) {
+
+	if(!empty($params['attachments'])){
+	$this->attachments = $params['attachments'];
+	} else {
+	    if($this->get_object_param('file')){
+		$this->attachments = $this->get_object_param('file');
+	    }
+	}
+    }
+
+    private function get_object_param( $param ){
+	if(isset($this->object->$param)){
+	    return $this->object->$param;
+	}
     }
 
     public function set_params($params){
@@ -113,10 +134,11 @@ class Callback_Email implements Interface_Callback{
             }
         }
         //dump($recipient);
-        if( wp_mail( $this->get_recipient(), $admin_subject, $admin_body, $this->headers( array( 'from' => get_option( 'admin_email' ) ) ) ) ) {
+        if( wp_mail( $this->get_recipient(), $admin_subject, $admin_body, $this->headers( array( 'from' => get_option( 'admin_email' ) ) ), $this->attachments ) ) {
             if($this->get_request( 'email' ) && $send_to_user != ''){
-                wp_mail( $this->get_request( 'email' ), $user_subject, $user_body, $this->headers( array( 'from' => get_option( 'admin_email' ) ) ) );
+                wp_mail( $this->get_request( 'email' ), $user_subject, $user_body, $this->headers( array( 'from' => get_option( 'admin_email' ) ) ), $this->attachments );
             }
+	    unlink($this->attachments);
             return true;
         } else {
             return false;

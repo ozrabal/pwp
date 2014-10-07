@@ -271,7 +271,7 @@ class Contact extends Form {
 	$result = null;
 	foreach( $this->callback_array as $callback ) {
 	    $result = $callback->do_callback( array(
-		    'object'		    => $result,
+		    
 		    'user_email_template'   => $this->user_email_template ,
 		    'admin_email_template'  => $this->admin_email_template,
 		    'user_email_subject'    => $this->user_email_subject,
@@ -279,7 +279,8 @@ class Contact extends Form {
 		    'send_to_user'	    => $this->send_to_user,
 		    'recipient'		    => $this->recipient,
 		    'request'		    => $this->get_request()
-		)
+		),
+		   $result
 	    );
 	}
 	return $result;
