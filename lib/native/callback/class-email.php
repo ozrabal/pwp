@@ -13,7 +13,7 @@ class Callback_Email implements Interface_Callback{
 
 
 
-    public function do_callback( $params,$object ) {
+    public function do_callback( $params, $object ) {
         $this->set_params( $params );
         //dump(__METHOD__);
 $this->object = $object;
@@ -89,6 +89,7 @@ dump($object);
     public function send(){
 
 
+
         $user_body = $this->get_param( 'user_email_template' );
         $user_subject = $this->get_param( 'user_email_subject' );
         $admin_body = $this->get_param( 'admin_email_template' );
@@ -138,6 +139,7 @@ dump($object);
             if($this->get_request( 'email' ) && $send_to_user != ''){
                 wp_mail( $this->get_request( 'email' ), $user_subject, $user_body, $this->headers( array( 'from' => get_option( 'admin_email' ) ) ), $this->attachments );
             }
+
 	    unlink($this->attachments);
             return true;
         } else {

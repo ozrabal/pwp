@@ -94,6 +94,7 @@ class Contact extends Form {
         $this->admin_email_subject = get_post_meta( $form_id,'admin_email_subject',true );
         $this->recipient = get_post_meta( $form_id,'recipient',true );
         $this->send_to_user = get_post_meta( $form_id,'send_to_user',true );
+	$this->user_email_field = get_post_meta( $form_id,'user_email_field',true );
         $this->message_form_send = get_post_meta( $form_id,'message_form_send',true );
         return get_post_meta( $form_id,'definition',true );
     }
@@ -241,6 +242,10 @@ class Contact extends Form {
 	}
 	$this->callback = explode( ',', $args );
 	foreach( $this->callback as $callback_class ) {
+	    if($callback_class == 'Callback_Mail'){
+		add_filter('wp_mail_from',array($this, 'filter_wp_mail_from'));
+		add_filter('wp_mail_from_name',array($this, 'filter_wp_mail_from_name'));
+	    }
 	    $this->attach( new $callback_class() );
 	}
     }
@@ -261,18 +266,109 @@ class Contact extends Form {
 	    echo '<div class="alert alert-success">' . $this->message_form_send . '</div>';
 	}
     }
+
+
+function filter_wp_mail_from_name($name) {
+  return 'Helen Hou-Sandi';
+}
+
     
+function filter_wp_mail_from($content_type) {
+  return 'helenyhou@example.com';
+}
+
+public function file($name){
+    return $name.'dupa';
+}
+
+    public function notify() {
+
+	
+	
+	//add_filter('callback_pdf_filename', array($this,'file'));
+
+	$params = new stdClass();
+	//$params->start = __METHOD__;
+$params->request = $this->get_request();
+	$params->user_email = $this->get_request($this->user_email_field);
+	    $params->user_subject = $this->user_email_subject;
+	    
+$params->admin_body = $this->admin_email_template;
+
+$params->user_body = $this->user_email_template;
+	if( $params->admin_body != '' ) {
+            foreach( $this->get_request( ) as $k => $v ) {
+                if( !is_array( $this->get_request( $k ) ) ) {
+                    //$user_body = str_ireplace( '['.$k.']',  $this->get_request( $k ), $user_body );
+                    $params->admin_body = str_ireplace( '['.$k.']',  $this->get_request( $k ), $params->admin_body );
+
+
+
+		} else {
+                    //@todo polapowtarzalne do szablonow email
+                }
+            }
+        } else {
+            foreach( $this->get_request( ) as $k => $v ) {
+                if( !is_array( $this->get_request( $k ) ) ) {
+                    $params->admin_body .= $k . ' : ' . $v . '<br>';
+                }
+            }
+        }
+
+if( $params->user_body != '' ) {
+            foreach( $this->get_request( ) as $k => $v ) {
+                if( !is_array( $this->get_request( $k ) ) ) {
+                    //$user_body = str_ireplace( '['.$k.']',  $this->get_request( $k ), $user_body );
+                    $params->user_body = str_ireplace( '['.$k.']',  $this->get_request( $k ), $params->user_body );
+
+
+
+		} else {
+                    //@todo polapowtarzalne do szablonow email
+                }
+            }
+        } else {
+            foreach( $this->get_request( ) as $k => $v ) {
+                if( !is_array( $this->get_request( $k ) ) ) {
+                    $params->user_body .= $k . ' : ' . $v . '<br>';
+                }
+            }
+        }
+
+
+
+	    //$params->user_attachment;
+	    $params->admin_email = $this->recipient;
+	    $params->admin_subject = $this->admin_email_subject;
+	    //$params->admin_body = $this->admin_email_template;
+	    //$params->admin_attachment;
+
+
+
+
+
+
+
+	foreach( $this->callback_array as $callback ) {
+	    $params = $callback->do_callback( $params );
+	}
+	return $params;
+    }
+
+
     /**
      * wywoluje akcje w funkcji obslugujacej po submicie formularza
      * @return boolean
      */
-    public function notify() {
+    public function anotify() {
 
 	$result = null;
 	foreach( $this->callback_array as $callback ) {
 	    $result = $callback->do_callback( array(
 		    
 		    'user_email_template'   => $this->user_email_template ,
+		    'user_email_field'   => $this->user_email_field ,
 		    'admin_email_template'  => $this->admin_email_template,
 		    'user_email_subject'    => $this->user_email_subject,
 		    'admin_email_subject'   => $this->admin_email_subject,
@@ -325,36 +421,8 @@ class Contact extends Form {
             'title'     => __( 'Form parameters', 'pwp' ),
             'post_type' => array( 'form' ),
             'elements'  => array(
-                array(
-                    'type' => 'text',
-                    'name' => 'user_email_subject',
-                    'params'=> array(
-                        'label' => __( 'Subject of user email', 'pwp' ),
-                        'class' => 'large-text',
-                        'validator'=>array('notempty','email')
-                        
-                    ),
-                    
-                ),
-		 array(
-                    'type' => 'textarea',
-                    'name' => 'user_email_template',
-                    'params'=> array(
-                        'label' => __( 'User email template', 'pwp' ),
-                        'class' => 'large-text',
-                        'comment' => __( 'Template of the message that is sent to administrator when a user to fill in a form on the page.', 'pwp' )
-                    ),
-                ),
-                array(
-                    'type' => 'textarea',
-                    'name' => 'user_email_template',
-                    'params'=> array(
-                        'label' => __( 'User email template', 'pwp' ),
-                        'class' => 'large-text',
-                        'comment' => __( 'Template of the message that is sent to administrator when a user to fill in a form on the page.', 'pwp' )
-                    ),
-                ),
-                array(
+
+		                array(
                     'type' => 'text',
                     'name' => 'admin_email_subject',
                     'params'=> array(
@@ -389,6 +457,7 @@ class Contact extends Form {
                         'comment' => __( 'Message displayed after submitting the form', 'pwp' )
                     ),
                 ),
+
 		array(
                     'type' => 'checkbox',
                     'name' => 'send_to_user',
@@ -397,6 +466,39 @@ class Contact extends Form {
                         'comment' => __( 'If the box is checked the user filling out a form will receive a copy of the sent data', 'pwp' )
 		    ),
                 ),
+                array(
+                    'type' => 'text',
+                    'name' => 'user_email_field',
+		  
+                    'params'=> array(
+                        'label' => __( 'Field of user email', 'pwp' ),
+                        'class' => 'large-text',
+			'comment' => __( "Name of the field that contains the user's email address", 'pwp' )
+
+		    ),
+
+                ),
+                array(
+                    'type' => 'text',
+                    'name' => 'user_email_subject',
+                    'params'=> array(
+                        'label' => __( 'Subject of user email', 'pwp' ),
+                        'class' => 'large-text'
+		    ),
+                    
+                ),
+		 array(
+                    'type' => 'textarea',
+                    'name' => 'user_email_template',
+                    'params'=> array(
+                        'label' => __( 'User email template', 'pwp' ),
+                        'class' => 'large-text',
+                        'comment' => __( 'Template of the message that is sent to administrator when a user to fill in a form on the page.', 'pwp' )
+                    ),
+                ),
+
+
+		
             )
         );
         new Metabox( $box );
