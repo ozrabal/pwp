@@ -16,7 +16,7 @@ class Formelement_File extends Formelement{
 	parent::__construct($form, $name);
 
 
-	die();
+	//die();
     }
 
 public function validate_setting($s) {
