@@ -1,21 +1,26 @@
 <?php
 
-
 class Callback_Pdf implements Interface_Callback {
 
 
-
     
-    public function do_callback($params,$bject) {
+    public function do_callback( $params ) {
+	
 	$this->params = $params;
-	//add_action('template_redirect',array($this, 'create'));
-	$this->file = $this->create();
 
-	//return array('attachments' => $this->create());
-return $this;
+	$this->params->admin_attachment = $this->create();
+
+
+	
+
+	return $this->params;
     }
 
-
+    private function get_form_name( $a, $b ) {
+	if( substr( $b, -5, strlen( $b ) ) == '_name' ) {
+	    $this->params->pdf_filename = $a;
+	}
+    }
 
 
 
@@ -42,7 +47,7 @@ $pdf->SetSubject('TCPDF Tutorial');
 $pdf->SetKeywords('TCPDF, PDF, example, test, guide');
 
 // set default header data
-$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE.' 061', PDF_HEADER_STRING);
+//$pdf->SetHeaderData(PDF_HEADER_LOGO, PDF_HEADER_LOGO_WIDTH, PDF_HEADER_TITLE.' 061', PDF_HEADER_STRING);
 
 // set header and footer fonts
 $pdf->setHeaderFont(Array(PDF_FONT_NAME_MAIN, '', PDF_FONT_SIZE_MAIN));
@@ -87,12 +92,53 @@ $pdf->AddPage();
  * *********************************************************
  */
 
-// define some HTML content with style
-$html = '';
 
-dump($this->params['request']);
-reset ($this->params['request'] );
-$p = array_walk($this->params['request'], array($this,'unset_var'));
+
+if( !isset( $this->params->pdf_filename ) ) {
+    if( isset( $this->params->request ) ) {
+	$pp = $this->params->request;
+	array_walk( $pp, array( $this, 'get_form_name' ) );
+    } else {
+	$this->params->pdf_filename = 'file';
+    }
+}
+$html = null;
+
+if(file_exists(get_template_directory().'/'.$this->params->pdf_filename.'.html')){
+$html = file_get_contents(get_template_directory().'/'.$this->params->pdf_filename.'.html');
+}
+dump($html);
+
+	if( $html  ) {
+            foreach( $this->params->request as $k => $v ) {
+                if( !is_array( $this->params->request[$k] ) ) {
+                    //$user_body = str_ireplace( '['.$k.']',  $this->get_request( $k ), $user_body );
+                    $html = str_ireplace( '['.$k.']',  $this->params->request[$k], $html );
+
+
+
+		} else {
+                    //@todo polapowtarzalne do szablonow email
+                }
+            }
+        } else {
+            foreach( $this->params->request as $k => $v ) {
+                if( !is_array( $this->params->request[$k] ) ) {
+                    $html .= $k . ' : ' . $v . '<br>';
+                }
+            }
+        }
+
+
+// define some HTML content with style
+//
+
+
+//reset ($this->params['request'] );
+//$pp = $this->params['request'];
+
+
+//$p = array_walk( $pp, array( $this, 'unset_var' ) );
 
 
 //foreach($this->params['request'] as $a => $b){
@@ -104,11 +150,11 @@ $p = array_walk($this->params['request'], array($this,'unset_var'));
 //}
 
  
-dump($this->params['request']);
+//dump($this->params['request']);
 
-$html .= implode(', ', $this->params['request']);
+//$html .= implode(', ', $this->params['request']);
 
-
+//$html = $this->params->admin_body;
 
 
 // output the HTML content
@@ -116,26 +162,26 @@ $pdf->writeHTML($html, true, false, true, false, '');
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// add a page
-$pdf->AddPage();
-
-$html = '
-<h1>HTML TIPS & TRICKS</h1>
-
-<h3>REMOVE CELL PADDING</h3>
-<pre>$pdf->SetCellPadding(0);</pre>
-This is used to remove any additional vertical space inside a single cell of text.
-';
-
-// output the HTML content
-$pdf->writeHTML($html, true, false, true, false, '');
 
 // reset pointer to the last page
 $pdf->lastPage();
 
 // ---------------------------------------------------------
 $upload_dir = wp_upload_dir();
-$file = $upload_dir['path'].'/'.time().'.pdf';
+
+
+
+
+
+
+$this->params->pdf_filename = apply_filters('callback_pdf_filename', $this->params->pdf_filename);
+
+
+
+
+$file = $upload_dir['path'].'/'.$this->params->pdf_filename.'-'.time().'.pdf';
+
+
 //Close and output PDF document
 $pdf->Output($file, 'F');
 return $file;
@@ -144,10 +190,13 @@ return $file;
 //============================================================+
     }
 
+
+
+
        public function unset_var($a, $b){
 	 
 
-dump($b);
+
 
        if(substr( $b, 0, 1 ) == '_' ){
 	  
