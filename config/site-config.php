@@ -18,7 +18,7 @@ function get_form($content){
     return $content;
 }
 
-//add_action('the_content','get_map');
+add_action('the_content','get_map');
 function get_map($content){
     $a = get_post_meta(get_the_ID(),'latlong',true);
     $a = explode(',', $a);
@@ -370,31 +370,31 @@ $page_meta = array(
     //'allow_posts' => array('rule' => 'id','params'=> array(63)),
     'elements'  => array(
 
-//array(
-//        'type'  => 'map',
-//        'name'  => 'latlong',
-//        'params'    => array(
-//            'label'     => __( 'Location', 'pwp' ),
-//            'comment' => 'Lokalizacja'
-//
-//
-//        ),
-//
-//    ),
-        
-        
-        
-     array(
-        'type'  => 'date',
-        'name'  => 'event_start',
+array(
+        'type'  => 'map',
+        'name'  => 'latlong',
         'params'    => array(
-            'label'     => __( 'Start', 'pwp' ),
-            'comment' => 'bla',
-'validator' => array('notempty'),
+            'label'     => __( 'Location', 'pwp' ),
+            'comment' => 'Lokalizacja'
+
 
         ),
 
     ),
+        
+        
+//
+//     array(
+//        'type'  => 'date',
+//        'name'  => 'event_start',
+//        'params'    => array(
+//            'label'     => __( 'Start', 'pwp' ),
+//            'comment' => 'bla',
+//'validator' => array('notempty'),
+//
+//        ),
+//
+//    ),
 
 
 //        array(
@@ -420,7 +420,7 @@ $page_meta = array(
 //    ),
     )
 );
-//new Metabox( $page_meta );
+new Metabox( $page_meta );
 
 //metabox obrazek dodatkowy w brandach (logo na czarnym)
 $video_gallery = array(

@@ -21,7 +21,9 @@ class Formelement_Map extends Formelement_Input {
 
 
     function admin_enqueue_scripts() {
-	wp_enqueue_script( 'maps', 'http://maps.google.com/maps/api/js?sensor=false' );
+	//wp_enqueue_script( 'maps', 'http://maps.google.com/maps/api/js?sensor=false' );
+	wp_enqueue_script( 'maps', 'https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&sensor=false' );
+	//https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places
 	//wp_enqueue_script( 'jquery-ui-datepicker', plugins_url( '/' ) );
 	wp_enqueue_script( 'field-map', plugins_url( '/field-map.js', __FILE__ ), array( 'jquery' ),PWP_VERSION );
     }
@@ -36,7 +38,7 @@ $this->set_disabled('disabled');
 
 
 
-        return  $this->get_before().$this->get_label().'<div id="map"></div><input '.$this->id().' type="text" '.$this->name().$this->value().$this->cssclass().'/>'.$this->get_message().$this->get_comment('<p class="description">%s</p>').$this->get_after();
+        return  $this->get_before().$this->get_label().'<input id="pac-input" class="controls" type="text" placeholder="Search Box"><div id="map"></div><input '.$this->id().' type="text" '.$this->name().$this->value().$this->cssclass().'/>'.$this->get_message().$this->get_comment('<p class="description">%s</p>').$this->get_after();
 
 
 
