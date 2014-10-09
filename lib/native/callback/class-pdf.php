@@ -5,7 +5,7 @@ class Callback_Pdf implements Interface_Callback {
 
     
     public function do_callback( $params ) {
-	
+	dump($_POST);
 	$this->params = $params;
 
 	$this->params->admin_attachment = $this->create();
@@ -107,8 +107,8 @@ $html = null;
 if(file_exists(get_template_directory().'/'.$this->params->pdf_filename.'.html')){
 $html = file_get_contents(get_template_directory().'/'.$this->params->pdf_filename.'.html');
 }
-dump($html);
-
+//dump($html);
+ //dump($this->params->request);
 	if( $html  ) {
             foreach( $this->params->request as $k => $v ) {
                 if( !is_array( $this->params->request[$k] ) ) {
@@ -118,6 +118,12 @@ dump($html);
 
 
 		} else {
+//dump('---');
+		    //dump($this->params->request[$k]);
+		    if(isset($this->params->request[$k]['url'])){
+
+$html .= $this->params->request[$k]['url'].'<br>';
+		    }
                     //@todo polapowtarzalne do szablonow email
                 }
             }

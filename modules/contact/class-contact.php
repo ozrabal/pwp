@@ -262,6 +262,7 @@ class Contact extends Form {
      * wysylka formularza i wywolanie obslugi
      */
     public function submit() {
+	parent::submit();
 	if( $this->notify() ) {
 	    echo '<div class="alert alert-success">' . $this->message_form_send . '</div>';
 	}
@@ -298,6 +299,7 @@ $params->admin_body = $this->admin_email_template;
 $params->user_body = $this->user_email_template;
 	if( $params->admin_body != '' ) {
             foreach( $this->get_request( ) as $k => $v ) {
+		//dump($k);
                 if( !is_array( $this->get_request( $k ) ) ) {
                     //$user_body = str_ireplace( '['.$k.']',  $this->get_request( $k ), $user_body );
                     $params->admin_body = str_ireplace( '['.$k.']',  $this->get_request( $k ), $params->admin_body );
@@ -306,7 +308,13 @@ $params->user_body = $this->user_email_template;
 
 		} else {
                     //@todo polapowtarzalne do szablonow email
+		    $el = $this->get_request( $k );
+
+$params->admin_body = str_ireplace( '['.$k.']',  $el['url'], $params->admin_body );
+
                 }
+
+		//dump($params->admin_body) .'<br>';
             }
         } else {
             foreach( $this->get_request( ) as $k => $v ) {
@@ -326,6 +334,10 @@ if( $params->user_body != '' ) {
 
 		} else {
                     //@todo polapowtarzalne do szablonow email
+
+		    $el = $this->get_request( $k );
+
+$params->user_body = str_ireplace( '['.$k.']',  $el['url'], $params->user_body );
                 }
             }
         } else {

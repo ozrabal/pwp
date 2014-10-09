@@ -319,6 +319,18 @@ abstract class Form {
      * wyswietla komunikat o wyslaniu formularza
      */
     public function submit() {
-        echo '<div class="alert alert-success">' . __( 'Form send', 'pwp' ) .'</div>';
+	//dump($_FILES);
+
+	//if(isset($_FILES)){
+	    foreach($this->elements as $element){
+		if(method_exists($element, 'on_submit')){
+		    $element->on_submit();
+		}
+	    }
+	    //dump($this->elements);
+
+	//}
+	//die();
+        //echo '<div class="alert alert-success">' . __( 'Form send', 'pwp' ) .'</div>';
     }
 }
