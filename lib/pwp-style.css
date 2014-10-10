@@ -20,6 +20,11 @@ color: #888888;
   height: 300px;
   border: 1px solid #000;
 }
+.box{
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+}
 input.error, input.pwp-error, div.pwp-error, textarea.pwp-error{
     background: none repeat scroll 0 0 #ffefef;
     border-left: 4px solid #DD3D36;
