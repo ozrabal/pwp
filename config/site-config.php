@@ -22,8 +22,70 @@ add_action('the_content','get_map');
 function get_map($content){
     $a = get_post_meta(get_the_ID(),'latlong',true);
     $a = explode(',', $a);
-    dump($a);
+    //dump($a);
+
+
+
+    $args  = array(
+	'post_type' => 'page',
+	'meta_query' => array(
+		array(
+			'key'     => 'latlong',
+			
+			'compare' => 'EXIST',
+		),
+	),
+
+    );
+
+$map_query = new WP_Query($args);
+
+//dump($map_query);
 ?>
+<style>
+    .entry-content img, .comment-content img, .widget img {
+    max-width: inherit;
+}
+
+</style>
+<?php 
+   if ( $map_query->have_posts() ) {
+	
+	while ( $map_query->have_posts() ) {
+		$map_query->the_post();
+		//dump(explode(',',get_post_meta(get_the_ID(),'latlong', true)));
+		$a = explode(',',get_post_meta(get_the_ID(),'latlong', true));
+		$a[] = '<div id="content"><h3><a href="">'.get_the_title().'</a></h3>'.get_the_content().'</div>';
+		$mark[] = $a;
+
+?>
+<script>
+    
+
+
+    </script>
+<?php
+	}
+
+
+	$markers = json_encode($mark,JSON_HEX_QUOT | JSON_HEX_TAG);
+	//dump($markers);
+
+	?>
+<script>
+    
+var markers = <?php echo $markers; ?>;
+ console.log(markers);
+    </script>
+<?php
+}
+
+
+
+
+?>
+
+
 <style>
 
     #map {
@@ -35,22 +97,94 @@ function get_map($content){
 <div id="map"></div>
 
 <script>
+//window.onload = function() {
+//
+//    var latlng = new google.maps.LatLng(<?php echo trim($a[0]) ?>, <?php echo trim($a[1]) ?>);
+//    var map = new google.maps.Map(document.getElementById('map'), {
+//        center: latlng,
+//        zoom: <?php echo trim($a[2]) ?>,
+//        mapTypeId: google.maps.MapTypeId.<?php echo strtoupper(trim($a[3])); ?>
+//    });
+//    var marker = new google.maps.Marker({
+//        position: latlng,
+//        map: map,
+//        title: 'Set lat/lon values for this property',
+//        draggable: false
+//    });
+//
+//
+//};
+
 window.onload = function() {
 
+    console.log(markers);
+
+            // execute
+            
+//                // map options
+//                var options = {
+//                    zoom: 5,
+//                    center: new google.maps.LatLng(39.909736, -98.522109), // centered US
+//                    mapTypeId: google.maps.MapTypeId.TERRAIN,
+//                    mapTypeControl: false
+//                };
+//
+//                // init map
+//                var map = new google.maps.Map(document.getElementById('map'), options);
     var latlng = new google.maps.LatLng(<?php echo trim($a[0]) ?>, <?php echo trim($a[1]) ?>);
     var map = new google.maps.Map(document.getElementById('map'), {
         center: latlng,
         zoom: <?php echo trim($a[2]) ?>,
         mapTypeId: google.maps.MapTypeId.<?php echo strtoupper(trim($a[3])); ?>
     });
-    var marker = new google.maps.Marker({
-        position: latlng,
-        map: map,
-        title: 'Set lat/lon values for this property',
-        draggable: false
-    });
-    
-};
+
+
+//var marker = new google.maps.Marker({
+//        position: latlng,
+//        map: map,
+//        title: 'Set lat/lon values for this property',
+//	icon: 'http://google.com/mapfiles/ms/micons/green-dot.png',
+//        draggable: false
+//    });
+var infowindow;
+
+//                // NY and CA sample Lat / Lng
+//                var southWest = new google.maps.LatLng(40.744656, -74.005966);
+//                var northEast = new google.maps.LatLng(34.052234, -118.243685);
+//                var lngSpan = northEast.lng() - southWest.lng();
+//                var latSpan = northEast.lat() - southWest.lat();
+
+                // set multiple marker
+                for (var i = 0; i < markers.length; i++) {
+                    // init markers
+                    var marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(markers[i][0],markers[i][1] ),
+                        map: map,
+                        title: 'click to description',
+			info: markers[i][4],
+			icon: 'http://google.com/mapfiles/ms/micons/green-dot.png',
+                    });
+
+                    // process multiple info windows
+                    (function(marker, i) {
+                        // add click event
+			
+                        google.maps.event.addListener(marker, 'click', function() {
+			    if (infowindow) infowindow.close();
+
+                            infowindow = new google.maps.InfoWindow({
+                                content: this.info
+                            });
+			    
+                            infowindow.open(map, marker);
+                        });
+                    })(marker, i);
+                }
+            }
+	    
+
+
+
 </script>
 
 <?php
@@ -291,74 +425,74 @@ $site->remove_head_element();
 //$widgets->remove_widgets();
 //$widgets->register_widgets();
 
-$prefix = 'pwp_';
-$event_meta_config = array(
-    'id'             => 'event_page_fields',
-    'title'          => __( 'Event parameters' ,'pwp' ),
-    'pages'          => array( 'event' ),
-    'context'        => 'advanced',
-    'priority'       => 'high',
-    'fields'         => array(),
-    'local_images'   => false,
-    'use_with_theme' => false
-);
-$event_meta_fields =  new AT_Meta_Box( $event_meta_config );
-//$event_meta_fields->addTextarea( $prefix . 'event_subtitle', array( 'name' => __( 'Sub title', 'pwp' ), 'style' => 'height:80px', 'desc' => 'Podtytuł wydarzenia (niebieski tekst wyświetlany w opisie wydarzenia)') );
-//$event_meta_fields->addTextarea( $prefix . 'event_band', array( 'name' => __( 'Band', 'pwp' ), 'style' => 'height:80px', 'desc' => 'Skład zespołu') );
+//$prefix = 'pwp_';
+//$event_meta_config = array(
+//    'id'             => 'event_page_fields',
+//    'title'          => __( 'Event parameters' ,'pwp' ),
+//    'pages'          => array( 'event' ),
+//    'context'        => 'advanced',
+//    'priority'       => 'high',
+//    'fields'         => array(),
+//    'local_images'   => false,
+//    'use_with_theme' => false
+//);
+//$event_meta_fields =  new AT_Meta_Box( $event_meta_config );
+////$event_meta_fields->addTextarea( $prefix . 'event_subtitle', array( 'name' => __( 'Sub title', 'pwp' ), 'style' => 'height:80px', 'desc' => 'Podtytuł wydarzenia (niebieski tekst wyświetlany w opisie wydarzenia)') );
+////$event_meta_fields->addTextarea( $prefix . 'event_band', array( 'name' => __( 'Band', 'pwp' ), 'style' => 'height:80px', 'desc' => 'Skład zespołu') );
+//
+//$event_meta_fields->addDate( $prefix . 'event_start', array( 'name' => __( 'Start date', 'pwp' ), 'format' => 'yy-mm-dd' , 'desc' => 'Data rozpoczęcia wydarzenia (format: RRRR-MM-DD)') );
+//$event_meta_fields->addTime( $prefix . 'event_time', array( 'name'=> __( 'Start time' , 'pwp' ), 'format' => 'HH:mm', 'desc' => 'Godzina rozpoczęcia (format: GG:MM)' ) );
+//$event_meta_fields->addDate( $prefix . 'event_end', array( 'name'=> __( 'End date', 'pwp' ), 'format' => 'yy-mm-dd', 'desc' => 'Data zakończenia wydarzenia, w przypadku wydarzeń jednodniowych wystarczy pozostawić pole puste, wypełni się automatycznie (format: RRRR-MM-DD)' ) );
+////$event_meta_fields->addTextarea( $prefix . 'event_price', array( 'name'=> __( 'Price', 'pwp' ),'style' => 'height:80px', 'desc' => 'Informacja o cenie biletów' ) );
+////$event_meta_fields->addText( $prefix . 'event_ticket', array( 'name' => __( 'Ticket info', 'pwp' ), 'desc' => 'Informacja o spzedaży biletów (do nabycia:...) w przypadku eBilet nie trzeba wpisywać nazwy "eBilet", wystarczy podać link w polu poniżej' ) );
+////$event_meta_fields->addText( $prefix . 'event_ebilet', array( 'name'=> __( 'eBilet', 'pwp' ), 'desc' => 'Link do serwisu eBilet' ) );
+////$event_meta_fields->addCheckbox( $prefix . 'event_reservation_form', array( 'name'=> __( 'Hide Reservation form', 'pwp' ) ,'desc' => 'Czy przy wydarzeniu NIE wyświetlać formularza rezerwacji biletów?') );
+//$event_meta_fields->Finish();
 
-$event_meta_fields->addDate( $prefix . 'event_start', array( 'name' => __( 'Start date', 'pwp' ), 'format' => 'yy-mm-dd' , 'desc' => 'Data rozpoczęcia wydarzenia (format: RRRR-MM-DD)') );
-$event_meta_fields->addTime( $prefix . 'event_time', array( 'name'=> __( 'Start time' , 'pwp' ), 'format' => 'HH:mm', 'desc' => 'Godzina rozpoczęcia (format: GG:MM)' ) );
-$event_meta_fields->addDate( $prefix . 'event_end', array( 'name'=> __( 'End date', 'pwp' ), 'format' => 'yy-mm-dd', 'desc' => 'Data zakończenia wydarzenia, w przypadku wydarzeń jednodniowych wystarczy pozostawić pole puste, wypełni się automatycznie (format: RRRR-MM-DD)' ) );
-//$event_meta_fields->addTextarea( $prefix . 'event_price', array( 'name'=> __( 'Price', 'pwp' ),'style' => 'height:80px', 'desc' => 'Informacja o cenie biletów' ) );
-//$event_meta_fields->addText( $prefix . 'event_ticket', array( 'name' => __( 'Ticket info', 'pwp' ), 'desc' => 'Informacja o spzedaży biletów (do nabycia:...) w przypadku eBilet nie trzeba wpisywać nazwy "eBilet", wystarczy podać link w polu poniżej' ) );
-//$event_meta_fields->addText( $prefix . 'event_ebilet', array( 'name'=> __( 'eBilet', 'pwp' ), 'desc' => 'Link do serwisu eBilet' ) );
-//$event_meta_fields->addCheckbox( $prefix . 'event_reservation_form', array( 'name'=> __( 'Hide Reservation form', 'pwp' ) ,'desc' => 'Czy przy wydarzeniu NIE wyświetlać formularza rezerwacji biletów?') );
-$event_meta_fields->Finish();
-
-//jesli nie ustawiono data zakonczenia eventu = data rozpoczecia
-add_action( 'save_post', 'validate_event_end' );
-function validate_event_end() {
-    global $post_id;
-    if( $_POST['post_type'] = 'event' ) {
-	if( isset( $_POST['pwp_event_start'] ) && ( $_POST['pwp_event_end'] == '' || !isset( $_POST['pwp_event_end'] ) ) ) {
-	    $_POST['pwp_event_end'] = $_POST['pwp_event_start'];
-	    update_post_meta( $post_id, 'pwp_event_end', $_POST['pwp_event_start'] );
-	}
-    }
-}
+////jesli nie ustawiono data zakonczenia eventu = data rozpoczecia
+//add_action( 'save_post', 'validate_event_end' );
+//function validate_event_end() {
+//    global $post_id;
+//    if( $_POST['post_type'] = 'event' ) {
+//	if( isset( $_POST['pwp_event_start'] ) && ( $_POST['pwp_event_end'] == '' || !isset( $_POST['pwp_event_end'] ) ) ) {
+//	    $_POST['pwp_event_end'] = $_POST['pwp_event_start'];
+//	    update_post_meta( $post_id, 'pwp_event_end', $_POST['pwp_event_start'] );
+//	}
+//    }
+//}
 
 
 
-//metabox pola dodatkowe w dyskografii
-$discography_meta = array(
-    'name'      => 'category',
-    'title'     => __( 'Dodatkowe', 'pwp' ),
-    'tax' => 'category',
-    'elements'  => array(
-    array(
-        'type'  => 'date',
-        'name'  => 'release_date',
-        'params'    => array(
-            'label'     => __( 'Data wydania płyty', 'pwp' ),
-            'validator' => array('notempty'),
-            'comment' => 'opis'
-
-        )
-    ),
-	array(
-        'type'  => 'image',
-        'name'  => 'header',
-        'params'    => array(
-            'label'     => __( 'Obrazek w nagłówku strony', 'pwp' ),
-             'comment' => 'opis opis'
-
-        )
-    ),
-    )
-);
-$d = new Taxmeta( $discography_meta );
-////$d->render();
-////dump($d);
+////metabox pola dodatkowe w dyskografii
+//$discography_meta = array(
+//    'name'      => 'category',
+//    'title'     => __( 'Dodatkowe', 'pwp' ),
+//    'tax' => 'category',
+//    'elements'  => array(
+//    array(
+//        'type'  => 'date',
+//        'name'  => 'release_date',
+//        'params'    => array(
+//            'label'     => __( 'Data wydania płyty', 'pwp' ),
+//            'validator' => array('notempty'),
+//            'comment' => 'opis'
+//
+//        )
+//    ),
+//	array(
+//        'type'  => 'image',
+//        'name'  => 'header',
+//        'params'    => array(
+//            'label'     => __( 'Obrazek w nagłówku strony', 'pwp' ),
+//             'comment' => 'opis opis'
+//
+//        )
+//    ),
+//    )
+//);
+//$d = new Taxmeta( $discography_meta );
+//////$d->render();
+//////dump($d);
 
 
 
