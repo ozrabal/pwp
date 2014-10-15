@@ -16,7 +16,7 @@ color: #888888;
     height: 80px;
     
 }
-#map {
+.map-box {
   height: 300px;
   border: 1px solid #000;
 }

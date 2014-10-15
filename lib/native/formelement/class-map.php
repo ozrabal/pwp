@@ -18,6 +18,7 @@ class Formelement_Map extends Formelement_Input {
 	
         add_action( 'admin_init', array( $this, 'admin_enqueue_scripts' ) );
 	parent::__construct( $form, $name );
+	$this->set_class( 'geodata' );
     }
     
     /**
@@ -35,12 +36,18 @@ class Formelement_Map extends Formelement_Input {
      * @return string
      */
     public function render(){
-
+	
 	parent::render();
 	$type = 'hidden';
 	if( WP_DEBUG ) {
 	    $type = 'text';
 	}
-        return  $this->get_before() . $this->get_label() . '<div class="box"><input onkeydown="if (event.keyCode == 13){ codeAddress(); return false;}" id="geocode" class="controls" type="text" placeholder="' . __( 'Type location', 'pwp' ) . '"><input type="button" class="button button-small" value="' . __( 'Show on map', 'pwp' ) . '" onclick="codeAddress();return false;"></div><div id="map"></div><input ' . $this->id() . ' type="' . $type . '" ' . $this->name() . $this->value() . $this->cssclass() . '/>' . $this->get_message() . $this->get_comment( '<p class="description">%s</p>' ) . $this->get_after();
+        return  $this->get_before() . $this->get_label() . ''
+		. '<div id="field_' . $this->get_name() . '" class="map-field box">'
+		. '<input onkeydown="if (event.keyCode == 13){ codeAddress(); return false;}" id="geocode_field_'.$this->get_name().'" class="controls" type="text" placeholder="' . __( 'Type location', 'pwp' ) . '">'
+		. '<input type="button" class="code-address button button-small" value="' . __( 'Show on map', 'pwp' ) . '" >'
+		. '<div id="map_field_' . $this->get_name() . '" class="map-box"></div>'
+		. '<input ' . $this->id() . ' type="' . $type . '" ' . $this->name() . $this->value() . $this->cssclass() . '/>' . $this->get_message() . $this->get_comment( '<p class="description">%s</p>' ) . $this->get_after() . ''
+		. '</div>';
 	}
 }

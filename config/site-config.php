@@ -515,7 +515,17 @@ array(
         ),
 
     ),
-        
+ array(
+        'type'  => 'map',
+        'name'  => 'latlong2',
+        'params'    => array(
+            'label'     => __( 'Location', 'pwp' ),
+            'comment' => 'Lokalizacja'
+
+
+        ),
+
+    ),
         
 //
 //     array(
