@@ -18,6 +18,7 @@ class Formelement_Select extends Formelement {
 
         foreach( $options as $name => $value ) {
 	    $option = new Formelement_Option( $this->form, $name, $this );
+            $option->set_value($value);
 	    if( $this->get_value() == $value ) {
                 $option->selected = true;
             }
