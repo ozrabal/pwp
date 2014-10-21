@@ -46,7 +46,8 @@ class Cookiealert {
      */
     public function enqueue_media_cookie() {
 	wp_enqueue_script( 'cookie-info', plugins_url( 'cookie-alert.js', __FILE__ ), array( 'jquery' ), true, true );
-	wp_localize_script( 'cookie-info', 'cookie_sec', wp_create_nonce( 'ok_cookie'  ) ) ;
+	wp_localize_script( 'cookie-info', 'cookie_sec', wp_create_nonce( 'ok_cookie'  ) );
+	wp_localize_script( 'cookie-info', 'ajaxurl', admin_url( 'admin-ajax.php'  ) );
     }
 
     /**
