@@ -35,3 +35,12 @@ function form_shortcode( $atts ) {
     );
     form( $atts['name'] );
 }
+/*
+add_action('media_buttons',  'add_my_media_button');
+
+function add_my_media_button() {
+        dump(__METHOD__);
+    echo '<a href="#" id="insert-my-media" class="button">Add my media</a>';
+}
+  */
+ 

@@ -21,8 +21,123 @@ class Contact extends Form {
 	if( is_admin() && current_user_can( 'edit_posts' ) && current_user_can( 'edit_pages' ) && 'form' == pwp_current_post_type() ) {
 	    new Contact();
 	}
+        add_action('media_buttons',  array('Contact','add_my_custom_button'), 12);
+        wp_enqueue_script('media_button', plugins_url( '/contact.js', __FILE__ ), array('jquery'), '1.0', true);
+        add_action( 'wp_ajax_choice', array('Contact','choice'));
+        add_action( 'wp_ajax_nopriv_choice', array('Contact','choice'));
     }
     
+    static function choice() {
+         wp_enqueue_script('jquery');
+    add_thickbox();
+    $context = '<a class="thickbox button " title="'.__('Add form element', 'pwp').'" href="/wp-admin/admin-ajax.php#?action=choice&width=150&height=100&TB_iframe=true">
+    <span class="wp-media-buttons-icon dashicons dashicons-exerpt-view"></span>'.__('Add form element', 'pwp').'</a>';
+
+ $map_args  = array(
+	'post_type'	=> 'form',
+	'post_status'	=> 'publish',
+	
+    );
+    $map_query = new WP_Query( $map_args );
+    if( $map_query->have_posts() ) {
+	
+?>
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>{#advanced_dlg.colorpicker_title}</title>
+	<script type="text/javascript" src="<?php echo '../wp-includes/js/tinymce/tiny_mce_popup.js?ver=358-2012120'; ?>"></script>
+	
+	<?php //wp_head() 
+        
+        ?>
+</head>
+<body id="colorpicker" style="" role="application" aria-labelledby="app_label">
+	<span class="mceVoiceLabel" id="app_label" style="display:none;">{#advanced_dlg.colorpicker_title}</span>
+<form onsubmit="insertAction();return false" action="#">
+	    ajaxem
+
+	    <?php echo $context; 
+            wp_enqueue_script('jquery');
+            while ( $map_query->have_posts() ) {
+	    $map_query->the_post();
+	    ?>
+           
+            <br><a href="">
+            <?php the_title(); ?>
+            </a>
+            
+            <?php
+            }
+   
+            
+            
+            
+            
+            
+            ?>
+</form>
+<p>
+  <a class="button choice_button" id="Black">Black</a>
+  <a class="button choice_button" id="White">White</a>
+</p>
+<script type="text/javascript">
+  jQuery(document).ready(function($) {
+    $('.choice_button').on('click',
+    function () {
+          tinyMCE.activeEditor.execCommand('mceInsertContent', 0, shortcode);
+        var choice = $(this).attr('id');
+        tb_remove();
+        alert(choice);
+        $('.your-choice').html(choice);
+      }
+    );
+  });
+</script>
+	</body>
+    </html>
+
+
+
+
+<?php
+            //wp_footer();
+ }
+  die();
+}
+     static function add_my_custom_button($context) {
+  
+  
+  //the id of the container I want to show in the popup
+  
+  
+  //if($screen->post_type == 'form'){
+  $container_id = 'element-form';
+    //append the icon
+  $context .= '&nbsp;&nbsp;&nbsp;&nbsp;<a class="thickbox button " title="'.__('Start form', 'pwp').'" href="#TB_inline?width=100&inlineId=form-form">
+    <span class="wp-media-buttons-icon dashicons dashicons-format-aside"></span>'.__('Start form', 'pwp').'</a>';
+  
+  
+  $context .= '<a class="thickbox button " title="'.__('Add form element', 'pwp').'" href="#TB_inline?width=400&inlineId='.$container_id.'">
+    <span class="wp-media-buttons-icon dashicons dashicons-exerpt-view"></span>'.__('Add form element', 'pwp').'</a>';
+    
+   $context .= '<a class="thickbox button " title="'.__('Add form element', 'pwp').'" href="/wp-admin/admin-ajax.php?&action=choice&width=150&height=100&TB_iframe=true">
+    <span class="wp-media-buttons-icon dashicons dashicons-exerpt-view"></span>'.__('Add form element', 'pwp').'</a>';
+
+
+echo $context;
+
+  //return $context;
+  //}
+}
+    
+    
+    
+    
+    static function add_my_media_button() {
+        
+    echo '<a href="#" id="insert-my-media" class="button">Add form</a>';
+}
     /**
      * Konstruktor
      * 
@@ -54,6 +169,7 @@ class Contact extends Form {
 	    }
 	    $this->print_form();
         }
+        
     }
     
     /**
