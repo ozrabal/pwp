@@ -47,7 +47,8 @@ class Formelement_Image extends Formelement {
      */
     public function render() {
 
-	add_action( 'init', array( $this, 'enqueue_scripts' ) );
+//	add_action( 'setup_theme', array( $this, 'enqueue_scripts' ) );
+	$this->enqueue_scripts();
         parent::render();
         wp_enqueue_media();
 	$this->set_class( 'field-box' );
