@@ -22,11 +22,42 @@ class Contact extends Form {
 	    new Contact();
 	}
         add_action('media_buttons',  array('Contact','add_my_custom_button'), 12);
-        wp_enqueue_script('media_button', plugins_url( '/contact.js', __FILE__ ), array('jquery'), '1.0', true);
-        add_action( 'wp_ajax_choice', array('Contact','choice'));
-        add_action( 'wp_ajax_nopriv_choice', array('Contact','choice'));
+        //wp_enqueue_script('media_button', plugins_url( '/contact.js', __FILE__ ), array('jquery'), '1.0', true);
+        //add_action( 'wp_ajax_choice', array('Contact','choice'));
+        //add_action( 'wp_ajax_nopriv_choice', array('Contact','choice'));
+
+	$base = plugin_dir_url( __FILE__ );
+				wp_enqueue_script( 'iframe_modal' , $base . 'modal.js' , array( 'jquery' ), true );
+				
+				wp_enqueue_style( 'iframe_modal' , $base . 'modal.css' );
+				wp_localize_script(
+					'iframe_modal' ,
+					'aut0poietic_iframe_modal_l10n',
+					array(
+						"close_label" => __( 'Close Dialog' , 'iframe_modal' )
+					)
+				);
+		add_action( 'wp_ajax_modal_frame_content' , array('Contact', 'modal_frame_content' ) );
+
+
     }
-    
+
+
+    static function modal_frame_content() {
+			wp_enqueue_style( 'iframe_modal-content' , plugin_dir_url( __FILE__ ) . 'modal-content.css' );
+			wp_enqueue_script( 'iframe_modal-content' , plugin_dir_url( __FILE__ ) . 'modal-content.js' , array( 'jquery' ) );
+			include( 'modal-content.php' );
+			die(); // you must die from an ajax call
+		}
+
+
+
+    static function get_template_data() {
+	$base = plugin_dir_url( __FILE__ );
+	dump($base);
+			include( $base .'template-data.php' );
+			die(); // you must die from an ajax call
+		}
     static function choice() {
          wp_enqueue_script('jquery');
     add_thickbox();
@@ -114,19 +145,28 @@ class Contact extends Form {
   //if($screen->post_type == 'form'){
   $container_id = 'element-form';
     //append the icon
-  $context .= '&nbsp;&nbsp;&nbsp;&nbsp;<a class="thickbox button " title="'.__('Start form', 'pwp').'" href="#TB_inline?width=100&inlineId=form-form">
-    <span class="wp-media-buttons-icon dashicons dashicons-format-aside"></span>'.__('Start form', 'pwp').'</a>';
-  
-  
-  $context .= '<a class="thickbox button " title="'.__('Add form element', 'pwp').'" href="#TB_inline?width=400&inlineId='.$container_id.'">
-    <span class="wp-media-buttons-icon dashicons dashicons-exerpt-view"></span>'.__('Add form element', 'pwp').'</a>';
-    
+//  $context .= '&nbsp;&nbsp;&nbsp;&nbsp;<a class="thickbox button " title="'.__('Start form', 'pwp').'" href="#TB_inline?width=100&inlineId=form-form">
+//    <span class="wp-media-buttons-icon dashicons dashicons-format-aside"></span>'.__('Start form', 'pwp').'</a>';
+//
+//
+//  $context .= '<a class="thickbox button " title="'.__('Add form element', 'pwp').'" href="#TB_inline?width=400&inlineId='.$container_id.'">
+//    <span class="wp-media-buttons-icon dashicons dashicons-exerpt-view"></span>'.__('Add form element', 'pwp').'</a>';
+//  
    $context .= '<a class="thickbox button " title="'.__('Add form element', 'pwp').'" href="/wp-admin/admin-ajax.php?&action=choice&width=150&height=100&TB_iframe=true">
-    <span class="wp-media-buttons-icon dashicons dashicons-exerpt-view"></span>'.__('Add form element', 'pwp').'</a>';
+    <span class="wp-media-buttons-icon dashicons adashicons-exerpt-view"></span>'.__('Dodaj do edytora', 'pwp').'</a>';
+
+   			print sprintf(
+				'<input type="button" class="button  " id="open-iframe_modal" value="%1$s" data-content-url="%3$s%2$d">' ,
+				__( 'Open IFrame Modal' , 'iframe_modal' ) ,
+ get_the_ID() ,
+				admin_url( 'admin-ajax.php?action=modal_frame_content&post_id=' ) );
 
 
-echo $context;
-
+//echo $context;
+//print sprintf(
+//				'<input type="button" class="button button-primary " id="open-backbone_modal" value="%1$s">' ,
+//				__( 'Open Backbone Modal' , 'backbone_modal' )
+//			);
   //return $context;
   //}
 }

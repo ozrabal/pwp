@@ -387,7 +387,7 @@ array(
 //    ),
     )
 );
-new Metabox( $page_meta );
+//new Metabox( $page_meta );
 
 //metabox obrazek dodatkowy w brandach (logo na czarnym)
 $video_gallery = array(
@@ -462,7 +462,7 @@ $video_gallery = array(
 //    ),
     )
 );
-new Metabox( $video_gallery );
+//new Metabox( $video_gallery );
 
 
 
