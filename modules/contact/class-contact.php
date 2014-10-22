@@ -40,9 +40,34 @@ class Contact extends Form {
 		add_action( 'wp_ajax_modal_frame_content' , array('Contact', 'modal_frame_content' ) );
 
 
+		//add_action('admin_head', array( 'Contact', 'admin_head') );
+			//add_action( 'admin_enqueue_scripts', array('Contact' , 'admin_enqueue_scripts' ) );
+wp_enqueue_style('bs3_panel_shortcode', plugins_url( 'css/mce-button.css' , __FILE__ ) );
+add_filter( 'mce_external_plugins', array( 'Contact' ,'mce_external_plugins' ) );
+			add_filter( 'mce_buttons', array('Contact', 'mce_buttons' ) );
+
+
     }
+    static function mce_buttons( $buttons ) {
+		array_push( $buttons, 'bs3_panel' );
+		return $buttons;
+	}
 
+static function admin_head() {
+		// check user permissions
+		if ( !current_user_can( 'edit_posts' ) && !current_user_can( 'edit_pages' ) ) {
+			return;
+		}
 
+		// check if WYSIWYG is enabled
+		if ( 'true' == get_user_option( 'rich_editing' ) ) {
+			
+		}
+	}
+static function mce_external_plugins( $plugin_array ) {
+		$plugin_array['bs3_panel'] = plugin_dir_url( __FILE__ ).'mce-buttons.js';
+		return $plugin_array;
+	}
     static function modal_frame_content() {
 			wp_enqueue_style( 'iframe_modal-content' , plugin_dir_url( __FILE__ ) . 'modal-content.css' );
 			wp_enqueue_script( 'iframe_modal-content' , plugin_dir_url( __FILE__ ) . 'modal-content.js' , array( 'jquery' ) );

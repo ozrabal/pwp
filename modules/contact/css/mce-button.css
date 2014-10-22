@@ -1,0 +1,8 @@
+i.mce-i-bs3_panel:before {
+    font-family: "dashicons";
+    content: "\f116";
+}
+#tinymce img.shortcode-replace{
+    max-width: 100%;
+    width: 100%;
+}
