@@ -77,7 +77,7 @@ function load_custom_wp_admin_style() {
 }
 add_action( 'admin_enqueue_scripts', 'load_custom_wp_admin_style' );
 
-include_once( PWP_ROOT . 'lib/external/meta-box-class/my-meta-box-class.php' );
+//include_once( PWP_ROOT . 'lib/external/meta-box-class/my-meta-box-class.php' );
 include_once PWP_ROOT . 'lib/native/class-pwp.php';
 include_once PWP_ROOT . 'config/site-config.php';
 
