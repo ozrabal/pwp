@@ -1,5 +1,7 @@
 <?php
-
+/*
+ * 
+ */
 add_filter( 'show_admin_bar', '__return_false');
 
 function pwp_remove_recent_comments_style() {  
