@@ -89,3 +89,12 @@ function pwp_plugin_initialize() {
     
 }
 add_action( 'widgets_init', array( 'Pwp', 'init' ), 2 );
+
+$pwp_admin = new Administrator();
+        $page = array(
+	    'page_title'    => __( 'Plugin settings', 'pwp' ),
+            'menu_title'    => __( 'Plugin settings', 'pwp' ),
+            'capability'    => 'manage_options',
+            'menu_slug'	    => 'pwp-options',
+        );
+        $pwp_admin->add_page( $page );
