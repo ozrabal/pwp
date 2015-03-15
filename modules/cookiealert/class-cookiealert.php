@@ -134,10 +134,12 @@ class Cookiealert {
      */
     private function settings_page() {
 
+        dump($this->pwp_admin);
 	$cookie_admin = new Administrator();
         $page = array(
 	    'page_title'    => __( 'Cookie alert settings', 'pwp' ),
             'menu_title'    => __( 'Cookie alert', 'pwp' ),
+            'parent_slug'   => 'pwp-options',
             'capability'    => 'manage_options',
             'menu_slug'	    => 'cookie-alert-options',
         );
